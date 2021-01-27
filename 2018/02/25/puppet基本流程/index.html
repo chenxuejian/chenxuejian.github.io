@@ -1,0 +1,332 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Puppet基本流程 | Adolf</title><meta name="keywords" content="linux,Puppet"><meta name="author" content="Adolf"><meta name="copyright" content="Adolf"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="1.  概述puppet是一个开源的软件自动化配置和部署工具，它使用简单且功能强大，正得到了越来越多地关注，现在很多大型IT公司均在使用puppet对集群中的软件进行管理和部署，如google利用puppet管理超过6000台地mac桌面电脑（2007年数据）。本文主要介绍puppet安装方法，设计架构及使用方法。 2.  设计架构puppet是基于c&#x2F;s架构的。服务器端保存着所有对客户端服务器的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Puppet基本流程">
+<meta property="og:url" content="http://example.com/2018/02/25/puppet%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Adolf">
+<meta property="og:description" content="1.  概述puppet是一个开源的软件自动化配置和部署工具，它使用简单且功能强大，正得到了越来越多地关注，现在很多大型IT公司均在使用puppet对集群中的软件进行管理和部署，如google利用puppet管理超过6000台地mac桌面电脑（2007年数据）。本文主要介绍puppet安装方法，设计架构及使用方法。 2.  设计架构puppet是基于c&#x2F;s架构的。服务器端保存着所有对客户端服务器的">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2018-02-24T21:30:50.000Z">
+<meta property="article:modified_time" content="2021-01-27T02:25:26.050Z">
+<meta property="article:author" content="Adolf">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="Puppet">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2018/02/25/puppet%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-01-27 10:25:26'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/null" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Adolf</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Puppet基本流程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2018-02-24T21:30:50.000Z" title="Created 2018-02-25 05:30:50">2018-02-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2021-01-27T02:25:26.050Z" title="Updated 2021-01-27 10:25:26">2021-01-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Linux/">Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="1-概述"><a href="#1-概述" class="headerlink" title="1.  概述"></a>1.  概述</h2><p>puppet是一个开源的软件自动化配置和部署工具，它使用简单且功能强大，正得到了越来越多地关注，现在很多大型IT公司均在使用puppet对集群中的软件进行管理和部署，如google利用puppet管理超过6000台地mac桌面电脑（2007年数据）。<br>本文主要介绍puppet安装方法，设计架构及使用方法。</p>
+<h2 id="2-设计架构"><a href="#2-设计架构" class="headerlink" title="2.  设计架构"></a>2.  设计架构</h2><p>puppet是基于c/s架构的。服务器端保存着所有对客户端服务器的配置代码，在puppet里面叫做manifest. 客户端下载manifest之后，可以根据manifest对服务器进行配置，例如软件包管理，用户管理和文件管理等等。</p>
+<p>   <img src="/2018/02/25/puppet%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/puppet.png" alt="puppet"></p>
+<p>如上图所示，puppet的工作流程如下：</p>
+<p>（1）客户端puppetd调用facter，facter探测出主机的一些变量，例如主机名，内存大小，ip地址等。pupppetd 把这些信息通过ssl连接发送到服务器端； </p>
+<p>（2）服务器端的puppetmaster 检测客户端的主机名，然后找到manifest里面对应的node配置， 并对该部分内容进行解析，facter送过来的信息可以作为变量处理，node牵涉到的代码才解析，其他没牵涉的代码不解析。解析分为几个阶段，语法检查，如果语法错误就报错。如果语法没错，就继续解析，解析的结果生成一个中间的“伪代码”，然后把伪代码发给客户端；</p>
+<p>（3）客户端接收到“伪代码”，并且执行，客户端把执行结果发送给服务器；</p>
+<p>（4）服务器端把客户端的执行结果写入日志。</p>
+<p>puppet工作过程中有两点值得注意，第一，为了保证安全，client和master之间是基于ssl和证书的，只有经master证书认证的client可以与master通信；第二，puppet会让系统保持在你所期望的某种状态并一直维持下去，如检测某个文件并保证其一直存在，保证ssh服务始终开启，如果文件被删除了或者ssh服务被关闭了，puppet下次执行时（默认30分钟），会重新创建该文件或者启动ssh服务。</p>
+<h2 id="3-软件安装"><a href="#3-软件安装" class="headerlink" title="3.  软件安装"></a>3.  软件安装</h2><p>不推荐使用apt-get命令进行安装，因为该命令下载的puppet存在bug。可直接从源代码进行安装，需要安装的软件有ruby，facter和puppet。</p>
+<h3 id="3-1-安装步骤"><a href="#3-1-安装步骤" class="headerlink" title="3.1   安装步骤"></a>3.1   安装步骤</h3><p>编辑/etc/host以修改主机名，因为puppet是基于证书的，证书中包含主机名；<br>在master和slave上依次安装ruby、facter和puppet，安装facter和puppet时，要使用ruby install.rb。</p>
+<h3 id="3-2-安装后的目录结构"><a href="#3-2-安装后的目录结构" class="headerlink" title="3.2    安装后的目录结构"></a>3.2    安装后的目录结构</h3><h4 id="1-安装目录"><a href="#1-安装目录" class="headerlink" title="(1)    安装目录"></a>(1)    安装目录</h4><p>安装目录默认存为/etc/puppet，该目录下的manifests存放manifest文件。<br>其他可执行文件在/user/sbin下，主要有：</p>
+<p>puppet： 用于执行用户所写独立的mainfests文件，如：</p>
+<pre><code>puppet -l /tmp/manifest.log manifest.pp</code></pre>
+<p>puppetd： 运行在被管理主机上的客户端程序，如：</p>
+<pre><code>puppet –server servername –waitforcert 60</code></pre>
+<p>puppetmasterd：运行在管理机上的服务器程序，如：</p>
+<pre><code>puppetmasterd –debug</code></pre>
+<p>puppetca puppet认证程序，主要用于对slave的证书进行认证，如：<br>查看需认证的slave：</p>
+<pre><code>puppetca –list</code></pre>
+<p>对这些slave进行认证：</p>
+<pre><code>puppetca -s –a</code></pre>
+<p>puppetrun 用于连接客户端，强制运行本地配置文件，如：</p>
+<pre><code>puppetrun -p 10 –host host1 –host host2 -t remotefile -t webserver</code></pre>
+<h4 id="2-配置文件"><a href="#2-配置文件" class="headerlink" title="(2)    配置文件"></a>(2)    配置文件</h4><p>puppet.conf<br>Puppet的主配置文件，如果是root用户，配置文件为/etc/puppet/puppet.conf，普通用户，配置文件为：~user/.puppet/puppet.conf</p>
+<p>具体配置参数，参见：<br><a target="_blank" rel="noopener" href="http://docs.puppetlabs.com/references/stable/configuration.html#configuration-files">http://docs.puppetlabs.com/references/stable/configuration.html#configuration-files</a></p>
+<p>fileserver.conf<br>puppet文件服务器的配置文件。用path配置文件路径，allow/deny配置访问权限</p>
+<p>具体参见：<a target="_blank" rel="noopener" href="http://docs.puppetlabs.com/guides/file_serving.html">http://docs.puppetlabs.com/guides/file_serving.html</a></p>
+<h3 id="3-3-验证安装是否成功"><a href="#3-3-验证安装是否成功" class="headerlink" title="3.3   验证安装是否成功"></a>3.3   验证安装是否成功</h3><p>选定一个slave与master进行验证，假设slave的host为slave00，master的host为masterhost，在slave00上输入：</p>
+<pre><code>puppetd –test –server servername</code></pre>
+<p>然后在masterhost上查看待认证的slave：</p>
+<pre><code>puppetca –list</code></pre>
+<p>如果没问题的话，此时可以看到slave00，对该slave的证书进行签名：</p>
+<pre><code>puppetca -s -a</code></pre>
+<p>这样slave00通过了证书验证，可以与master进行进一步交互了。<br>在masterhost的/etc/puppet/manifests目录下编写site.pp文件，内容如下：</p>
+<pre><code>node default &#123;
+file &#123;
+“/tmp/test”:
+content=&gt;”hello\n”,
+mode =&gt; 0644;
+&#125;
+&#125;</code></pre>
+<p>同时在slave00上输入：puppetd –test –server servername， 查看slave00的/tmp文件夹，生成了一个新文件test，里面的内容是hello，该文件的权限是-rw-r—r—。这样，便证明puppet安装成功，如果出现错误，查看第六节。</p>
+<h2 id="4-配置脚本编写"><a href="#4-配置脚本编写" class="headerlink" title="4.  配置脚本编写"></a>4.  配置脚本编写</h2><p>本节介绍puppet的配置脚本编写方法，主要是指puppet的manifest编写方法。puppet把需要管理的内容抽象成为资源，每种资源有不同的属性，因此puppet语言就是描述这些资源的属性以及资源之间关系的语言。<br>为了便于管理，puppet将资源模块化，即每个功能模块的manifest单独放在一个目录下。每个模块包含一个主要的manifest文件（init.pp，它是模块的入口，类似于C语言中的main函数），里面包含若干个class对该模块的资源进行封装，常见的资源有file，package，service等，每种资源由自己的属性，如file有属性name，owner，mode等。<br>本节主要介绍puppet中manifest的编写方法，将依次介绍资源属性，资源，节点管理，函数和模块的编写方法。</p>
+<h3 id="4-1-资源属性"><a href="#4-1-资源属性" class="headerlink" title="4.1   资源属性"></a>4.1   资源属性</h3><p>资源属性有两种，一种是资源专属属性，另一种是资源共同属性，对于资源专属属性，将在下一节介绍；而资源共同属性是所有资源共有的属性，主要有：<br>before<br>用于控制不同对象（资源）的执行顺序关系，表示某个对象（资源）在另一个对象之后发生（require与之相反，它表示之前发生）。如：</p>
+<pre><code>file &#123; “/var/nagios/configuration”:
+source  =&gt; “…”,
+recurse =&gt; true,
+before =&gt; Exec[&quot;nagios-rebuid&quot;]
+&#125;
+exec &#123; “nagios-rebuild”:
+command =&gt; “/usr/bin/make”,
+cwd =&gt; “/var/nagios/configuration”
+&#125;</code></pre>
+<p>这段代码保证用make编译之前，所有代码都是最新的。也可以before多个资源，如：</p>
+<pre><code>before =&gt; [ File[&quot;/usr/local&quot;], File[&quot;/usr/local/scripts&quot;] ]
+subscribe</code></pre>
+<p>检测某个资源，当它发生变化时，该资源会重新加载，如：</p>
+<pre><code>class nagios &#123;
+file &#123; “/etc/nagios/nagios.conf”:
+source =&gt; “puppet://server/module/nagios.conf”,
+alias =&gt; nagconf # just to make things easier for me
+&#125;
+service &#123; nagios:
+ensure =&gt; running,
+subscribe =&gt; File[nagconf]
+&#125;
+&#125;</code></pre>
+<p>当检测到文件nagconf被修改时，服务nagios会相应的更新。需要注意的是，目前支持subscribe的资源只有exec，service和mount。</p>
+<p>更多资料，参见：<a target="_blank" rel="noopener" href="http://docs.puppetlabs.com/references/latest/metaparameter.html">http://docs.puppetlabs.com/references/latest/metaparameter.html</a></p>
+<h3 id="4-2-资源"><a href="#4-2-资源" class="headerlink" title="4.2   资源"></a>4.2   资源</h3><p>常用的资源主要有以下几个：</p>
+<p>file：文件管理</p>
+<p>package：软件包管理</p>
+<p>service：系统服务管理</p>
+<p>cron：配置定期任务</p>
+<p>exec：运行shell命令</p>
+<h4 id="1-file资源"><a href="#1-file资源" class="headerlink" title="(1)    file资源"></a>(1)    file资源</h4><p>更详细资料，可参见：<a target="_blank" rel="noopener" href="http://puppet.wikidot.com/file">http://puppet.wikidot.com/file</a></p>
+<h4 id="2-package资源"><a href="#2-package资源" class="headerlink" title="(2)    package资源"></a>(2)    package资源</h4><p>更详细资料，可参见：<a target="_blank" rel="noopener" href="http://puppet.wikidot.com/package">http://puppet.wikidot.com/package</a></p>
+<h4 id="3-service资源"><a href="#3-service资源" class="headerlink" title="(3)    service资源"></a>(3)    service资源</h4><p>更详细资料，可参见：<a target="_blank" rel="noopener" href="http://puppet.wikidot.com/srv">http://puppet.wikidot.com/srv</a></p>
+<h4 id="4-exec资源"><a href="#4-exec资源" class="headerlink" title="(4)    exec资源"></a>(4)    exec资源</h4><p>更详细资料，可参见：<a target="_blank" rel="noopener" href="http://puppet.wikidot.com/exec">http://puppet.wikidot.com/exec</a></p>
+<h4 id="5-cron资源"><a href="#5-cron资源" class="headerlink" title="(5)    cron资源"></a>(5)    cron资源</h4><p>更详细资料，可参见：<a target="_blank" rel="noopener" href="http://puppet.wikidot.com/cron">http://puppet.wikidot.com/cron</a></p>
+<h3 id="4-3-节点管理"><a href="#4-3-节点管理" class="headerlink" title="4.3   节点管理"></a>4.3   节点管理</h3><p>puppet如何区分不同的客户端，并且给不同的服务端分配manifest呢？puppet使用node资源做这件事情，node 后面跟客户端的主机名，例如：</p>
+<pre><code>node ‘ slave00 ‘ &#123;
+include ssh
+&#125;
+node ‘ slave11 ‘ &#123;
+$networktype=”tele”
+$nagioscheckport=”80,22,3306″
+include apache, mysql, php
+&#125;</code></pre>
+<p>资源node中可使用变量，也可直接通过include把其他manifest包含进来。</p>
+<p>更详细资料，可参见：<a target="_blank" rel="noopener" href="http://docs.puppetlabs.com/references/latest/type.html">http://docs.puppetlabs.com/references/latest/type.html</a></p>
+<h3 id="4-4-类和函数"><a href="#4-4-类和函数" class="headerlink" title="4.4   类和函数"></a>4.4   类和函数</h3><p>类可以把多个相关的资源定义在一起,组成一个类。类可以继承，具体参见：<a target="_blank" rel="noopener" href="http://docs.puppetlabs.com/guides/language_guide.html#resource-collections">http://docs.puppetlabs.com/guides/language_guide.html#resource-collections</a><br>函数（在puppet中称为“defination”）可以把多个资源包装成一个资源，或者把一个资源包装成一个模型，便于使用。例如，在debian里面管理一个apache虚拟机非常简单,把一个虚拟主机的配置文件放到/etc/sites-available/里面,然后做一个符号链接到/etc/sites-enabled目录。 你可以为你每个虚拟主机复制同样的配置代码，但是如果你使用下面的代码就会更好和更简单：</p>
+<pre><code>define virtual_host($docroot, $ip, $order = 500, $ensure = “enabled”) &#123;
+$file = “/etc/sites-available/$name.conf”
+# The template fills in the docroot, ip, and name.
+file &#123; $file:
+content =&gt; template(“virtual_host.erb”),
+notify  =&gt; Service[apache]
+&#125;
+file &#123; “/etc/sites-enabled/$order-$name.conf”:
+ensure =&gt; $ensure ? &#123;
+enabled  =&gt; $file,
+disabled =&gt; absent
+&#125;
+&#125;
+&#125;</code></pre>
+<p>然后,你就可以使用这个定义来管理一个apache虚拟主机，如下面代码所示：</p>
+<pre><code>virtual_host &#123; “reductivelabs.com”:
+order   =&gt; 100,
+ip      =&gt; “192.168.0.100″,
+docroot =&gt; “/var/www/reductivelabs.com/htdocs”
+&#125;</code></pre>
+<h3 id="4-5-模块"><a href="#4-5-模块" class="headerlink" title="4.5   模块"></a>4.5   模块</h3><p>一个模块就是一个/etc/puppet/modules目录下面的一个目录和它的子目录，在puppet的主文件site.pp里面用import modulename可以插入模块。新版本的puppet可以自动插入/etc/puppet/modules目录下的模块。引入模块，可以结构化代码，便于分享和管理。例如关于apache的所有配置都写到apache模块下面。</p>
+<p>一个模块目录下面通常包括三个目录：files，manifests，templates。manifests 里面必须要包括一个init.pp的文件，这是该模块的初始（入口）文件，导入一个模块的时候，会从init.pp开始执行。可以把所有的代码都写到init.pp里面，也可以分成多个pp文件，init 再去包含其他文件。files目录是该模块的文件发布目录，puppet提供一个文件分发机制，类似rsync的模块。templates 目录包含erb模型文件，这个和file资源的template属性有关。</p>
+<p>puppet安装好以后，modules目录是没有的，自己建立一个就行，然后在里面可以新增加你的模块。</p>
+<h2 id="5-编程实例"><a href="#5-编程实例" class="headerlink" title="5.  编程实例"></a>5.  编程实例</h2><h3 id="5-1-Hello-World"><a href="#5-1-Hello-World" class="headerlink" title="5.1    Hello World"></a>5.1    Hello World</h3><p>本节介绍了一个非常简单的编程实例：一个slave从master中获取其manifest，该maniftest要求slave依次做以下工作：安装gcc，创建文件夹/home/dxc/test，下载文件hello.c程序，编译hello.c。</p>
+<h4 id="1-代码结构组织"><a href="#1-代码结构组织" class="headerlink" title="(1)    代码结构组织"></a>(1)    代码结构组织</h4><p>Master上代码的目录结构如下：</p>
+<pre><code>|– auth.conf
+|– fileserver.conf   #puppet文件服务器配置文件
+|– manifests   #puppet主文件所在目录
+|   |– modules.pp        #puppet各个模块汇总
+|   |– nodes         #各个slave要处理的模块
+|   |   `– execHello.pp      #hello模块对应由那些slave处理
+|   `– site.pp                  #puppet主文件（入口文件）
+|– modules     #puppet的各个模块所在文件
+|   `– hello   #hello模块
+|       |– files    #该模块对应的文件资源，可能是要发送给slave的配置文件等
+|       |   `– hello.c
+|       |– manifests   #模块的manifest文件
+|       |     `– init.pp                  #模块入口文件
+|       `– templates  #模板目录
+|          `– xx.sh
+`– ssl       #puppet的证书文件目录</code></pre>
+<h4 id="2-程序执行流程"><a href="#2-程序执行流程" class="headerlink" title="(2)    程序执行流程"></a>(2)    程序执行流程</h4><p>代码调用顺序是：<br>Slave发起连接请求 &gt; manifests/site.pp &gt;&gt; nodes &gt;&gt; modules —&gt;manifests—&gt; init.pp</p>
+<ul>
+<li>首先，slave向发起master连接请求，进行证书验证；</li>
+<li>接着，证书验证通过后，master会直接找到入口文件manifests目录下的site.pp文件，该文件可能包含一些全局变量，参数缺省值（当各个模块没有设置这些参数时，它们的缺省值）以及其它pp文件的调用（在该例子中，会调用modules.pp和nodes下的各个pp文件）；</li>
+<li>然后，master通过nodes下的各个pp文件定位到该slave要执行的模块（init.pp是各个模块的入口），汇总这些模块代码返回给slave；</li>
+<li>最后，slave根据master发过来的manifest，配置信息。</li>
+</ul>
+<h4 id="3-代码解释"><a href="#3-代码解释" class="headerlink" title="(3)    代码解释"></a>(3)    代码解释</h4><p>直接在此处 <a target="_blank" rel="noopener" href="https://code.google.com/archive/p/puppet-manifest-share/">下载代码</a>。</p>
+<h3 id="5-2-一个更复杂的实例"><a href="#5-2-一个更复杂的实例" class="headerlink" title="5.2   一个更复杂的实例"></a>5.2   一个更复杂的实例</h3><p>本节介绍了一个更为复杂的某个公司正在使用实例，puppet代码布局与上一个实例一致，只不过该实例涉及到更多模块，更复杂的依赖管理。代码具体内容本节就不解释了，具体参见代码。</p>
+<h2 id="6-可能遇到的问题"><a href="#6-可能遇到的问题" class="headerlink" title="6.  可能遇到的问题"></a>6.  可能遇到的问题</h2><p>Q: puppet的证书机制</p>
+<p>A: puppet证书问题是初学者最容易遇到的问题，这里讲一下怎么处理。puppet服务器端在安装或者首次启动的时候，会自动生产一个根证书和服务器证书，证书和主机名相关，因此如果证书生成后友改了主机名，那就会出问题。 puppet客户端在首次启动的时候，也会自动生成证书；但是这个证书需要得到puppet服务器端的签名才行，因此；puppet客户端第一次连接服务器的时候，会发送一个证书请求；服务器端需要对这个证书进行签名。puppet客户端在下次连接服务器的时候就会下载签名好的证书。</p>
+<p>Q:Ubuntu下面的证书出错，怎么解决?</p>
+<p>A:本方法是提供给初学者的测试环境，生成环境不建议这么做。首先在puppetmaster(服务器端)删除/var/lib/puppet/ssl目录;然后启动puppetmasterd；然后在客户端也删除/var/lib/puppet/ssl目录。把puppetmaster机器的主机名和对应的ip地址写入客户端机器的/etc/hosts。<br>然后执行：</p>
+<pre><code>puppetd –test –server server.example.com. 把server.example.com替</code></pre>
+<p>换成你自己的服务器主机名。 执行这个命令，会有提示信息，不用理会。<br>然后登录到puppetmaster服务器机器，执行puppetca –list 命令，看看是否有客户端的证书请求；如果没有，请检查前面的步骤是执行正确，以及网络连接是否正常。 如果puppetca –list 能看到请求，那么执行puppetca -s -a 命令；对所有的证书请求签名。最后回到puppet客户端机器，执行</p>
+<pre><code>puppetd –test –server server.example.com.</code></pre>
+<p>就能建立连接了，如果你的site.pp写好了.就可以测试puppet了。<br>补充：如果客户端和服务器端的时间不一致也会导致证书认证失败，因此出现证书问题的时候需要检查两台机器的时间是否一致，如果不一致用date命令或者ntpdate命令让两台机器的时间一致。</p>
+<p>Q:出现错误[Puppet Users] err: Could not retrieve catalog; skipping run</p>
+<p>A：可能是由于安装了两个版本的ruby或者facter的原因，解决方案见：<br><a target="_blank" rel="noopener" href="https://projects.puppetlabs.com/issues/5279">https://projects.puppetlabs.com/issues/5279</a></p>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7.  总结"></a>7.  总结</h2><p>随着服务器集群规模越来越大，自动化配置和部署这些服务器能够使管理变得非常容易并大大减小管理部署成本，因而得到IT公司的高度重视。<br>本文档介绍了puppet，一种新型的软件自动化配置和部署工具。本文主要内容涉及puppet的架构，安装和使用方法，并给出了两个使用实例。<br>在大规模的生成环境中，如果只有一台puppetmaster会忙不过来的，因为puppet是用ruby写的，ruby是解析型语言，每个客户端来访问，都要解析一次，当客户端多了就忙不过来，所以需要扩展成一个服务器组。puppetmaster可以看作一个web服务器，实际上也是由ruby提供的web服务器模块来做的。因此可以利用web代理软件来配合puppetmaster做集群设置，具体参见：<a target="_blank" rel="noopener" href="http://puppet.wikidot.com/puppetnginx">http://puppet.wikidot.com/puppetnginx</a> 。</p>
+<h2 id="8-参考资料"><a href="#8-参考资料" class="headerlink" title="8.  参考资料"></a>8.  参考资料</h2><p>puppet官方网站：<a target="_blank" rel="noopener" href="http://www.puppetlabs.com/">http://www.puppetlabs.com/</a></p>
+<p>puppet中文wiki：<a target="_blank" rel="noopener" href="http://puppet.chinaec2.com/">http://puppet.chinaec2.com/</a></p>
+<p>puppet中文博客：<a target="_blank" rel="noopener" href="http://www.comeonsa.com/">http://www.comeonsa.com</a></p>
+<h2 id="9-代码下载"><a href="#9-代码下载" class="headerlink" title="9.  代码下载"></a>9.  代码下载</h2><p>(1) 5.1节实例代码下载</p>
+<p>(2) 5.2节实例代码下载</p>
+<p>原创文章，转载请注明： 转载自董的博客</p>
+<p>链接地址: <a target="_blank" rel="noopener" href="http://dongxicheng.org/cluster-managemant/puppet/">http://dongxicheng.org/cluster-managemant/puppet/</a></p>
+<p>作者：Dong，作者介绍：<a target="_blank" rel="noopener" href="http://dongxicheng.org/about/">http://dongxicheng.org/about/</a></p>
+<p>本博客的文章集合:<a target="_blank" rel="noopener" href="http://dongxicheng.org/recommend/">http://dongxicheng.org/recommend/</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Adolf</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2018/02/25/puppet%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/">http://example.com/2018/02/25/puppet%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/linux/">linux</a><a class="post-meta__tags" href="/tags/Puppet/">Puppet</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2018/02/25/LVS%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">LVS负载均衡</div></div></a></div><div class="next-post pull-right"><a href="/2018/02/25/SELinux%E7%8A%B6%E6%80%81/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">SELinux状态</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2019/02/23/Create Lvm/" title="Create_lvm"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-23</div><div class="title">Create_lvm</div></div></a></div><div><a href="/2019/03/09/AWS常用cli命令/" title="AWS常用cli命令"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-03-09</div><div class="title">AWS常用cli命令</div></div></a></div><div><a href="/2019/02/25/DNS介绍/" title="DNS介绍"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-25</div><div class="title">DNS介绍</div></div></a></div><div><a href="/2019/02/23/Delete private registry mirror/" title="Delete private registry mirror"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-23</div><div class="title">Delete private registry mirror</div></div></a></div><div><a href="/2019/02/24/Commonly used Git command list/" title="Commonly used Git command list"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-24</div><div class="title">Commonly used Git command list</div></div></a></div><div><a href="/2019/02/26/Get the value of a variable error within the pod K8S/" title="K8S的pod内获取变量的值错误"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-26</div><div class="title">K8S的pod内获取变量的值错误</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/null" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Adolf</div><div class="author-info__description">xxx</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">1.  概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E8%AE%BE%E8%AE%A1%E6%9E%B6%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">2.  设计架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E8%BD%AF%E4%BB%B6%E5%AE%89%E8%A3%85"><span class="toc-number">3.</span> <span class="toc-text">3.  软件安装</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4"><span class="toc-number">3.1.</span> <span class="toc-text">3.1   安装步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E5%AE%89%E8%A3%85%E5%90%8E%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-number">3.2.</span> <span class="toc-text">3.2    安装后的目录结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%AE%89%E8%A3%85%E7%9B%AE%E5%BD%95"><span class="toc-number">3.2.1.</span> <span class="toc-text">(1)    安装目录</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">3.2.2.</span> <span class="toc-text">(2)    配置文件</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-%E9%AA%8C%E8%AF%81%E5%AE%89%E8%A3%85%E6%98%AF%E5%90%A6%E6%88%90%E5%8A%9F"><span class="toc-number">3.3.</span> <span class="toc-text">3.3   验证安装是否成功</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E9%85%8D%E7%BD%AE%E8%84%9A%E6%9C%AC%E7%BC%96%E5%86%99"><span class="toc-number">4.</span> <span class="toc-text">4.  配置脚本编写</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E8%B5%84%E6%BA%90%E5%B1%9E%E6%80%A7"><span class="toc-number">4.1.</span> <span class="toc-text">4.1   资源属性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E8%B5%84%E6%BA%90"><span class="toc-number">4.2.</span> <span class="toc-text">4.2   资源</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-file%E8%B5%84%E6%BA%90"><span class="toc-number">4.2.1.</span> <span class="toc-text">(1)    file资源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-package%E8%B5%84%E6%BA%90"><span class="toc-number">4.2.2.</span> <span class="toc-text">(2)    package资源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-service%E8%B5%84%E6%BA%90"><span class="toc-number">4.2.3.</span> <span class="toc-text">(3)    service资源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-exec%E8%B5%84%E6%BA%90"><span class="toc-number">4.2.4.</span> <span class="toc-text">(4)    exec资源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-cron%E8%B5%84%E6%BA%90"><span class="toc-number">4.2.5.</span> <span class="toc-text">(5)    cron资源</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E8%8A%82%E7%82%B9%E7%AE%A1%E7%90%86"><span class="toc-number">4.3.</span> <span class="toc-text">4.3   节点管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E7%B1%BB%E5%92%8C%E5%87%BD%E6%95%B0"><span class="toc-number">4.4.</span> <span class="toc-text">4.4   类和函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-5-%E6%A8%A1%E5%9D%97"><span class="toc-number">4.5.</span> <span class="toc-text">4.5   模块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E7%BC%96%E7%A8%8B%E5%AE%9E%E4%BE%8B"><span class="toc-number">5.</span> <span class="toc-text">5.  编程实例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Hello-World"><span class="toc-number">5.1.</span> <span class="toc-text">5.1    Hello World</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E4%BB%A3%E7%A0%81%E7%BB%93%E6%9E%84%E7%BB%84%E7%BB%87"><span class="toc-number">5.1.1.</span> <span class="toc-text">(1)    代码结构组织</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="toc-number">5.1.2.</span> <span class="toc-text">(2)    程序执行流程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E4%BB%A3%E7%A0%81%E8%A7%A3%E9%87%8A"><span class="toc-number">5.1.3.</span> <span class="toc-text">(3)    代码解释</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A4%8D%E6%9D%82%E7%9A%84%E5%AE%9E%E4%BE%8B"><span class="toc-number">5.2.</span> <span class="toc-text">5.2   一个更复杂的实例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E5%8F%AF%E8%83%BD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">6.</span> <span class="toc-text">6.  可能遇到的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">7.  总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">8.</span> <span class="toc-text">8.  参考资料</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E4%BB%A3%E7%A0%81%E4%B8%8B%E8%BD%BD"><span class="toc-number">9.</span> <span class="toc-text">9.  代码下载</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo中图片无法加载"/></a><div class="content"><a class="title" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载">hexo中图片无法加载</a><time datetime="2021-01-26T15:59:21.000Z" title="Created 2021-01-26 23:59:21">2021-01-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/25/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2021/01/25/hello-world/" title="Hello World">Hello World</a><time datetime="2021-01-25T10:57:47.958Z" title="Created 2021-01-25 18:57:47">2021-01-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SLUB:Unable to Allocate Memory"/></a><div class="content"><a class="title" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory">SLUB:Unable to Allocate Memory</a><time datetime="2020-04-22T05:40:38.000Z" title="Created 2020-04-22 13:40:38">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="重启服务器导致docker中redis无法启动的问题解决"/></a><div class="content"><a class="title" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决">重启服务器导致docker中redis无法启动的问题解决</a><time datetime="2020-04-21T23:11:33.000Z" title="Created 2020-04-22 07:11:33">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用etcd快照恢复集群数据"/></a><div class="content"><a class="title" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据">使用etcd快照恢复集群数据</a><time datetime="2020-04-16T22:34:44.000Z" title="Created 2020-04-17 06:34:44">2020-04-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Adolf</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>

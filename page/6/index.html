@@ -1,0 +1,291 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Adolf - xxx</title><meta name="author" content="Adolf"><meta name="copyright" content="Adolf"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="xxx">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Adolf">
+<meta property="og:url" content="http://example.com/page/6/index.html">
+<meta property="og:site_name" content="Adolf">
+<meta property="og:description" content="xxx">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/null">
+<meta property="article:author" content="Adolf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/null"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/page/6/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: false,
+  isHome: true,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2021-01-27 10:51:55'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/null" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Adolf</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="site-info"><h1 id="site-title">Adolf</h1><div id="site-subtitle"><span id="subtitle"></span></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/21/k8sdepodbunengfangwensvc/" title="K8s pod内访问svc IP服务不通">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="K8s pod内访问svc IP服务不通"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/21/k8sdepodbunengfangwensvc/" title="K8s pod内访问svc IP服务不通">K8s pod内访问svc IP服务不通</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-20T22:32:45.000Z" title="Created 2019-02-21 06:32:45">2019-02-21</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">在pod内访问服务名不通的问题?Flannel网络,打开网卡的混合模式:
+    ip link set flannel.1 promisc on
+    ip link set cin0 promisc on
+同一台主机上的pod内访问同一台Node上svc的ip不通？解决方法：
+[root@k8s-int-node4 ~]# cat /proc/sys/net/bridge/bridge-nf-call-iptables
+0
+[root@k8s-int-node4 ~]# echo &#39;1&#39; &gt; /proc/sys/net/bridge/bridge-nf-call-iptables
+[root@k8s-int-node4 ~]# cat /proc/sys/net/bridge/bridge-nf-call-iptables
+1
+[root@k8s-int-node4 ~]#
+</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2018/03/09/Linux%20%E4%B8%8B%E5%90%84%E6%96%87%E4%BB%B6%E5%A4%B9%E7%9A%84%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E%E5%8F%8A%E7%94%A8%E9%80%94%E4%BB%8B%E7%BB%8D/" title="Linux 下各文件夹的结构说明及用途介绍">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Linux 下各文件夹的结构说明及用途介绍"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/03/09/Linux%20%E4%B8%8B%E5%90%84%E6%96%87%E4%BB%B6%E5%A4%B9%E7%9A%84%E7%BB%93%E6%9E%84%E8%AF%B4%E6%98%8E%E5%8F%8A%E7%94%A8%E9%80%94%E4%BB%8B%E7%BB%8D/" title="Linux 下各文件夹的结构说明及用途介绍">Linux 下各文件夹的结构说明及用途介绍</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-03-09T06:16:39.000Z" title="Created 2018-03-09 14:16:39">2018-03-09</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">目录简介/bin：二进制可执行命令。
+/dev：设备特殊文件。
+/etc：系统管理和配置文件。
+/etc/rc.d：启动的配 置文件和脚本。
+/home：用户主目录的基点，比如用户user的主目录就是/home/user，可以用~user表示。
+/lib：标准程序设计库，又 叫动态链接共享库，作用类似windows里的.dll文件。
+/sbin：系统管理命令，这 里存放的是系统管理员使用的管理程序。
+/tmp：公用的临时文件存储 点。
+/root：系统管理员的主目 录。
+/mnt：系统提供这个目录是 让用户临时挂载其他的文件系统。
+/lost+found：这个 目录平时是空的，系统非正常关机而留下“无家可归”的文件就在这里。
+/proc：虚拟的目录，是系 统内存的映射。可直接访问这个目录来获取系统信息。
+/var：某些大文件的溢出 区，比方说各种服务的日志文件。
+/usr：最庞大的目录，要用 到的应用程序和文件几乎都在这个目录。其中包含：
+/usr/x11r6：存放x window的目录。
+/usr/bin：众多的应用程序。
+/usr/sbin：超级用户的一些管理程序。
+/usr/do ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2018/02/28/%E6%95%85%E9%9A%9C%E5%A4%84%E7%90%86%E7%9A%84%E6%83%AF%E7%94%A8%E6%80%9D%E8%B7%AF/" title="故障处理的惯用思路">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="故障处理的惯用思路"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/02/28/%E6%95%85%E9%9A%9C%E5%A4%84%E7%90%86%E7%9A%84%E6%83%AF%E7%94%A8%E6%80%9D%E8%B7%AF/" title="故障处理的惯用思路">故障处理的惯用思路</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-02-28T06:06:02.000Z" title="Created 2018-02-28 14:06:02">2018-02-28</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Other/">Other</a></span></div><div class="content">
+【报障来源及描述】
+【明确之故障现象】
+【定位分析并验证】
+【处理方法与结果】
+【经验教训和精华】
+
+以上5段虽是我们故障报告的格式，但其实是总结了故障处理的惯用思路：
+【报障来源及描述】了解这些，是为了做形势分析。———这也是《5个优势思维》里边的第一条，对重要性和紧急性有个初步判断。
+比如，老板报障的？付费客户报障的？客服收到大量投诉报障的？监控告警主动发现的？ 或是个别用户个别同事反映的？
+【明确之故障现象】对故障现象的本身明确清楚，是为了聚焦排障范围，也避免兜转一圈回来才发现方向查错（比如人家其实不是乐视主站挂了，而是百度QQ全都打不开）。       明确故障现象的方法就是问4个W：
+
+What ——— 具体现象是什么？有报错提示内容？同类对比正常吗？能提供操作方法或URL或截图或抓包？
+Who ——— 是谁发现类似现象？ 还有其他人吗？ 哪位方便我们联系抓包或测试？
+Where ——— 位置是在公司还是哪里？ 哪个型号终端？ 哪个版本？ 没绑定hosts吧？
+When ——— 什么时候发现的？ 一直这样吗还是突然变这样的？
+
+【定位分析并验证】首先需要定位：这只是个案？还 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2018/02/28/%E6%9B%BE%E5%9B%BD%E8%97%A9%EF%BC%9A%E4%B8%80%E5%8B%A4%E5%A4%A9%E4%B8%8B%E6%97%A0%E9%9A%BE%E4%BA%8B/" title="曾国藩：一勤天下无难事">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="曾国藩：一勤天下无难事"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/02/28/%E6%9B%BE%E5%9B%BD%E8%97%A9%EF%BC%9A%E4%B8%80%E5%8B%A4%E5%A4%A9%E4%B8%8B%E6%97%A0%E9%9A%BE%E4%BA%8B/" title="曾国藩：一勤天下无难事">曾国藩：一勤天下无难事</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-02-28T05:35:33.000Z" title="Created 2018-02-28 13:35:33">2018-02-28</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Other/">Other</a></span></div><div class="content">曾国藩：一勤天下无难事  曾国藩说为官者当有五勤：
+
+一曰身勤：险远之路，身往验之；艰苦之境，身亲尝之。
+二曰眼勤：遇一人，必详细察看；接一文，必反复审阅。
+三曰手勤：易弃之物，随手收拾；易忘之事，随笔记载。
+四曰口勤：待同僚，则互相规劝；待下属，则再三训导。
+五曰心勤：精诚所至，金石亦开；苦思所积，鬼神迹通。
+
+曾国藩的“五勤”之道虽是为官之道，同时也是为人处世之道：       
+一曰身勤曾国藩所说的“身勤”就是身体力行、以身作则。       
+曾国藩曾说“余谓天子或可不亲细事，为大臣者则断不可不亲”。       
+曾国藩是这么说的，也是这么做的。曾国藩在军中要求自己早起，不论是什么样的天气，不论是什么样的环境，他一定“闻鸡起舞”，练兵督训，办理各项事务。曾国藩对军中将士说：“练兵之道，必须官弁昼夜从事，乃可渐几于熟。如鸡孵卵，如炉炼丹，未可须臾稍离。”
+《论语》有曰：“其身正，不令而行；其身不正，虽令不从。”       
+言传不如身教，曾国藩就是这样影响手下的幕僚、将领的。不管是个人修行还是管理团队，这一点至关重要，要给周围的人和下属做一个好榜样。       
+二曰眼勤曾 ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2018/02/26/pwgen%E9%9A%8F%E6%9C%BA%E7%94%9F%E6%88%90%E5%AF%86%E7%A0%81/" title="Pwgen随机生成密码">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Pwgen随机生成密码"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/02/26/pwgen%E9%9A%8F%E6%9C%BA%E7%94%9F%E6%88%90%E5%AF%86%E7%A0%81/" title="Pwgen随机生成密码">Pwgen随机生成密码</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-02-25T20:22:13.000Z" title="Created 2018-02-26 04:22:13">2018-02-26</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">安装
+Centos 7.5的系统可以使用yum安装：
+  yum install -y pwgen
+
+Ubuntu 系统安装：
+  apt-get install -y pwgen   
+
+
+常用组合pwgen - generate pronounceable passwords常用命令可指定为：
+pwgen -sy -1 18
+参数详解-0, --no-numerals    不要在生成的密码中包含数字。
+       Don&#39;t include numbers in the generated passwords.
+
+-1   打印生成的密码每行一个。
+     Print the generated passwords one per line.
+
+-A, --no-capitalize  不包含任何大写字母。
+       Don&#39;t bother to include any capital letters in the generated passwords.
+
+-a, --alt-phonics  此选项没有做任何特殊的，它只存在向后兼容性。
+       ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2018/02/25/LVS%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" title="LVS负载均衡">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="LVS负载均衡"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/02/25/LVS%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" title="LVS负载均衡">LVS负载均衡</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-02-25T01:14:02.000Z" title="Created 2018-02-25 09:14:02">2018-02-25</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">阅读目录
+基础知识介绍
+二、基础知识及一些要点
+三、LVS 性能调优
+1 通过NAT实现虚拟服务器（VS/NAT）
+2 通过IP隧道实现虚拟服务器（VS/TUN）
+3 通过直接路由实现虚拟服务器（VS/DR）
+
+Load Balancer(负载均衡器)：Load Balancer是整个集群系统的前端，负责把客户请求转发到Real Server上。Load Balancer通过Ldirectord监测各Real Server的健康状况。在Real Server不可用时把它从群中剔除，恢复时重新加入。Backup是备份Load Balancer，当Load Balancer不可用时接替它，成为实际的Load Balancer。
+Server Array(服务器群)：Server Array是 一组运行实际应用服务的机器，比如WEB, Mail, FTP, DNS, Media等等。在实际应用中，Load Balancer和Backup也可以兼任Real Server的角色。以下的测试就是一台服务器既担任了LVSserver,同时也是realserver节点.
+Shared Storage( ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2018/02/25/puppet%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/" title="Puppet基本流程">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Puppet基本流程"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/02/25/puppet%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/" title="Puppet基本流程">Puppet基本流程</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-02-24T21:30:50.000Z" title="Created 2018-02-25 05:30:50">2018-02-25</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">1.  概述puppet是一个开源的软件自动化配置和部署工具，它使用简单且功能强大，正得到了越来越多地关注，现在很多大型IT公司均在使用puppet对集群中的软件进行管理和部署，如google利用puppet管理超过6000台地mac桌面电脑（2007年数据）。本文主要介绍puppet安装方法，设计架构及使用方法。
+2.  设计架构puppet是基于c/s架构的。服务器端保存着所有对客户端服务器的配置代码，在puppet里面叫做manifest. 客户端下载manifest之后，可以根据manifest对服务器进行配置，例如软件包管理，用户管理和文件管理等等。
+   
+如上图所示，puppet的工作流程如下：
+（1）客户端puppetd调用facter，facter探测出主机的一些变量，例如主机名，内存大小，ip地址等。pupppetd 把这些信息通过ssl连接发送到服务器端； 
+（2）服务器端的puppetmaster 检测客户端的主机名，然后找到manifest里面对应的node配置， 并对该部分内容进行解析，facter送过来的信息可以作为变量处理，node牵涉到的代码才解析，其 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2018/02/25/SELinux%E7%8A%B6%E6%80%81/" title="SELinux状态">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SELinux状态"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/02/25/SELinux%E7%8A%B6%E6%80%81/" title="SELinux状态">SELinux状态</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-02-24T21:07:07.000Z" title="Created 2018-02-25 05:07:07">2018-02-25</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">查看SELinux状态：1./usr/sbin/sestatus -v      ##如果SELinux status参数为enabled即为开启状态
+SELinux status:                 enabled
+2.getenforce                 ##也可以用这个命令检查
+关闭SELinux：1、临时关闭（不用重启机器）：
+setenforce 0             ##设置SELinux 成为permissive模式
+setenforce 1             ##设置SELinux 成为enforcing模式
+2、修改配置文件需要重启机器：
+修改/etc/selinux/config 文件
+将SELINUX=enforcing改为SELINUX=disabled
+重启机器即可
+</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2018/02/23/Use%20the%20CLI%20to%20create%20Azure%20VM%20image/" title="Use the CLI to Create Azure VM Image">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Use the CLI to Create Azure VM Image"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/02/23/Use%20the%20CLI%20to%20create%20Azure%20VM%20image/" title="Use the CLI to Create Azure VM Image">Use the CLI to Create Azure VM Image</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-02-23T05:51:37.000Z" title="Created 2018-02-23 13:51:37">2018-02-23</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Windows/">Windows</a></span></div><div class="content">本文大概内容自定义映像类似于应用商店映像，不同的是自定义映像的创建者是你自己。 自定义映像可用于启动配置，例如预加载应用程序、应用程序配置和其他 OS 配置。 在本教程中，你将创建自己的 Azure 虚拟机自定义映像。 你将学习如何执行以下操作：
+
+取消预配和通用化 VM
+创建自定义映像
+从自定义映像创建 VM
+列出订阅中的所有映像
+删除映像
+
+Note
+在 Azure 中国区使用 Azure CLI 2.0 之前，请先运行 az cloud set -n AzureChinaCloud 来改变云环境。如果想切回国际版 Azure，请再次运行 az cloud set -n AzureCloud。
+如果选择在本地安装并使用 CLI，本教程要求运行 Azure CLI 2.0.4 或更高版本。 运行 az –version 即可查找版本。 如果需要进行安装或升级，请参阅安装 Azure CLI 2.0。
+开始之前下列步骤详细说明了如何将现有 VM 转换为可重用自定义映像，用于创建新的 VM 实例。若要完成本教程中的示例，必须现有一个虚拟机。 如果需要，此脚本示例可为你创建一个虚拟机。 按 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2018/02/22/nf_conntrack:%20table%20full,%20dropping%20packet/" title="nf_conntrack: table full, dropping packet">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="nf_conntrack: table full, dropping packet"></a></div><div class="recent-post-info"><a class="article-title" href="/2018/02/22/nf_conntrack:%20table%20full,%20dropping%20packet/" title="nf_conntrack: table full, dropping packet">nf_conntrack: table full, dropping packet</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2018-02-22T07:07:22.000Z" title="Created 2018-02-22 15:07:22">2018-02-22</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">写在前边的话netfilter/conntrack 相关内核参数往往是用 Linux 服务器的互联网小公司业务量上去之后遇到的第 3 个“新手怪”。（第 1 位：进程可用的 FD 不足，第 2 位：IP 临时端口不足 + TIME_WAIT 状态的连接过多导致无法建立新连接）
+很多人以为 Linux 经过这么多年优化，默认参数应该“足够好”，其实不是。默认参数面向“通用”服务器，不适用于连接数和访问量比较多的场景。
+
+症状服务器负载正常，但请求大量超时，服务器／应用访问日志看不到相关请求记录。
+在 dmesg 或 /var/log/messages 看到大量以下记录：
+kernel: nf_conntrack: table full, dropping packet.
+
+原因服务器访问量大，内核 netfilter 模块 conntrack 相关参数配置不合理，导致 IP 包被丢掉，连接无法建立。
+详细nf_conntrack 模块在 kernel 2.6.15（2006-01-03 发布） 被引入，支持 IPv4 和 IPv6，取代只支持 IPv4 的 ip_connktrack，用 ...</div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/page/5/"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/null" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Adolf</div><div class="author-info__description">xxx</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo中图片无法加载"/></a><div class="content"><a class="title" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载">hexo中图片无法加载</a><time datetime="2021-01-26T15:59:21.000Z" title="Created 2021-01-26 23:59:21">2021-01-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/25/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2021/01/25/hello-world/" title="Hello World">Hello World</a><time datetime="2021-01-25T10:57:47.958Z" title="Created 2021-01-25 18:57:47">2021-01-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SLUB:Unable to Allocate Memory"/></a><div class="content"><a class="title" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory">SLUB:Unable to Allocate Memory</a><time datetime="2020-04-22T05:40:38.000Z" title="Created 2020-04-22 13:40:38">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="重启服务器导致docker中redis无法启动的问题解决"/></a><div class="content"><a class="title" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决">重启服务器导致docker中redis无法启动的问题解决</a><time datetime="2020-04-21T23:11:33.000Z" title="Created 2020-04-22 07:11:33">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用etcd快照恢复集群数据"/></a><div class="content"><a class="title" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据">使用etcd快照恢复集群数据</a><time datetime="2020-04-16T22:34:44.000Z" title="Created 2020-04-17 06:34:44">2020-04-17</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline"><i class="fas fa-folder-open"></i><span>Categories</span></div><ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Linux/"><span class="card-category-list-name">Linux</span><span class="card-category-list-count">51</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Other/"><span class="card-category-list-name">Other</span><span class="card-category-list-count">4</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Windows/"><span class="card-category-list-name">Windows</span><span class="card-category-list-count">3</span></a></li>
+            
+            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/18-09-5/" style="font-size: 1.1em; color: #999">18.09.5</a> <a href="/tags/Ansible/" style="font-size: 1.1em; color: #999">Ansible</a> <a href="/tags/Azure/" style="font-size: 1.3em; color: #99a1ac">Azure</a> <a href="/tags/DNS/" style="font-size: 1.1em; color: #999">DNS</a> <a href="/tags/Docker/" style="font-size: 1.1em; color: #999">Docker</a> <a href="/tags/ES/" style="font-size: 1.1em; color: #999">ES</a> <a href="/tags/Eviction-Thresholds/" style="font-size: 1.1em; color: #999">Eviction Thresholds</a> <a href="/tags/FTP/" style="font-size: 1.1em; color: #999">FTP</a> <a href="/tags/Git/" style="font-size: 1.2em; color: #999da3">Git</a> <a href="/tags/GitHub/" style="font-size: 1.1em; color: #999">GitHub</a> <a href="/tags/Harbor/" style="font-size: 1.1em; color: #999">Harbor</a> <a href="/tags/Hugo/" style="font-size: 1.1em; color: #999">Hugo</a> <a href="/tags/LVS/" style="font-size: 1.1em; color: #999">LVS</a> <a href="/tags/Linux/" style="font-size: 1.4em; color: #99a5b6">Linux</a> <a href="/tags/Nginx/" style="font-size: 1.2em; color: #999da3">Nginx</a> <a href="/tags/Puppet/" style="font-size: 1.1em; color: #999">Puppet</a> <a href="/tags/ace2-3/" style="font-size: 1.1em; color: #999">ace2.3</a> <a href="/tags/arm/" style="font-size: 1.1em; color: #999">arm</a> <a href="/tags/aws/" style="font-size: 1.1em; color: #999">aws</a> <a href="/tags/captain/" style="font-size: 1.1em; color: #999">captain</a> <a href="/tags/cli/" style="font-size: 1.3em; color: #99a1ac">cli</a> <a href="/tags/cos/" style="font-size: 1.1em; color: #999">cos</a> <a href="/tags/direct-lvm/" style="font-size: 1.1em; color: #999">direct-lvm</a> <a href="/tags/docker/" style="font-size: 1.1em; color: #999">docker</a> <a href="/tags/docker%E5%8D%87%E7%BA%A7/" style="font-size: 1.1em; color: #999">docker升级</a> <a href="/tags/etcd/" style="font-size: 1.1em; color: #999">etcd</a> <a href="/tags/firewalld/" style="font-size: 1.1em; color: #999">firewalld</a> <a href="/tags/helm/" style="font-size: 1.2em; color: #999da3">helm</a> <a href="/tags/hexo/" style="font-size: 1.1em; color: #999">hexo</a> <a href="/tags/hung-task-timeout-secs/" style="font-size: 1.1em; color: #999">hung_task_timeout_secs</a> <a href="/tags/image/" style="font-size: 1.1em; color: #999">image</a> <a href="/tags/iostat/" style="font-size: 1.1em; color: #999">iostat</a> <a href="/tags/iptables/" style="font-size: 1.3em; color: #99a1ac">iptables</a> <a href="/tags/k8s/" style="font-size: 1.4em; color: #99a5b6">k8s</a> <a href="/tags/kafka/" style="font-size: 1.1em; color: #999">kafka</a> <a href="/tags/kong/" style="font-size: 1.2em; color: #999da3">kong</a> <a href="/tags/linux/" style="font-size: 1.5em; color: #99a9bf">linux</a> <a href="/tags/log/" style="font-size: 1.1em; color: #999">log</a> <a href="/tags/lvm/" style="font-size: 1.1em; color: #999">lvm</a> <a href="/tags/overlay2/" style="font-size: 1.1em; color: #999">overlay2</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/01/"><span class="card-archive-list-date">January 2021</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2020/04/"><span class="card-archive-list-date">April 2020</span><span class="card-archive-list-count">10</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/08/"><span class="card-archive-list-date">August 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/07/"><span class="card-archive-list-date">July 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/06/"><span class="card-archive-list-date">June 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/05/"><span class="card-archive-list-date">May 2019</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/03/"><span class="card-archive-list-date">March 2019</span><span class="card-archive-list-count">13</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/02/"><span class="card-archive-list-date">February 2019</span><span class="card-archive-list-count">18</span></a></li><li class="card-archive-list-item more is-center"><a class="card-archive-list-link-more" href="/archives/">
+              <span>More</span><i class="fas fa-angle-right"  ></i></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">60</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"></div></div><div class="webinfo-item"><div class="item-name">Last Push :</div><div class="item-count" id="last-push-date" data-lastPushDate="2021-01-27T02:51:55.478Z"></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Adolf</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>

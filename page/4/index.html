@@ -1,0 +1,271 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Adolf - xxx</title><meta name="author" content="Adolf"><meta name="copyright" content="Adolf"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="xxx">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Adolf">
+<meta property="og:url" content="http://example.com/page/4/index.html">
+<meta property="og:site_name" content="Adolf">
+<meta property="og:description" content="xxx">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/null">
+<meta property="article:author" content="Adolf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/null"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/page/4/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: false,
+  isHome: true,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2021-01-27 10:51:55'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/null" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Adolf</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="site-info"><h1 id="site-title">Adolf</h1><div id="site-subtitle"><span id="subtitle"></span></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/03/08/%E4%BD%BF%E7%94%A8%20CLI%20%E5%88%9B%E5%BB%BA%20Azure%20VM%20%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E6%98%A0%E5%83%8F/" title="使用 CLI 创建 Azure VM 的自定义映像">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用 CLI 创建 Azure VM 的自定义映像"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/03/08/%E4%BD%BF%E7%94%A8%20CLI%20%E5%88%9B%E5%BB%BA%20Azure%20VM%20%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E6%98%A0%E5%83%8F/" title="使用 CLI 创建 Azure VM 的自定义映像">使用 CLI 创建 Azure VM 的自定义映像</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-03-07T16:03:02.000Z" title="Created 2019-03-08 00:03:02">2019-03-08</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Windows/">Windows</a></span></div><div class="content">自定义映像类似于应用商店映像，不同的是自定义映像的创建者是你自己。 自定义映像可用于启动配置，例如预加载应用程序、应用程序配置和其他 OS 配置。 在本教程中，你将创建自己的 Azure 虚拟机自定义映像。 你将学习如何执行以下操作：
+
+取消预配和通用化 VM
+创建自定义映像
+从自定义映像创建 VM
+列出订阅中的所有映像
+删除映像
+
+在 Azure 中国区使用 Azure CLI 2.0 之前，请先运行 az cloud set -n AzureChinaCloud 来改变云环境。如果想切回国际版 Azure，请再次运行 az cloud set -n AzureCloud。如果选择在本地安装并使用 CLI，本教程要求运行 Azure CLI 2.0.4 或更高版本。 运行 az --version 即可查找版本。 如果需要进行安装或升级，请参阅安装 Azure CLI 2.0。
+开始之前下列步骤详细说明了如何将现有 VM 转换为可重用自定义映像，用于创建新的 VM 实例。若要完成本教程中的示例，必须现有一个虚拟机。 如果需要，此脚本示例可为你创建一个虚拟机。 按照教程进行操作时，请根 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/03/07/%E5%8F%91%E5%B8%83Azure%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%EF%BC%88ARM%EF%BC%89%E6%A8%A1%E6%9D%BF/" title="发布Azure资源管理（ARM）模板">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="发布Azure资源管理（ARM）模板"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/03/07/%E5%8F%91%E5%B8%83Azure%E8%B5%84%E6%BA%90%E7%AE%A1%E7%90%86%EF%BC%88ARM%EF%BC%89%E6%A8%A1%E6%9D%BF/" title="发布Azure资源管理（ARM）模板">发布Azure资源管理（ARM）模板</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-03-07T15:47:01.000Z" title="Created 2019-03-07 23:47:01">2019-03-07</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Windows/">Windows</a></span></div><div class="content">以下为代码模板，根据自己情况修改&#123;
+    &quot;$schema&quot;: &quot;http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#&quot;,
+    &quot;contentVersion&quot;: &quot;1.0.0.0&quot;,
+    &quot;parameters&quot;: &#123; 
+    &quot;virtualMachineName&quot;: &#123;
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;metadata&quot;: &#123;
+        &quot;description&quot;: &quot;虚拟机名称&quot;
+      &#125;
+    &#125;,
+    &quot;virtualMachineSize&quot;: &#123;
+      &quot;type&quot;: &quot; ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/03/02/kubernetes%20%E6%BB%9A%E5%8A%A8%E5%8D%87%E7%BA%A7/" title="Kubernetes 滚动升级">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Kubernetes 滚动升级"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/03/02/kubernetes%20%E6%BB%9A%E5%8A%A8%E5%8D%87%E7%BA%A7/" title="Kubernetes 滚动升级">Kubernetes 滚动升级</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-03-01T17:47:56.000Z" title="Created 2019-03-02 01:47:56">2019-03-02</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">
+run test deploy
+  [root@k8s-master ~]# kubectl run --image=nginx --port=80 --replicas=2 test-nginx
+
+scale replica
+  [root@k8s-master ~]# kubectl scale --replicas=1 deploy/test-nginx
+  [root@k8s-master ~]# kubectl get deploy
+  NAME         DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+  busybox      2         2         2            2           39d
+  busybox1     1         1         1            1           39d
+  test-nginx   1         1         1            1           2h
+
+update image
+  [roo ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/28/k8s%E5%AE%B9%E5%99%A8%E4%B8%80%E7%9B%B4%E9%87%8D%E5%90%AF%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" title="K8s容器一直重启问题排查">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="K8s容器一直重启问题排查"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/28/k8s%E5%AE%B9%E5%99%A8%E4%B8%80%E7%9B%B4%E9%87%8D%E5%90%AF%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" title="K8s容器一直重启问题排查">K8s容器一直重启问题排查</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-27T19:21:10.000Z" title="Created 2019-02-28 03:21:10">2019-02-28</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">问题昨天有个客户反馈服务不可访问，查看服务日志发现dns无法解析，通过kubectl查看kube-dns 这个pod一直在重启，客户只反馈了这一个问题，如图：
+
+过了一会后发现kube-dns灾厄已经恢复，但是kube-flannel这个pod又开始一直重启。根据自己以往的经验还以为是路由出了什么问题，所以在排查路由方面浪费了一些时间，
+排查一段时间路由后未发现异常，随后想到查看有问题机器的kubelet日志，如下
+describe node的Events如下：
+
+解决通过日志可以发现是磁盘满导致的原因，但在当时看到问题时只是根据经验以为是路由有问题（只能说是学艺不精），但是我还没来得及查看磁盘，就补客户给清理过，而且客户还顺手把机器给重启了，机器启动后一切就恢复正常
+排查后来上网搜索相关错误字段，随后阅读相关文章以及查看k8s代码，发现k8s有一个Eviction Manager的机制，如下图：
+
+如果在启动k8s时没有设置Eviction Thresholds（驱逐阈值)，k8s将按代码里（上图）默认的值执行
+但是通过可看kubelet日志发现，前一天的时候就已经发现有相关报错，那 ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/27/Kubernetes%20Eviction%20Manager%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%88%86%E6%9E%90/" title="Kubernetes Eviction Manager工作机制分析">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Kubernetes Eviction Manager工作机制分析"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/27/Kubernetes%20Eviction%20Manager%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%88%86%E6%9E%90/" title="Kubernetes Eviction Manager工作机制分析">Kubernetes Eviction Manager工作机制分析</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-27T06:59:43.000Z" title="Created 2019-02-27 14:59:43">2019-02-27</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">摘要为了极限的压榨资源，很多时候Kubernetes集群会运行一些Best-Effort Task，这样就会存在资源超配的情况，Kubernetes是如何控制Node上资源的使用，在压榨资源使用的同时又能保证Node的稳定性？本文就为你介绍其背后运行机制。我的下一篇博文，会对Kubelet Eviction Manager进行源码分析，感兴趣的同学可以关注。
+研究过Kubernetes Resource QoS的同学，肯定会有一个疑问：QoS中会通过Pod QoS和OOM Killer进行资源的回收，当发生资源紧缺的时候。那为什么Kubernetes会再搞一个Kubelet Eviction机制，来做几乎同样的事呢？
+首先，我们来谈一下kubelet通过OOM Killer来回收资源的缺点：
+
+System OOM events本来就是对资源敏感的，它会stall这个Node直到完成了OOM Killing Process。
+当OOM Killer干掉某些containers之后，kubernetes Scheduler可能很快又会调度一个新的Pod到该Node上或者container ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/27/Kubernetes%E7%9A%84%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/" title="Kubernetes的使用技巧">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Kubernetes的使用技巧"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/27/Kubernetes%E7%9A%84%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/" title="Kubernetes的使用技巧">Kubernetes的使用技巧</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-27T06:51:39.000Z" title="Created 2019-02-27 14:51:39">2019-02-27</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">1. bash针对kubectl命令的自动补充这可能是在使用Kubernetes过程中最容易做的事，但它也是其中一个最有用的。要添加自动补充功能，如果使用bash，只需执行以下命令：
+echo &quot;source &lt;(kubectl completion bash)&quot; &gt;&gt; ~/.bashrc
+它将添加自动补全命令到你的.bashrc文件。因此每个你打开的shell窗口都支持该功能。我发现自动补全对一些长的参数，比如–all-namespaces特别有用。
+2. 给每个namespace添加默认的内存和CPU限额是人就会犯错。我们假定某人写了个应用，他每秒就会打开一个数据库连接，但是不会关闭。这样集群中就有了一个内存泄漏的应用。假定我们把该应用部署到了没有限额设置的集群，那么该应用就会crash掉一个节点。为了避免这种情况，Kubernetes允许为每个namespace设置默认的限额。要做到这很简单，我们只需创建一个limit range 的 yaml 并应用到特定namespace。以下是一个例子：
+apiVersion: v1  
+ kind:  ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/27/K8S%E7%9A%84%20QoS%E7%AD%96%E7%95%A5/" title="K8S的 QoS策略">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="K8S的 QoS策略"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/27/K8S%E7%9A%84%20QoS%E7%AD%96%E7%95%A5/" title="K8S的 QoS策略">K8S的 QoS策略</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-27T05:44:12.000Z" title="Created 2019-02-27 13:44:12">2019-02-27</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">QoSk8s中对容器的资源分配有三种策略：
+
+Guaranteed 。该策略下，pod.spec.containers[].resources中会存在cpu或memory的request和limit。顾名思义是该容器对资源的最低要求和最高使用量限制。如果我们配置了limit，没有配置request，默认会以limit的值来定义request。具体的配置可以参考以前的这篇笔记。
+BestEffort。当pod的描述文件中没有resource.limit、resource.request相关的配置时，意味着这个容器想跑多少资源就跑多少资源，其资源使用上限实际上即所在node的capacity。
+Burstable。当resource.limit和resource.request以上述两种方式以外的形式配置的时候，就会采用本模式。QoS目前只用cpu和memory来描述，其中cpu可压缩资源，当一个容器的cpu使用率超过limit时会被进行流控，而当内存超过limit时则会被oom_kill。这里kubelet是通过自己计算容器的oom_score，确认相应的linux进程的oom_adj， ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/27/k8s%E7%9A%84%E4%B8%80%E6%AC%A1%E8%B7%AF%E7%94%B1%E6%95%85%E9%9A%9C/" title="K8s的一次路由故障">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="K8s的一次路由故障"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/27/k8s%E7%9A%84%E4%B8%80%E6%AC%A1%E8%B7%AF%E7%94%B1%E6%95%85%E9%9A%9C/" title="K8s的一次路由故障">K8s的一次路由故障</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-26T22:21:47.000Z" title="Created 2019-02-27 06:21:47">2019-02-27</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">问题今天有个客户三台master上有两台的kube-dns一直起不来，如图：
+
+排查
+查看pod的日志：
+  
+
+看到报错后首先想到的就是rount有问题，然后通过查看路由发现，有问题的两台机器多了一条路由：
+  
+
+通过以下命令查看本机应该对应的flannel的路由：
+  [root@node-dev-3 ~]# cat /run/flannel/subnet.env
+  FLANNEL_NETWORK=10.5.0.0/16
+  FLANNEL_SUBNET=10.5.2.1/24
+  FLANNEL_MTU=1450
+  FLANNEL_IPMASQ=true
+
+
+解决方法
+删除多余的路由规则：
+  [root@node-dev-3 ~]# route del -net 10.5.2.0 gw 172.26.7.12 netmask 255.255.255.0
+
+删除之前的旧dns pod
+  [root@node-dev-3 ~]# kubectl delete pod -n kube-system kube-dns-xxx
+
+最后查看dns pod 已经正常运行
+  
+
+
+</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/27/hung_task_timeout_secs%E5%8F%82%E6%95%B0/" title="Hung_task_timeout_secs参数">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hung_task_timeout_secs参数"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/27/hung_task_timeout_secs%E5%8F%82%E6%95%B0/" title="Hung_task_timeout_secs参数">Hung_task_timeout_secs参数</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-26T17:11:36.000Z" title="Created 2019-02-27 01:11:36">2019-02-27</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">问题客户有一台服务器，安装了VMW软件做了虚拟化，在其上搭建了一台readhat虚拟机，起初给的内存为16G，在添加了12G的内存后，将虚拟机的内存调整到了20G调整完后主机这边就一直报错：
+Nov 5 13:05:41 RedHat5 kernel: INFO: task oracle:22439 blocked for more than 120 seconds.
+Nov 5 13:05:41 RedHat5 kernel: “echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs” disables this message.
+解决方法从以上的报错信息也给出了简单的解决方案，就是禁止该120秒的超时：
+echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs
+原因查询了资料后对于该参数的了解为后台对进行的任务由于超时而挂起
+随后询问了主机工程师：给出方案是按照告警里的提示将该提醒disable后续询问后给出如下解释：
+This is a know bug. By default Linu ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/26/Get%20the%20value%20of%20a%20variable%20error%20within%20the%20pod%20K8S/" title="K8S的pod内获取变量的值错误">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="K8S的pod内获取变量的值错误"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/26/Get%20the%20value%20of%20a%20variable%20error%20within%20the%20pod%20K8S/" title="K8S的pod内获取变量的值错误">K8S的pod内获取变量的值错误</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-26T03:43:02.000Z" title="Created 2019-02-26 11:43:02">2019-02-26</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">问题今天遇到一个问题，就是用shell脚本从k8s的pod内获取变量，然后再进行赋值或字符拼接时，结果发现总是不对，但是通过自定义的变量没有问题以下为问题复现：
+[root@cloud-cn-master-1 ~]# cc=`kubectl exec -it -n nginx-system nginx-df4b995c5-98w66 -c nginx-01 env | grep SYS_ADMIN_USERNAME | awk -F&quot;=&quot; &#39;&#123;print $2&#125;&#39;`
+[root@cloud-cn-master-1 ~]# echo $cc
+sysadmin
+[root@cloud-cn-master-1 ~]# echo $cc&quot;abcde&quot;
+:abcdein
+[root@cloud-cn-master-1 ~]#
+[root@cloud-cn-master-1 ~]# dd=test
+[root@cloud-cn-master-1 ~]# echo $dd
+test
+[root@cloud-cn-master ...</div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/page/3/"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/5/"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/null" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Adolf</div><div class="author-info__description">xxx</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo中图片无法加载"/></a><div class="content"><a class="title" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载">hexo中图片无法加载</a><time datetime="2021-01-26T15:59:21.000Z" title="Created 2021-01-26 23:59:21">2021-01-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/25/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2021/01/25/hello-world/" title="Hello World">Hello World</a><time datetime="2021-01-25T10:57:47.958Z" title="Created 2021-01-25 18:57:47">2021-01-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SLUB:Unable to Allocate Memory"/></a><div class="content"><a class="title" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory">SLUB:Unable to Allocate Memory</a><time datetime="2020-04-22T05:40:38.000Z" title="Created 2020-04-22 13:40:38">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="重启服务器导致docker中redis无法启动的问题解决"/></a><div class="content"><a class="title" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决">重启服务器导致docker中redis无法启动的问题解决</a><time datetime="2020-04-21T23:11:33.000Z" title="Created 2020-04-22 07:11:33">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用etcd快照恢复集群数据"/></a><div class="content"><a class="title" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据">使用etcd快照恢复集群数据</a><time datetime="2020-04-16T22:34:44.000Z" title="Created 2020-04-17 06:34:44">2020-04-17</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline"><i class="fas fa-folder-open"></i><span>Categories</span></div><ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Linux/"><span class="card-category-list-name">Linux</span><span class="card-category-list-count">51</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Other/"><span class="card-category-list-name">Other</span><span class="card-category-list-count">4</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Windows/"><span class="card-category-list-name">Windows</span><span class="card-category-list-count">3</span></a></li>
+            
+            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/18-09-5/" style="font-size: 1.1em; color: #999">18.09.5</a> <a href="/tags/Ansible/" style="font-size: 1.1em; color: #999">Ansible</a> <a href="/tags/Azure/" style="font-size: 1.3em; color: #99a1ac">Azure</a> <a href="/tags/DNS/" style="font-size: 1.1em; color: #999">DNS</a> <a href="/tags/Docker/" style="font-size: 1.1em; color: #999">Docker</a> <a href="/tags/ES/" style="font-size: 1.1em; color: #999">ES</a> <a href="/tags/Eviction-Thresholds/" style="font-size: 1.1em; color: #999">Eviction Thresholds</a> <a href="/tags/FTP/" style="font-size: 1.1em; color: #999">FTP</a> <a href="/tags/Git/" style="font-size: 1.2em; color: #999da3">Git</a> <a href="/tags/GitHub/" style="font-size: 1.1em; color: #999">GitHub</a> <a href="/tags/Harbor/" style="font-size: 1.1em; color: #999">Harbor</a> <a href="/tags/Hugo/" style="font-size: 1.1em; color: #999">Hugo</a> <a href="/tags/LVS/" style="font-size: 1.1em; color: #999">LVS</a> <a href="/tags/Linux/" style="font-size: 1.4em; color: #99a5b6">Linux</a> <a href="/tags/Nginx/" style="font-size: 1.2em; color: #999da3">Nginx</a> <a href="/tags/Puppet/" style="font-size: 1.1em; color: #999">Puppet</a> <a href="/tags/ace2-3/" style="font-size: 1.1em; color: #999">ace2.3</a> <a href="/tags/arm/" style="font-size: 1.1em; color: #999">arm</a> <a href="/tags/aws/" style="font-size: 1.1em; color: #999">aws</a> <a href="/tags/captain/" style="font-size: 1.1em; color: #999">captain</a> <a href="/tags/cli/" style="font-size: 1.3em; color: #99a1ac">cli</a> <a href="/tags/cos/" style="font-size: 1.1em; color: #999">cos</a> <a href="/tags/direct-lvm/" style="font-size: 1.1em; color: #999">direct-lvm</a> <a href="/tags/docker/" style="font-size: 1.1em; color: #999">docker</a> <a href="/tags/docker%E5%8D%87%E7%BA%A7/" style="font-size: 1.1em; color: #999">docker升级</a> <a href="/tags/etcd/" style="font-size: 1.1em; color: #999">etcd</a> <a href="/tags/firewalld/" style="font-size: 1.1em; color: #999">firewalld</a> <a href="/tags/helm/" style="font-size: 1.2em; color: #999da3">helm</a> <a href="/tags/hexo/" style="font-size: 1.1em; color: #999">hexo</a> <a href="/tags/hung-task-timeout-secs/" style="font-size: 1.1em; color: #999">hung_task_timeout_secs</a> <a href="/tags/image/" style="font-size: 1.1em; color: #999">image</a> <a href="/tags/iostat/" style="font-size: 1.1em; color: #999">iostat</a> <a href="/tags/iptables/" style="font-size: 1.3em; color: #99a1ac">iptables</a> <a href="/tags/k8s/" style="font-size: 1.4em; color: #99a5b6">k8s</a> <a href="/tags/kafka/" style="font-size: 1.1em; color: #999">kafka</a> <a href="/tags/kong/" style="font-size: 1.2em; color: #999da3">kong</a> <a href="/tags/linux/" style="font-size: 1.5em; color: #99a9bf">linux</a> <a href="/tags/log/" style="font-size: 1.1em; color: #999">log</a> <a href="/tags/lvm/" style="font-size: 1.1em; color: #999">lvm</a> <a href="/tags/overlay2/" style="font-size: 1.1em; color: #999">overlay2</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/01/"><span class="card-archive-list-date">January 2021</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2020/04/"><span class="card-archive-list-date">April 2020</span><span class="card-archive-list-count">10</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/08/"><span class="card-archive-list-date">August 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/07/"><span class="card-archive-list-date">July 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/06/"><span class="card-archive-list-date">June 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/05/"><span class="card-archive-list-date">May 2019</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/03/"><span class="card-archive-list-date">March 2019</span><span class="card-archive-list-count">13</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/02/"><span class="card-archive-list-date">February 2019</span><span class="card-archive-list-count">18</span></a></li><li class="card-archive-list-item more is-center"><a class="card-archive-list-link-more" href="/archives/">
+              <span>More</span><i class="fas fa-angle-right"  ></i></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">60</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"></div></div><div class="webinfo-item"><div class="item-name">Last Push :</div><div class="item-count" id="last-push-date" data-lastPushDate="2021-01-27T02:51:55.478Z"></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Adolf</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>

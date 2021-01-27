@@ -1,0 +1,376 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LVS负载均衡 | Adolf</title><meta name="keywords" content="linux,LVS"><meta name="author" content="Adolf"><meta name="copyright" content="Adolf"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="阅读目录 基础知识介绍 二、基础知识及一些要点 三、LVS 性能调优 1 通过NAT实现虚拟服务器（VS&#x2F;NAT） 2 通过IP隧道实现虚拟服务器（VS&#x2F;TUN） 3 通过直接路由实现虚拟服务器（VS&#x2F;DR）  Load Balancer(负载均衡器)：Load Balancer是整个集群系统的前端，负责把客户请求转发到Real Server上。Load Balancer通过Ldirectord监">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LVS负载均衡">
+<meta property="og:url" content="http://example.com/2018/02/25/LVS%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/index.html">
+<meta property="og:site_name" content="Adolf">
+<meta property="og:description" content="阅读目录 基础知识介绍 二、基础知识及一些要点 三、LVS 性能调优 1 通过NAT实现虚拟服务器（VS&#x2F;NAT） 2 通过IP隧道实现虚拟服务器（VS&#x2F;TUN） 3 通过直接路由实现虚拟服务器（VS&#x2F;DR）  Load Balancer(负载均衡器)：Load Balancer是整个集群系统的前端，负责把客户请求转发到Real Server上。Load Balancer通过Ldirectord监">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2018-02-25T01:14:02.000Z">
+<meta property="article:modified_time" content="2021-01-27T02:25:26.039Z">
+<meta property="article:author" content="Adolf">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="LVS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2018/02/25/LVS%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-01-27 10:25:26'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/null" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Adolf</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">LVS负载均衡</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2018-02-25T01:14:02.000Z" title="Created 2018-02-25 09:14:02">2018-02-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2021-01-27T02:25:26.039Z" title="Updated 2021-01-27 10:25:26">2021-01-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Linux/">Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="阅读目录"><a href="#阅读目录" class="headerlink" title="阅读目录"></a>阅读目录</h2><ul>
+<li>基础知识介绍</li>
+<li>二、基础知识及一些要点</li>
+<li>三、LVS 性能调优</li>
+<li>1 通过NAT实现虚拟服务器（VS/NAT）</li>
+<li>2 通过IP隧道实现虚拟服务器（VS/TUN）</li>
+<li>3 通过直接路由实现虚拟服务器（VS/DR）</li>
+</ul>
+<h2 id="Load-Balancer-负载均衡器-："><a href="#Load-Balancer-负载均衡器-：" class="headerlink" title="Load Balancer(负载均衡器)："></a>Load Balancer(负载均衡器)：</h2><p>Load Balancer是整个集群系统的前端，负责把客户请求转发到Real Server上。Load Balancer通过Ldirectord监测各Real Server的健康状况。在Real Server不可用时把它从群中剔除，恢复时重新加入。<br>Backup是备份Load Balancer，当Load Balancer不可用时接替它，成为实际的Load Balancer。</p>
+<h2 id="Server-Array-服务器群-："><a href="#Server-Array-服务器群-：" class="headerlink" title="Server Array(服务器群)："></a>Server Array(服务器群)：</h2><p>Server Array是 一组运行实际应用服务的机器，比如WEB, Mail, FTP, DNS, Media等等。在实际应用中，Load Balancer和Backup也可以兼任Real Server的角色。以下的测试就是一台服务器既担任了LVSserver,同时也是realserver节点.</p>
+<h2 id="Shared-Storage-共享存储-："><a href="#Shared-Storage-共享存储-：" class="headerlink" title="Shared Storage(共享存储)："></a>Shared Storage(共享存储)：</h2><ul>
+<li>Shared Storage为所有Real Server提供共享存储空间和一致的数据内容。</li>
+<li>Director: 前端负载均衡器即运行LVS服务可以针对web、ftp、cache、mms甚至mysql等服务做load balances。</li>
+<li>RealServer: 后端需要负载均衡的服务器，可以为各类系统，Linux、Solaris、Aix、BSD、Windows都可，甚至Director本身也可以作为 RealServer使用.</li>
+</ul>
+<p>LVS( Linux Virtual Server),Linux下的负载均衡器，支持LVS-NAT、 LVS-DR、LVS-TUNL三种不同的方式:</p>
+<ul>
+<li>nat用的不是很多，主要用的是DR、TUNL方式。</li>
+<li>DR方式适合所有的RealServer同一网段下，即接在同一个交换机上.</li>
+<li>TUNL方式就对于RealServer的位置可以任意了，完全可以跨地域、空间，只要系统支持Tunnel就可以,方便以后扩充的话直接Tunl方式即可</li>
+</ul>
+<h2 id="一、基础知识介绍"><a href="#一、基础知识介绍" class="headerlink" title="一、基础知识介绍"></a>一、基础知识介绍</h2><h3 id="1、LVS基础及介绍"><a href="#1、LVS基础及介绍" class="headerlink" title="1、LVS基础及介绍"></a>1、LVS基础及介绍</h3><p>LVS是Linux Virtual Server的简写，意即Linux虚拟服务器，是一个虚拟的服务器集群系统。本项目在1998年5月由章文嵩（目前就职于阿里）博士成立，是中国国内最早出现的自由软件项目之一。<br>目前有三种IP负载均衡技术（VS/NAT、VS/TUN和VS/DR）；<br>十种调度算法（rrr|wrr|lc|wlc|lblc|lblcr|dh|sh|sed|nq）<br>【参考资料:】<br>1)官方中文参考资料: <a target="_blank" rel="noopener" href="http://www.linuxvirtualserver.org/zh/index.html">http://www.linuxvirtualserver.org/zh/index.html</a></p>
+<p>2)LinuxTone 相关LVS技术档汇总: <a target="_blank" rel="noopener" href="http://bbs.linuxtone.org/thread-1191-1-1.html">http://bbs.linuxtone.org/thread-1191-1-1.html</a></p>
+<h3 id="2、-LVS-三种IP负载均衡技术对比"><a href="#2、-LVS-三种IP负载均衡技术对比" class="headerlink" title="2、 LVS 三种IP负载均衡技术对比"></a>2、 LVS 三种IP负载均衡技术对比</h3><p>三种IP负载均衡技术的优缺点归纳在下表中：</p>
+<table>
+<thead>
+<tr>
+<th>null</th>
+<th>VS/NAT</th>
+<th>VS/TUN</th>
+<th>VS/DR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Server</td>
+<td>any</td>
+<td>Tunneling</td>
+<td>Non-arp device</td>
+</tr>
+<tr>
+<td>server network</td>
+<td>private</td>
+<td>LAN/WAN</td>
+<td>LAN</td>
+</tr>
+<tr>
+<td>server number</td>
+<td>low (10~20)</td>
+<td>High (100)</td>
+<td>High (100)</td>
+</tr>
+<tr>
+<td>server gateway</td>
+<td>load balancer</td>
+<td>own router</td>
+<td>Own router</td>
+</tr>
+</tbody></table>
+<p>【注】 以上三种方法所能支持最大服务器数目的估计是假设调度器使用100M网卡，调度器的硬件配置与后端服务器的硬件配置相同，而且是对一般Web服务。使用更 高的硬件配置（如千兆网卡和更快的处理器）作为调度器，调度器所能调度的服务器数量会相应增加。当应用不同时，服务器的数目也会相应地改变。所以，以上数 据估计主要是为三种方法的伸缩性进行量化比较。</p>
+<h3 id="3、LVS目前实现的几种调度算法"><a href="#3、LVS目前实现的几种调度算法" class="headerlink" title="3、LVS目前实现的几种调度算法"></a>3、LVS目前实现的几种调度算法</h3><p>IPVS 在内核中的负载均衡调度是以连接为粒度的。在HTTP协议（非持久）中，每个对象从WEB服务器上获取都需要建立一个TCP连接，同一用户的不同请求会被 调度到不同的服务器上，所以这种细粒度的调度在一定程度上可以避免单个用户访问的突发性引起服务器间的负载不平衡。<br>在内核中的连接调度算法上，IPVS已实现了以下十种调度算法：</p>
+<ul>
+<li>轮叫调度（Round-Robin Scheduling）</li>
+<li>加权轮叫调度（Weighted Round-Robin Scheduling）</li>
+<li>最小连接调度（Least-Connection Scheduling）</li>
+<li>加权最小连接调度（Weighted Least-Connection Scheduling）</li>
+<li>基于局部性的最少链接（Locality-Based Least Connections Scheduling）</li>
+<li>带复制的基于局部性最少链接（Locality-Based Least Connections with Replication Scheduling）</li>
+<li>目标地址散列调度（Destination Hashing Scheduling）</li>
+<li>源地址散列调度（Source Hashing Scheduling）</li>
+<li>最短预期延时调度（Shortest Expected Delay Scheduling）</li>
+<li>不排队调度（Never Queue Scheduling）</li>
+</ul>
+<p>对应: rr|wrr|lc|wlc|lblc|lblcr|dh|sh|sed|nq,</p>
+<p>Ldirecotrd配置选项及ipvsadm使用参数.</p>
+<table>
+<thead>
+<tr>
+<th>ldirectord配置选项</th>
+<th>ipvsadm使用的参数</th>
+<th>ipvsadm -L的输出</th>
+<th>LVS转发方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>gate</td>
+<td>-g</td>
+<td>Route</td>
+<td>LVS-DR</td>
+</tr>
+<tr>
+<td>ipip</td>
+<td>-i</td>
+<td>Tunnel</td>
+<td>LVS-TUN</td>
+</tr>
+<tr>
+<td>masq</td>
+<td>-m</td>
+<td>Masq</td>
+<td>LVS-NAT</td>
+</tr>
+</tbody></table>
+<h3 id="4、集群架构时我们应该采用什么样的调度算法"><a href="#4、集群架构时我们应该采用什么样的调度算法" class="headerlink" title="4、集群架构时我们应该采用什么样的调度算法?"></a>4、集群架构时我们应该采用什么样的调度算法?</h3><p>在一般的网络服务（如HTTP和Mail Service等）调度中，我会使用加权最小连接调度wlc或者加权轮叫调度wrr算法。</p>
+<p>基于局部性的最少链接LBLC和带复制的基于局部性最少链接LBLCR主要适用于Web Cache集群。</p>
+<p>目标地址散列调度和源地址散列调度是用静态映射方法，可能主要适合防火墙调度。</p>
+<p>最短预期延时调度SED和不排队调度NQ主要是对处理时间相对比较长的网络服务。</p>
+<p>其实，它们的适用范围不限于这些。我想最好参考内核中的连接调度算法的实现原理，看看那种调度方法适合你的应用。</p>
+<h3 id="5、LVS的ARP问题"><a href="#5、LVS的ARP问题" class="headerlink" title="5、LVS的ARP问题"></a>5、LVS的ARP问题</h3><p>2.4.x kernels:</p>
+<p>Hidden Patch</p>
+<p>arptable</p>
+<p>iptables</p>
+<p>2.6.x kernels: （关闭arp查询响应请求）</p>
+<p>net.ipv4.conf.eth0.arp_ignore = 1</p>
+<p>net.ipv4.conf.eth0.arp_announce = 2</p>
+<p>net.ipv4.conf.all.arp_ignore = 1</p>
+<p>net.ipv4.conf.all.arp_announce = 2</p>
+<p>arping tools</p>
+<h2 id="二、基础知识及一些要点"><a href="#二、基础知识及一些要点" class="headerlink" title="二、基础知识及一些要点"></a>二、基础知识及一些要点</h2><h3 id="1、InActConn并不代表错误连接，它是指不活跃连接-Inactive-Connections-，"><a href="#1、InActConn并不代表错误连接，它是指不活跃连接-Inactive-Connections-，" class="headerlink" title="1、InActConn并不代表错误连接，它是指不活跃连接(Inactive Connections)，"></a>1、InActConn并不代表错误连接，它是指不活跃连接(Inactive Connections)，</h3><p>我们将处于TCP ESTABLISH状态以外的连接都称为不活跃连接，例如处于SYN_RECV状态的连接，处于TIME_WAIT状态的连接等。</p>
+<h3 id="2、用四个参数来关闭arp查询响应请求："><a href="#2、用四个参数来关闭arp查询响应请求：" class="headerlink" title="2、用四个参数来关闭arp查询响应请求："></a>2、用四个参数来关闭arp查询响应请求：</h3><pre><code>echo 1 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+echo 2 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce</code></pre>
+<h3 id="3、ipvsadm-L-n-–stats"><a href="#3、ipvsadm-L-n-–stats" class="headerlink" title="3、ipvsadm -L -n –stats"></a>3、ipvsadm -L -n –stats</h3><p>Prot LocalAddress:Port Conns InPkts OutPkts InBytes OutBytes<br>连接数 输入包 输出包 输入流量 输出流量</p>
+<h3 id="4、注意事项"><a href="#4、注意事项" class="headerlink" title="4、注意事项:"></a>4、注意事项:</h3><ul>
+<li><p>1）在LVS方案中，虚拟ip地址与普通网络接口大大不同，这点需要特别注意。<br>虚拟ip地址的广播地址是它本身，子网掩码是255.255.255.255。 为什么要这样呢？因为有若干机器要使用同一个ip地址，<br>用本身做广播地址和把子网掩码设成4个255就不会造成ip地址冲突了,否则lvs将不能正常转发访问请求。</p>
+</li>
+<li><p>2） 假如两台VS之间使用的互备关系，那么当一台VS接管LVS服务时，可能会网络不通，这时因为路由器的MAC缓存表里关于vip这个地址的MAC地 址还是被替换的VS的MAC，有两种解决方法，一种是修改新VS的MAC地址，另一种是使用send_arp 命令（piranha软件包里带的一个小工具） 格式如下：</p>
+<p>  send_arp:<br>  send_arp [-i dev] src_ip_addr src_hw_addr targ_ip_addr tar_hw_addr<br>这个命令不一定非要在VS上执行，只+要在同一VLAN即可。</p>
+<p>  /sbin/arping -f -q -c 5 -w 5 -I eth0 -s WEBVIP−UGW</p>
+</li>
+</ul>
+<h3 id="5、Virtual-Server-via-Direct-Routing（VS-DR）"><a href="#5、Virtual-Server-via-Direct-Routing（VS-DR）" class="headerlink" title="5、Virtual Server via Direct Routing（VS/DR）"></a>5、Virtual Server via Direct Routing（VS/DR）</h3><p>VS/DR 通过改写请求报文的MAC地址，将请求发送到真实服务器，而真实服务器将响应直接返回给客户。</p>
+<p>同VS/TUN技术一样，VS/DR技术可极大地提高集群系 统的伸缩性。这种方法没有IP隧道的开销，对集群中的真实服务器也没有必须支持IP隧道协议的要求，但是要求调度器与真实服务器都有一块网卡连在同一物理 网段上。</p>
+<h3 id="6-LVS-经验"><a href="#6-LVS-经验" class="headerlink" title="6. LVS 经验:"></a>6. LVS 经验:</h3><p>1). LVS调度的最小单位是“连接”。</p>
+<p>2). 当apache的KeepAlive被设置成Off时，“连接”才能被较均衡的调度。</p>
+<p>3). 在不指定-p参数时，LVS才真正以“连接”为单位按“权值”调度流量。</p>
+<p>4). 在指定了-p参数时，则一个client在一定时间内，将会被调度到同一台RS。</p>
+<p>5). 可以通过”ipvsadm ?set tcp tcpfin udp”来调整TCP和UDP的超时，让连接淘汰得快一些。</p>
+<p>6). 在NAT模式时，RS的PORT参数才有意义。</p>
+<p>7). DR和TUN模式时，InActConn 是没有意义的(Thus the count in the InActConn column for LVS-DR, LVS-Tun is<br>inferred rather than real.)</p>
+<pre><code>/sbin/arping -f -q -c 5 -w 5 -I eth0 -s WEBVIP−UGW</code></pre>
+<h2 id="三、LVS-性能调优"><a href="#三、LVS-性能调优" class="headerlink" title="三、LVS 性能调优"></a>三、LVS 性能调优</h2><p>Least services in System or Compile kernel.</p>
+<p>Performace Tuning base LVS:<br>LVS self tuning( ipvsadm Timeout (tcp tcpfin udp)).</p>
+<pre><code>ipvsadm -Ln --timeout</code></pre>
+<p>Timeout (tcp tcpfin udp): 900 120 300</p>
+<pre><code>ipvsadm --set tcp tcpfin udp</code></pre>
+<p>Improving TCP/IP performance</p>
+<pre><code>net.ipv4.tcp_tw_recyle=1
+net.ipv4.tcp_tw_reuse=1
+net.ipv4.tcp_max_syn_backlog=8192
+net.ipv4.tcp_keepalive_time=1800
+net.ipv4.tcp_fin_timeout=30
+net.core.rmem_max=16777216
+net.core.wmem_max=16777216
+net.ipv4.tcp_rmem=4096 87380 16777216
+net.ipv4.tcp_wmem=4096 65536 16777216
+net.core.netdev_max_backlog=3000</code></pre>
+<h3 id="1-通过NAT实现虚拟服务器（VS-NAT）"><a href="#1-通过NAT实现虚拟服务器（VS-NAT）" class="headerlink" title="1 通过NAT实现虚拟服务器（VS/NAT）"></a>1 通过NAT实现虚拟服务器（VS/NAT）</h3><p>NAT的工作原理是报文头（目标地址、源地址和端口等）被正确改写后，客户相信它们连接一个IP地址，而不同IP地址的服务器组也认为它们是与客户直接相连的。</p>
+<p>可以用NAT方法将不同IP地址的并行网络服务变成在一个IP地址上的一个虚拟服务。</p>
+<p>客户通过Virtual IP Address（虚拟服务的IP地址）访问网络服务时，请求报文到达调度器，调度器根据连接调度算法从一组真实服务器中选出一台服务器，将报文的目标地址 Virtual IP Address改写成选定服务器的地址，报文的目标端口改写成选定服务器的相应端口，最后将修改后的报文发送给选出的服务器。同时，调度器在连接Hash 表中记录这个连接，当这个连接的下一个报文到达时，从连接Hash表中可以得到原选定服务器的地址和端口，进行同样的改写操作，并将报文传给原选定的服务 器。当来自真实服务器的响应报文经过调度器时，调度器将报文的源地址和源端口改为Virtual IP Address和相应的端口，再把报文发给用户。<br>在连接上引入一个状态机，不同的报文会使得连接处于不同的状态，不同的状态有不同的超时值。在TCP连接中，根据标准的TCP有限状态机进行状态迁移； 在UDP中，我们只设置一个UDP状态。不同状态的超时值是可以设置的，在缺省情况下，SYN状态的超时为1分钟，ESTABLISHED状态的超时为 15分钟，FIN状态的超时为1分钟；UDP状态的超时为5分钟。当连接终止或超时，调度器将这个连接从连接Hash表中删除。</p>
+<h3 id="2-通过IP隧道实现虚拟服务器（VS-TUN）"><a href="#2-通过IP隧道实现虚拟服务器（VS-TUN）" class="headerlink" title="2 通过IP隧道实现虚拟服务器（VS/TUN）"></a>2 通过IP隧道实现虚拟服务器（VS/TUN）</h3><p>大多数Internet服务都有这样的特点：请求报文较短而响应报文往往包含大量的数据。如果能将请求和响应分开处理，即在负载调度器中只负责调度请求而响应直接返回给客户，将极大地提高整个集群系统的吞吐量。<br>调度器根据各个服务器的负载情况，动态地选择一台服务器，将请求报文封装在另一个IP报文中，再将封装后的IP报文转发给选出的服务器；服务器收到报文 后，先将报文解封获得原来目标地址为VIP的报文，服务器发现VIP地址被配置在本地的IP隧道设备上，所以就处理这个请求，然后根据路由表将响应报文直 接返回给客户。<br>响应报文根据服务器的路由表直接返回给客户，而不经过负载调度器，所以负载调度器只处于从客户到服务器的半连接中</p>
+<h3 id="3-通过直接路由实现虚拟服务器（VS-DR）"><a href="#3-通过直接路由实现虚拟服务器（VS-DR）" class="headerlink" title="3 通过直接路由实现虚拟服务器（VS/DR）"></a>3 通过直接路由实现虚拟服务器（VS/DR）</h3><p>VS/DR利用大多数Internet服务的非对称特点，负载调度器中只负责调度请求，而服务器直接将响应返回给客户，可以极大地提高整个集群系统的吞吐量<br>在VS/DR中，调度器根据各个服务器的负载情况，动态地选择一台服务器，不修改也不封装IP报文，而是将数据帧的MAC地址改为选出服务器的MAC地址， 再将修改后的数据帧在与服务器组的局域网上发送。因为数据帧的MAC地址是选出的服务器，所以服务器肯定可以收到这个数据帧，从中可以获得该IP报文。当 服务器发现报文的目标地址VIP是在本地的网络设备上，服务器处理这个报文，然后根据路由表将响应报文直接返回给客户。</p>
+<table>
+<thead>
+<tr>
+<th>xx</th>
+<th>VS/NAT</th>
+<th>VS/TUN</th>
+<th>VS/DR</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Server</td>
+<td>any</td>
+<td>Tuneling</td>
+<td>Non-arp device</td>
+</tr>
+<tr>
+<td>server number</td>
+<td>low10-20</td>
+<td>high100</td>
+<td>high100</td>
+</tr>
+<tr>
+<td>server gateway</td>
+<td>loadbalancer</td>
+<td>own router</td>
+<td>own router</td>
+</tr>
+<tr>
+<td>server network</td>
+<td>private</td>
+<td>lan/wan</td>
+<td>lan</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>NAT </p>
+<p>  当服务器数目变多时，调度器成为瓶颈</p>
+</li>
+<li><p>IP Tuneling </p>
+<p>  术对服务器有要求，即所有的服务器必须支持“IP Tunneling”者“IPEncapsulation ”协议</p>
+</li>
+<li><p>DR </p>
+<p>  跟VS/TUN相比，这种方法没有IP隧道的开销，但是要求负载调度器与实际服务器都有一块网卡连在同一物理网段上，服务器网络设备（或者设备别名）不作ARP响应，或者能将报文重定向（Redirect）到本地的Socket端口上。</p>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Adolf</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2018/02/25/LVS%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">http://example.com/2018/02/25/LVS%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/linux/">linux</a><a class="post-meta__tags" href="/tags/LVS/">LVS</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2018/02/26/pwgen%E9%9A%8F%E6%9C%BA%E7%94%9F%E6%88%90%E5%AF%86%E7%A0%81/"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">Pwgen随机生成密码</div></div></a></div><div class="next-post pull-right"><a href="/2018/02/25/puppet%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">Puppet基本流程</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2019/02/23/Create Lvm/" title="Create_lvm"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-23</div><div class="title">Create_lvm</div></div></a></div><div><a href="/2019/03/09/AWS常用cli命令/" title="AWS常用cli命令"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-03-09</div><div class="title">AWS常用cli命令</div></div></a></div><div><a href="/2019/02/25/DNS介绍/" title="DNS介绍"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-25</div><div class="title">DNS介绍</div></div></a></div><div><a href="/2019/02/23/Delete private registry mirror/" title="Delete private registry mirror"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-23</div><div class="title">Delete private registry mirror</div></div></a></div><div><a href="/2019/02/24/Commonly used Git command list/" title="Commonly used Git command list"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-24</div><div class="title">Commonly used Git command list</div></div></a></div><div><a href="/2019/02/26/Get the value of a variable error within the pod K8S/" title="K8S的pod内获取变量的值错误"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-26</div><div class="title">K8S的pod内获取变量的值错误</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/null" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Adolf</div><div class="author-info__description">xxx</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%98%85%E8%AF%BB%E7%9B%AE%E5%BD%95"><span class="toc-number">1.</span> <span class="toc-text">阅读目录</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Load-Balancer-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%99%A8-%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">Load Balancer(负载均衡器)：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Server-Array-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%BE%A4-%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">Server Array(服务器群)：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shared-Storage-%E5%85%B1%E4%BA%AB%E5%AD%98%E5%82%A8-%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">Shared Storage(共享存储)：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E4%BB%8B%E7%BB%8D"><span class="toc-number">5.</span> <span class="toc-text">一、基础知识介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81LVS%E5%9F%BA%E7%A1%80%E5%8F%8A%E4%BB%8B%E7%BB%8D"><span class="toc-number">5.1.</span> <span class="toc-text">1、LVS基础及介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81-LVS-%E4%B8%89%E7%A7%8DIP%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E6%8A%80%E6%9C%AF%E5%AF%B9%E6%AF%94"><span class="toc-number">5.2.</span> <span class="toc-text">2、 LVS 三种IP负载均衡技术对比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81LVS%E7%9B%AE%E5%89%8D%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%87%A0%E7%A7%8D%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="toc-number">5.3.</span> <span class="toc-text">3、LVS目前实现的几种调度算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E9%9B%86%E7%BE%A4%E6%9E%B6%E6%9E%84%E6%97%B6%E6%88%91%E4%BB%AC%E5%BA%94%E8%AF%A5%E9%87%87%E7%94%A8%E4%BB%80%E4%B9%88%E6%A0%B7%E7%9A%84%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="toc-number">5.4.</span> <span class="toc-text">4、集群架构时我们应该采用什么样的调度算法?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81LVS%E7%9A%84ARP%E9%97%AE%E9%A2%98"><span class="toc-number">5.5.</span> <span class="toc-text">5、LVS的ARP问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%8F%8A%E4%B8%80%E4%BA%9B%E8%A6%81%E7%82%B9"><span class="toc-number">6.</span> <span class="toc-text">二、基础知识及一些要点</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81InActConn%E5%B9%B6%E4%B8%8D%E4%BB%A3%E8%A1%A8%E9%94%99%E8%AF%AF%E8%BF%9E%E6%8E%A5%EF%BC%8C%E5%AE%83%E6%98%AF%E6%8C%87%E4%B8%8D%E6%B4%BB%E8%B7%83%E8%BF%9E%E6%8E%A5-Inactive-Connections-%EF%BC%8C"><span class="toc-number">6.1.</span> <span class="toc-text">1、InActConn并不代表错误连接，它是指不活跃连接(Inactive Connections)，</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E7%94%A8%E5%9B%9B%E4%B8%AA%E5%8F%82%E6%95%B0%E6%9D%A5%E5%85%B3%E9%97%ADarp%E6%9F%A5%E8%AF%A2%E5%93%8D%E5%BA%94%E8%AF%B7%E6%B1%82%EF%BC%9A"><span class="toc-number">6.2.</span> <span class="toc-text">2、用四个参数来关闭arp查询响应请求：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81ipvsadm-L-n-%E2%80%93stats"><span class="toc-number">6.3.</span> <span class="toc-text">3、ipvsadm -L -n –stats</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">6.4.</span> <span class="toc-text">4、注意事项:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81Virtual-Server-via-Direct-Routing%EF%BC%88VS-DR%EF%BC%89"><span class="toc-number">6.5.</span> <span class="toc-text">5、Virtual Server via Direct Routing（VS&#x2F;DR）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-LVS-%E7%BB%8F%E9%AA%8C"><span class="toc-number">6.6.</span> <span class="toc-text">6. LVS 经验:</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81LVS-%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98"><span class="toc-number">7.</span> <span class="toc-text">三、LVS 性能调优</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E9%80%9A%E8%BF%87NAT%E5%AE%9E%E7%8E%B0%E8%99%9A%E6%8B%9F%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%88VS-NAT%EF%BC%89"><span class="toc-number">7.1.</span> <span class="toc-text">1 通过NAT实现虚拟服务器（VS&#x2F;NAT）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%80%9A%E8%BF%87IP%E9%9A%A7%E9%81%93%E5%AE%9E%E7%8E%B0%E8%99%9A%E6%8B%9F%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%88VS-TUN%EF%BC%89"><span class="toc-number">7.2.</span> <span class="toc-text">2 通过IP隧道实现虚拟服务器（VS&#x2F;TUN）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E9%80%9A%E8%BF%87%E7%9B%B4%E6%8E%A5%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0%E8%99%9A%E6%8B%9F%E6%9C%8D%E5%8A%A1%E5%99%A8%EF%BC%88VS-DR%EF%BC%89"><span class="toc-number">7.3.</span> <span class="toc-text">3 通过直接路由实现虚拟服务器（VS&#x2F;DR）</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo中图片无法加载"/></a><div class="content"><a class="title" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载">hexo中图片无法加载</a><time datetime="2021-01-26T15:59:21.000Z" title="Created 2021-01-26 23:59:21">2021-01-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/25/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2021/01/25/hello-world/" title="Hello World">Hello World</a><time datetime="2021-01-25T10:57:47.958Z" title="Created 2021-01-25 18:57:47">2021-01-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SLUB:Unable to Allocate Memory"/></a><div class="content"><a class="title" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory">SLUB:Unable to Allocate Memory</a><time datetime="2020-04-22T05:40:38.000Z" title="Created 2020-04-22 13:40:38">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="重启服务器导致docker中redis无法启动的问题解决"/></a><div class="content"><a class="title" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决">重启服务器导致docker中redis无法启动的问题解决</a><time datetime="2020-04-21T23:11:33.000Z" title="Created 2020-04-22 07:11:33">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用etcd快照恢复集群数据"/></a><div class="content"><a class="title" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据">使用etcd快照恢复集群数据</a><time datetime="2020-04-16T22:34:44.000Z" title="Created 2020-04-17 06:34:44">2020-04-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Adolf</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>

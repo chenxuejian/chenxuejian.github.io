@@ -1,0 +1,430 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>K8s部署kong之yaml | Adolf</title><meta name="keywords" content="linux,kong"><meta name="author" content="Adolf"><meta name="copyright" content="Adolf"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="官方文档官方安装：https:&#x2F;&#x2F;getkong.org&#x2F;install&#x2F;kubernetes&#x2F; 简介：Kong 是在客户端和（微）服务间转发API通信的API网关，通过插件扩展功能。 Kong 有两个主要组件： Kong Server ：基于 nginx 的服务器，用来接收 API 请求。 Apache Cassandra &amp; ：用来存储操作数据。  注：Ambassador没有数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="K8s部署kong之yaml">
+<meta property="og:url" content="http://example.com/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/index.html">
+<meta property="og:site_name" content="Adolf">
+<meta property="og:description" content="官方文档官方安装：https:&#x2F;&#x2F;getkong.org&#x2F;install&#x2F;kubernetes&#x2F; 简介：Kong 是在客户端和（微）服务间转发API通信的API网关，通过插件扩展功能。 Kong 有两个主要组件： Kong Server ：基于 nginx 的服务器，用来接收 API 请求。 Apache Cassandra &amp; ：用来存储操作数据。  注：Ambassador没有数据库">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2019-05-08T19:03:31.000Z">
+<meta property="article:modified_time" content="2021-01-27T02:25:26.046Z">
+<meta property="article:author" content="Adolf">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="kong">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-01-27 10:25:26'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/null" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Adolf</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">K8s部署kong之yaml</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2019-05-08T19:03:31.000Z" title="Created 2019-05-09 03:03:31">2019-05-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2021-01-27T02:25:26.046Z" title="Updated 2021-01-27 10:25:26">2021-01-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Linux/">Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h2><p>官方安装：<a target="_blank" rel="noopener" href="https://getkong.org/install/kubernetes/">https://getkong.org/install/kubernetes/</a></p>
+<h2 id="简介："><a href="#简介：" class="headerlink" title="简介："></a>简介：</h2><p>Kong 是在客户端和（微）服务间转发API通信的API网关，通过插件扩展功能。</p>
+<h3 id="Kong-有两个主要组件："><a href="#Kong-有两个主要组件：" class="headerlink" title="Kong 有两个主要组件："></a>Kong 有两个主要组件：</h3><ul>
+<li>Kong Server ：基于 nginx 的服务器，用来接收 API 请求。</li>
+<li>Apache Cassandra &amp; ：用来存储操作数据。</li>
+</ul>
+<p>注：Ambassador没有数据库 - 它依赖于ConfigMap来存储状态</p>
+<h3 id="Kong-基本功能："><a href="#Kong-基本功能：" class="headerlink" title="Kong 基本功能："></a>Kong 基本功能：</h3><ul>
+<li>HTTP 基本认证、密钥认证、CORS（ Cross-origin Resource Sharing，跨域资源共享）、TCP、UDP、文件日志、API 请求限流、请求转发以及 nginx 监控</li>
+<li>Serf是一个去中心化的集群成员管理、故障检测解决方案，Kong用它做清缓存，看来Kong里面核心的数据consumer、api、plugin都是做了缓存的，还可以做集群节点的监控</li>
+</ul>
+<h3 id="Kong-不足："><a href="#Kong-不足：" class="headerlink" title="Kong 不足："></a>Kong 不足：</h3><ul>
+<li>数据库不支持常用的mysql，只支持Postgres/Cassandra</li>
+<li>扩展Kong需要会写lua脚本</li>
+<li>不修改源码的情况下，无法自定义nginx配置文件，因为重启后会重新初始化有变更的nginx配置文件【nginx.conf|nginx-kong.conf】</li>
+<li>安装过程中会创建一个 Postgres 的 StatefulSet，前面提到，这一版本对 Kubernetes 集群的最低版本要求是 1.8</li>
+</ul>
+<h3 id="Kong的限流"><a href="#Kong的限流" class="headerlink" title="Kong的限流"></a>Kong的限流</h3><ul>
+<li><p>本地限流（local）</p>
+</li>
+<li><p>数据库限流（cluster）</p>
+</li>
+<li><p>Redis限流</p>
+<ul>
+<li>注：Kong的这三种限流方式都没有考虑并发情况</li>
+<li>限流：<a target="_blank" rel="noopener" href="https://my.oschina.net/chinamerp/blog/851613">https://my.oschina.net/chinamerp/blog/851613</a></li>
+</ul>
+</li>
+</ul>
+<p>当到达限流的临界值（max-1）时，此时有多条请求同时执行get_usage，计算结果全部通过，而我们期望的是仅有一条请求能通过</p>
+<p>8000端口是可以给用户访问，就是说用户发送请求先到 Kong 项目的 8000 端口，然后Kong 项目帮你转到你的后端应用api。</p>
+<h3 id="Kong-api简单使用"><a href="#Kong-api简单使用" class="headerlink" title="Kong api简单使用"></a>Kong api简单使用</h3><p>8001 端口是管理端口，比如说，管理员可以通过 8001端口来得到你加入过的 api</p>
+<ul>
+<li><p>列出 所加过的 api</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl localhost:8001&#x2F;apis&#x2F; </span><br></pre></td></tr></table></figure></li>
+<li><p>加入 api</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -i -X POST --url http:&#x2F;&#x2F;localhost:8001&#x2F;apis&#x2F; --data &#39;upstream_url&#x3D;http:&#x2F;&#x2F;camp.uats.cc&#39; --data &#39;request_path&#x3D;login&#39;   </span><br></pre></td></tr></table></figure>
+<p>  上面这段命令表示：</p>
+<ul>
+<li>–url：<a target="_blank" rel="noopener" href="http://localhost:8001/apis/">http://localhost:8001/apis/</a> 固定的，加入 api 就得写这个，表示给 kong管理。</li>
+<li>upstream_url：表示我们的网站。相当于一个请求前缀。</li>
+<li>request_path：就是具体我们的 api。</li>
+</ul>
+</li>
+<li><p>删除 api</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -i -X DELETE localhost:8001&#x2F;apis&#x2F;00f90ca9-cf2d-4830-c842-3b90f6cd08af  </span><br></pre></td></tr></table></figure>
+<p>  后面 这个串表示 加入的api的 id。</p>
+</li>
+</ul>
+<h2 id="初始设置"><a href="#初始设置" class="headerlink" title="初始设置"></a>初始设置</h2><ul>
+<li><p>下载或克隆以下代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;Kong&#x2F;kong-dist-kubernetes.git</span><br><span class="line">cd kong-dist-kubernetes</span><br></pre></td></tr></table></figure></li>
+<li><p>修改配置文件主要是k8s对应service的类型修改为type:nodePort</p>
+<pre><code>  apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-proxy
+  spec:
+  type: LoadBalancer  ## 将这里修改为nodeport
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-proxy
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+      app: kong</code></pre>
+</li>
+</ul>
+<h2 id="部署数据存储"><a href="#部署数据存储" class="headerlink" title="部署数据存储"></a>部署数据存储</h2><blockquote>
+<p>注意：这里使用pg数据库</p>
+</blockquote>
+<ul>
+<li><p>创建数据库</p>
+<pre><code>  apiVersion: v1
+  kind: Service
+  metadata:
+  name: postgres
+  spec:
+  ports:
+  - name: pgql
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+      app: postgres
+  ---
+  apiVersion: v1
+  kind: ReplicationController
+  metadata:
+  name: postgres
+  spec:
+  replicas: 1
+  template:
+      metadata:
+      labels:
+          app: postgres
+      spec:
+      containers:
+          - name: postgres
+          image: postgres:9.6
+          env:
+              - name: POSTGRES_USER
+              value: kong
+              - name: POSTGRES_PASSWORD
+              value: kong
+              - name: POSTGRES_DB
+              value: kong
+              - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+              - containerPort: 5432
+          volumeMounts:
+              - mountPath: /var/lib/postgresql/data
+              name: pg-data
+      volumes:
+          - name: pg-data
+          emptyDir: &#123;&#125;</code></pre>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f postgres.yaml   </span><br></pre></td></tr></table></figure></li>
+<li><p>准备数据库运行迁移作业，以下为kong_migration_postgres.yaml</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: batch&#x2F;v1</span><br><span class="line">kind: Job</span><br><span class="line">metadata:</span><br><span class="line">name: kong-migration</span><br><span class="line">spec:</span><br><span class="line">template:</span><br><span class="line">    metadata:</span><br><span class="line">    name: kong-migration</span><br><span class="line">    spec:</span><br><span class="line">    containers:</span><br><span class="line">    - name: kong-migration</span><br><span class="line">        image: kong</span><br><span class="line">        env:</span><br><span class="line">        - name: KONG_NGINX_DAEMON</span><br><span class="line">            value: &#39;off&#39;</span><br><span class="line">        - name: KONG_PG_PASSWORD</span><br><span class="line">            value: kong</span><br><span class="line">        - name: KONG_PG_HOST</span><br><span class="line">            value: postgres.default.svc.cluster.local</span><br><span class="line">        command: [ &quot;&#x2F;bin&#x2F;sh&quot;, &quot;-c&quot;, &quot;kong migrations bootstrap&quot; ]</span><br><span class="line">    restartPolicy: Never</span><br></pre></td></tr></table></figure>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f kong_migration_postgres.yaml </span><br></pre></td></tr></table></figure></li>
+<li><p>将Kong管理员，代理服务和Deployment控制器部署到集群</p>
+<pre><code>  apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-proxy
+  spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-proxy
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+      app: kong
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-proxy-ssl
+  spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-proxy-ssl
+      port: 8443
+      targetPort: 8443
+      protocol: TCP
+  selector:
+      app: kong
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-admin
+  spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-admin
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+  selector:
+      app: kong
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-admin-ssl
+  spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-admin-ssl
+      port: 8444
+      targetPort: 8444
+      protocol: TCP
+  selector:
+      app: kong
+  ---
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+  name: kong-rc
+  spec:
+  replicas: 3
+  template:
+      metadata:
+      labels:
+          name: kong-rc
+          app: kong
+      spec:
+      containers:
+      - name: kong
+          image: kong
+          env:
+          - name: KONG_ADMIN_LISTEN
+              value: &quot;0.0.0.0:8001, 0.0.0.0:8444 ssl&quot;
+          - name: KONG_PG_PASSWORD
+              value: kong
+          - name: KONG_PG_HOST
+              value: postgres
+          - name: KONG_PROXY_ACCESS_LOG
+              value: &quot;/dev/stdout&quot;
+          - name: KONG_ADMIN_ACCESS_LOG
+              value: &quot;/dev/stdout&quot;
+          - name: KONG_PROXY_ERROR_LOG
+              value: &quot;/dev/stderr&quot;
+          - name: KONG_ADMIN_ERROR_LOG
+              value: &quot;/dev/stderr&quot;
+          ports:
+          - name: admin
+          containerPort: 8001
+          protocol: TCP
+          - name: proxy
+          containerPort: 8000
+          protocol: TCP
+          - name: proxy-ssl
+          containerPort: 8443
+          protocol: TCP
+          - name: admin-ssl
+          containerPort: 8444
+          protocol: TCP</code></pre>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f kong_postgres.yaml</span><br></pre></td></tr></table></figure></li>
+<li><p>验证您的部署<br>您现在可以看到已经使用的资源kubectl：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl get all</span><br></pre></td></tr></table></figure>
+<p>一旦EXTERNAL_IP可用于Kong代理和管理服务，您可以通过发出以下请求来测试Kong：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl &lt;kong-admin-ip-address&gt;:8001</span><br><span class="line">curl https:&#x2F;&#x2F;&lt;admin-ssl-ip-address&gt;:8444</span><br><span class="line">curl &lt;kong-proxy-ip-address&gt;:8000</span><br><span class="line">curl https:&#x2F;&#x2F;&lt;kong-proxy-ssl-ip-address&gt;:8443</span><br></pre></td></tr></table></figure>
+<p>我这可以看到kong以及启动了，kong-rc都是running，<br>举例测试例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl 192.168.1.216:31572</span><br></pre></td></tr></table></figure>
+<h2 id="kong-UI管理工具–dashboard"><a href="#kong-UI管理工具–dashboard" class="headerlink" title="kong UI管理工具–dashboard"></a>kong UI管理工具–dashboard</h2></li>
+<li><p>使用docker 进行启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 8080:8080 pgbi&#x2F;kong-dashboard:v2</span><br></pre></td></tr></table></figure></li>
+<li><p>配置管理界面</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">API node 输入 k8snodeip:service nodeport</span><br><span class="line">      例如我的是：192.168.1.216:31572</span><br></pre></td></tr></table></figure>
+<p><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong01.png" alt="kong01"><br><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong02.png" alt="kong02"></p>
+</li>
+<li><p>操作界面<br><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong03.png" alt="kong03"><br><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong04.png" alt="kong04"></p>
+</li>
+<li><p>测试接口<br><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong05.png" alt="kong05"></p>
+</li>
+<li><p>参考资料</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/PGBI/kong-dashboard">https://github.com/PGBI/kong-dashboard</a></li>
+<li><a target="_blank" rel="noopener" href="https://getkong.org/install/kubernetes/">https://getkong.org/install/kubernetes/</a></li>
+<li><a target="_blank" rel="noopener" href="https://getkong.org/install/kubernetes/">https://getkong.org/install/kubernetes/</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/shown1985/p/6484822.html">http://www.cnblogs.com/shown1985/p/6484822.html</a></li>
+<li>API Gateway 模式： <a target="_blank" rel="noopener" href="http://microservices.io/patterns/apigateway.html">http://microservices.io/patterns/apigateway.html</a></li>
+<li>Nginx： <a target="_blank" rel="noopener" href="https://www.nginx.com/blog/introduction-to-microservices/">https://www.nginx.com/blog/introduction-to-microservices/</a></li>
+<li>Kong 项目官网：<a target="_blank" rel="noopener" href="https://getkong.org/">https://getkong.org/</a></li>
+</ul>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Adolf</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/">http://example.com/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/linux/">linux</a><a class="post-meta__tags" href="/tags/kong/">kong</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Bdocker/"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">K8s部署kong之docker</div></div></a></div><div class="next-post pull-right"><a href="/2019/05/08/kafka%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">kafka入门教程</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2019/05/09/k8s部署kong之docker/" title="K8s部署kong之docker"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-05-09</div><div class="title">K8s部署kong之docker</div></div></a></div><div><a href="/2019/02/23/Create Lvm/" title="Create_lvm"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-23</div><div class="title">Create_lvm</div></div></a></div><div><a href="/2019/03/09/AWS常用cli命令/" title="AWS常用cli命令"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-03-09</div><div class="title">AWS常用cli命令</div></div></a></div><div><a href="/2019/02/25/DNS介绍/" title="DNS介绍"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-25</div><div class="title">DNS介绍</div></div></a></div><div><a href="/2019/02/23/Delete private registry mirror/" title="Delete private registry mirror"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-23</div><div class="title">Delete private registry mirror</div></div></a></div><div><a href="/2019/02/24/Commonly used Git command list/" title="Commonly used Git command list"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-24</div><div class="title">Commonly used Git command list</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/null" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Adolf</div><div class="author-info__description">xxx</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3"><span class="toc-number">1.</span> <span class="toc-text">官方文档</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">简介：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong-%E6%9C%89%E4%B8%A4%E4%B8%AA%E4%B8%BB%E8%A6%81%E7%BB%84%E4%BB%B6%EF%BC%9A"><span class="toc-number">2.1.</span> <span class="toc-text">Kong 有两个主要组件：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong-%E5%9F%BA%E6%9C%AC%E5%8A%9F%E8%83%BD%EF%BC%9A"><span class="toc-number">2.2.</span> <span class="toc-text">Kong 基本功能：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong-%E4%B8%8D%E8%B6%B3%EF%BC%9A"><span class="toc-number">2.3.</span> <span class="toc-text">Kong 不足：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong%E7%9A%84%E9%99%90%E6%B5%81"><span class="toc-number">2.4.</span> <span class="toc-text">Kong的限流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong-api%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="toc-number">2.5.</span> <span class="toc-text">Kong api简单使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E8%AE%BE%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">初始设置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="toc-number">4.</span> <span class="toc-text">部署数据存储</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#kong-UI%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7%E2%80%93dashboard"><span class="toc-number">5.</span> <span class="toc-text">kong UI管理工具–dashboard</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo中图片无法加载"/></a><div class="content"><a class="title" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载">hexo中图片无法加载</a><time datetime="2021-01-26T15:59:21.000Z" title="Created 2021-01-26 23:59:21">2021-01-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/25/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2021/01/25/hello-world/" title="Hello World">Hello World</a><time datetime="2021-01-25T10:57:47.958Z" title="Created 2021-01-25 18:57:47">2021-01-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SLUB:Unable to Allocate Memory"/></a><div class="content"><a class="title" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory">SLUB:Unable to Allocate Memory</a><time datetime="2020-04-22T05:40:38.000Z" title="Created 2020-04-22 13:40:38">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="重启服务器导致docker中redis无法启动的问题解决"/></a><div class="content"><a class="title" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决">重启服务器导致docker中redis无法启动的问题解决</a><time datetime="2020-04-21T23:11:33.000Z" title="Created 2020-04-22 07:11:33">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用etcd快照恢复集群数据"/></a><div class="content"><a class="title" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据">使用etcd快照恢复集群数据</a><time datetime="2020-04-16T22:34:44.000Z" title="Created 2020-04-17 06:34:44">2020-04-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Adolf</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>

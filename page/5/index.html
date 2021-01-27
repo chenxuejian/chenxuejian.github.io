@@ -1,0 +1,323 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Adolf - xxx</title><meta name="author" content="Adolf"><meta name="copyright" content="Adolf"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="xxx">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Adolf">
+<meta property="og:url" content="http://example.com/page/5/index.html">
+<meta property="og:site_name" content="Adolf">
+<meta property="og:description" content="xxx">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/null">
+<meta property="article:author" content="Adolf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/null"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/page/5/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: false,
+  isHome: true,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2021-01-27 10:51:55'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/null" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Adolf</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="site-info"><h1 id="site-title">Adolf</h1><div id="site-subtitle"><span id="subtitle"></span></div></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/25/DNS%E4%BB%8B%E7%BB%8D/" title="DNS介绍">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DNS介绍"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/25/DNS%E4%BB%8B%E7%BB%8D/" title="DNS介绍">DNS介绍</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-25T05:24:22.000Z" title="Created 2019-02-25 13:24:22">2019-02-25</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">DNS解析全过程
+客户机提出域名解析请求,并将该请求发送给本地的域名服务器。
+
+当本地的域名服务器收到请求后,就先查询本地的缓存,如果有该纪录项,则本地的域名服务器就直接把查询的结果返回。
+
+如果本地的缓存中没有该纪录,则本地域名服务器就直接把请求发给根域名服务器,然后根域名服务器再返回给本地域名服务器一个所查询域(根的子域)的主域名服务器的地址。
+
+本地服务器再向上一步返回的域名服务器发送请求,然后接受请求的服务器查询自己的缓存,如果没有该纪录,则返回相关的下级的域名服务器的地址。
+
+重复第四步,直到找到正确的纪录。
+
+本地域名服务器把返回的结果保存到缓存,以备下一次使用,同时还将结果返回给客户机。
+
+
+1、什么是域名解析？域名解析就是国际域名或者国内域名以及中文域名等域名申请后做的到IP地址的转换过程。IP地址是网路上标识您站点的数字地址，为了简单好记，采用域名来代替ip地址标识站点地址。域名的解析工作由DNS服务器完成。 
+2、什么是A记录？A (Address) 记录是用来指定主机名（或域名）对应的IP地址记录。用户可以将该域名下的网站服务器指向到自己的web server上。 ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/25/%E9%85%8D%E7%BD%AEiptables%E4%BD%BF%E5%86%85%E7%BD%91%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%AE%BF%E9%97%AE%E5%85%AC%E7%BD%91/" title="Linux:配置iptables使内网虚拟机访问公网">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Linux:配置iptables使内网虚拟机访问公网"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/25/%E9%85%8D%E7%BD%AEiptables%E4%BD%BF%E5%86%85%E7%BD%91%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%AE%BF%E9%97%AE%E5%85%AC%E7%BD%91/" title="Linux:配置iptables使内网虚拟机访问公网">Linux:配置iptables使内网虚拟机访问公网</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-25T05:00:28.000Z" title="Created 2019-02-25 13:00:28">2019-02-25</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">问题当公网ip地址不够用的时候，或者出于安全目的，虚拟机使用纯内网ip，然后通过nat转发出去，是一个典型的虚拟化网络环境。
+解决方法
+打开宿主机的内核转发：
+  echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+配置nat
+  iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -o br0 -j SNAT --to 外网ip
+然后虚拟机网关配置宿主机内网ip，就可以上网了。
+
+
+注意点：
+1 宿主机虚拟机之间的流量是走的forward的链，宿主机的forward链必须全部打开。
+2 如果希望外面能访问虚拟机上的应用，可以配置端口映射
+
+比如将宿主机的10080映射到虚拟机192.168.1.8的80端口，命令如下：
+
+    iptables -t nat -A PREROUTING -d 外网ip -p tcp --10080 -j DNAT --to 192.168.1.8:80
+</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/24/%E6%98%8E%E6%9C%9D%E7%9A%87%E5%B8%9D%E5%88%97%E8%A1%A8/" title="明朝皇帝列表">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="明朝皇帝列表"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/24/%E6%98%8E%E6%9C%9D%E7%9A%87%E5%B8%9D%E5%88%97%E8%A1%A8/" title="明朝皇帝列表">明朝皇帝列表</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-24T06:59:20.000Z" title="Created 2019-02-24 14:59:20">2019-02-24</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Other/">Other</a></span></div><div class="content">明朝皇帝列表太祖朱元璋(1328-1398)
+年号“洪武”1368年称帝，在位31年 
+太祖朱元璋，安徽凤阳人，公元1368年8月，由朱元璋领导的起义军在大将徐达、常遇春等人的指挥下一举攻陷元大都–北京，宣告了元朝的灭亡。同年，朱元璋在建康(今南京)称帝，改元洪武，建立了明王朝，朱元璋是为明太祖。他死于1398年，时年71岁。 
+
+惠帝朱允炆(1377-1402)
+年号“建文”1398年即位，在位5年 
+
+惠帝，太祖孙，皇太子朱标的次子，朱元璋在世时，大封王室，20多个儿子均封为亲王，分驻各地，惠帝登基后，进行削藩，以统一军事，惹恼诸王，燕王朱棣其兵北京，1402年攻入南京，惠帝一说被烧死，一说外逃。 
+
+
+成祖朱棣(1360-1424)
+年号“永乐”1402年即位，在位23年 
+成祖朱棣，朱元璋的第四子，朱棣以入京除奸为名，发动了“靖难之役“。经过四年的战争，在1420年打败惠帝统治集团，夺取了明朝政权，建元永乐，是为明成祖。 
+1421年迁都北京，并下令编纂了《永乐大典》。死于1424年，时年65岁。 
+
+仁宗朱高炽(1378-1425)
+年号“洪熙”1424年即位，在位1年仁宗
+ ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/24/ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97%E8%AF%A6%E8%A7%A3/" title="Ansible常用模块详解">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Ansible常用模块详解"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/24/ansible%E5%B8%B8%E7%94%A8%E6%A8%A1%E5%9D%97%E8%AF%A6%E8%A7%A3/" title="Ansible常用模块详解">Ansible常用模块详解</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-24T06:41:20.000Z" title="Created 2019-02-24 14:41:20">2019-02-24</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">写在前边的根据zs官方的分类，将模块按功能分类为：云模块、命令模块、数据库模块、文件模块、资产模块、消息模块、监控模块、网络模块、通知模块、包管理模块、源码控制模块、系统模块、单元模块、web设施模块、windows模块 ，具体可以参看官方页面。这里从官方分类的模块里选择最常用的一些模块进行介绍。
+一、ping模块测试主机是否是通的，用法很简单，不涉及参数：
+ansible test -m ping
+二、setup模块setup模块，主要用于获取主机信息，在playbooks里经常会用到的一个参数gather_facts就与该模块相关。setup模块下经常使用的一个参数是filter参数，具体使用示例如下：
+ansible 10.212.52.252 -m setup -a &#39;filter=ansible_*_mb&#39;   //查看主机内存信息 ansible 10.212.52.252 -m setup -a &#39;filter=ansible_eth[0-2]&#39;   //查看地接口为eth0-2的网卡信息 ansible all -m setup --tr ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/24/Commonly%20used%20Git%20command%20list/" title="Commonly used Git command list">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Commonly used Git command list"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/24/Commonly%20used%20Git%20command%20list/" title="Commonly used Git command list">Commonly used Git command list</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-24T06:33:56.000Z" title="Created 2019-02-24 14:33:56">2019-02-24</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">说在前边的话一般来说，日常使用只要记住下图6个命令，就可以了。但是熟练使用，恐怕要记住60～100个命令。
+几个代码库* Workspace：工作区
+* Index / Stage：暂存区
+* Repository：仓库区（或本地仓库）
+* Remote：远程仓库
+一、新建代码库# 在当前目录新建一个Git代码库
+$ git init
+
+# 新建一个目录，将其初始化为Git代码库
+$ git init [project-name]
+
+# 下载一个项目和它的整个代码历史
+$ git clone [url]
+二、配置Git的设置文件为.gitconfig，它可以在用户主目录下（全局配置），也可以在项目目录下（项目配置）。
+# 显示当前的Git配置
+$ git config --list
+
+# 编辑Git配置文件
+$ git config -e [--global]
+
+# 设置提交代码时的用户信息
+$ git config [--global] user.name &quot;[name]&quot;
+$ git config [--global] user.email &quot;[ema ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/24/Git%20common%20commands/" title="Git common commands">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Git common commands"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/24/Git%20common%20commands/" title="Git common commands">Git common commands</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-24T06:23:58.000Z" title="Created 2019-02-24 14:23:58">2019-02-24</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">常用的几条git add .
+git commit -m &quot;xxxxxx&quot;
+git push
+git pull
+基本操作查看、添加、提交、删除、找回，重置修改文件git help &lt;command&gt; # 显示command的help
+git show # 显示某次提交的内容 git show $id
+git co -- &lt;file&gt; # 抛弃工作区修改
+git co . # 抛弃工作区修改
+git add &lt;file&gt; # 将工作文件修改提交到本地暂存区
+git add . # 将所有修改过的工作文件提交暂存区
+git rm &lt;file&gt; # 从版本库中删除文件
+git rm &lt;file&gt; --cached # 从版本库中删除文件，但不删除文件
+git reset &lt;file&gt; # 从暂存区恢复到工作文件
+git reset -- . # 从暂存区恢复到工作文件
+git reset --hard # 恢复最近一次提交过的状态，即放弃上次提交后的所有本次修改
+git ci &lt;file&gt; ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/23/GitHub%20+%20Hugo%20To%20build%20a%20personal%20blog/" title="GitHub + Hugo to Build a Personal Blog">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GitHub + Hugo to Build a Personal Blog"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/23/GitHub%20+%20Hugo%20To%20build%20a%20personal%20blog/" title="GitHub + Hugo to Build a Personal Blog">GitHub + Hugo to Build a Personal Blog</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-23T06:22:31.000Z" title="Created 2019-02-23 14:22:31">2019-02-23</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">-
+自己搭博客的N个理由
+你的笔记非常值钱，丢了就等于丢了N年工作经验。
+大多数博客网站都满足不了你：
+倒闭/停止服务/被删库时，你多半没备份。
+格式互不兼容，导入导出困难，复制粘贴会乱。
+富文本编辑器极其难用。
+可配置的地方不够，你讨厌的功能一堆。
+
+
+可以使用 Markdown 写博文：
+任何一个文本编辑器都能写，随时随地。
+足够沉浸，让你忘记格式，专注内容。
+备份容易：
+GitHub, GitBook, 印象笔记，CSDN，博客园，简书等都支持，到处复制粘贴也能得到大致相同的格式。
+纯文本本身也有足够可读性，网站/软件不支持也无所谓。
+
+
+
+
+GitHub 提供免费空间和 CDN，站点放 GitHub 仓库也方便做版本控制。
+用来当印象笔记的一个备份网站，写作的同时加深印象
+方便自己，方便他人
+
+
+可以作为学习新技术的试验田。
+
+
+注册 GitHub先注册一个 GitHub 账号。
+
+用户名会成为网址的一部分，以下为建议
+
+
+最好全英文小写
+不需要空格
+不需要太长
+建议使用自己的名字，方便好记。
+
+例：用户名 adolf，对应网址 adolf.github.io
+
+安装GitMa ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/23/Create%20Lvm/" title="Create_lvm">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Create_lvm"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/23/Create%20Lvm/" title="Create_lvm">Create_lvm</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-22T17:20:58.000Z" title="Created 2019-02-23 01:20:58">2019-02-23</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">创建 pvpvcreate /dev/sdb
+创建 vgvgcreate docker /dev/sdb
+检查 vgvgdisplay docker
+创建 lvlvcreate --wipesignatures y -n thinpool docker -l 90%VG
+
+注： 在名字叫 docker 的 vg 上创建名字叫 thinpool 的 lv，并指定这个 lv 使用的空间是 vg 的90%，–wipesignatures y 参数的意思是擦除signatures #
+
+创建 lvlvcreate --wipesignatures y -n thinpoolmeta docker -l 5%VG
+
+注：在名字叫 docker 的 vg 上创建名字叫 thinpoolmeta 的 lv，并指定这个 lv 使用的空间是 vg 的5%，–wipesignatures y 参数的意思是擦除signatures#
+
+将pool转换为thinpoollvconvert -y --zero n -c 512K --thinpool docker/thinpool --poolmetadata ...</div></div></div><div class="recent-post-item"><div class="post_cover left_radius"><a href="/2019/02/23/Delete%20private%20registry%20mirror/" title="Delete private registry mirror">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Delete private registry mirror"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/23/Delete%20private%20registry%20mirror/" title="Delete private registry mirror">Delete private registry mirror</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-22T17:16:20.000Z" title="Created 2019-02-23 01:16:20">2019-02-23</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">首先，在默认情况下，docker registry 是不允许删除镜像的，需要在配置config.yml中启用，在reigstry容器内：
+delete:
+enabled: true
+然后，使用 API GET /v2/&lt;镜像名&gt;/manifests/ 来取得要删除的镜像:Tag所对应的 digest。Registry 2.3 以后，必须加入头 Accept: application/vnd.docker.distribution.manifest.v2+json，否则取到的 digest 是错误的，这是为了防止误删除。比如，要删除 myimage:latest 镜像，那么取得 digest 的命令是：
+$ curl --header &quot;Accept: application/vnd.docker.distribution.manifest.v2+json&quot; \
+-I -X HEAD http://192.168.99.100:5000/v2/myimage/manifests/latest \
+| grep Digest
+Docker-Content-D ...</div></div></div><div class="recent-post-item"><div class="post_cover right_radius"><a href="/2019/02/22/journalctl/" title="Journalctl执行报错">     <img class="post_bg" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Journalctl执行报错"></a></div><div class="recent-post-info"><a class="article-title" href="/2019/02/22/journalctl/" title="Journalctl执行报错">Journalctl执行报错</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">Created</span><time datetime="2019-02-21T22:36:03.000Z" title="Created 2019-02-22 06:36:03">2019-02-22</time></span><span class="article-meta"><span class="article-meta__separator">|</span><i class="fas fa-inbox article-meta__icon"></i><a class="article-meta__categories" href="/categories/Linux/">Linux</a></span></div><div class="content">原因： 日志文件损坏，删除之前的日志
+[root@172 admin]# journalctl
+Error was encountered while opening journal files: Input/output error
+解决方法：rm -rf /var/log/journal/*
+然后可以通过重启systemd-journald服务重新生成：
+systemctl restart systemd-journald%
+</div></div></div><nav id="pagination"><div class="pagination"><a class="extend prev" rel="prev" href="/page/4/"><i class="fas fa-chevron-left fa-fw"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/"><i class="fas fa-chevron-right fa-fw"></i></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/null" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Adolf</div><div class="author-info__description">xxx</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo中图片无法加载"/></a><div class="content"><a class="title" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载">hexo中图片无法加载</a><time datetime="2021-01-26T15:59:21.000Z" title="Created 2021-01-26 23:59:21">2021-01-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/25/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2021/01/25/hello-world/" title="Hello World">Hello World</a><time datetime="2021-01-25T10:57:47.958Z" title="Created 2021-01-25 18:57:47">2021-01-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SLUB:Unable to Allocate Memory"/></a><div class="content"><a class="title" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory">SLUB:Unable to Allocate Memory</a><time datetime="2020-04-22T05:40:38.000Z" title="Created 2020-04-22 13:40:38">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="重启服务器导致docker中redis无法启动的问题解决"/></a><div class="content"><a class="title" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决">重启服务器导致docker中redis无法启动的问题解决</a><time datetime="2020-04-21T23:11:33.000Z" title="Created 2020-04-22 07:11:33">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用etcd快照恢复集群数据"/></a><div class="content"><a class="title" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据">使用etcd快照恢复集群数据</a><time datetime="2020-04-16T22:34:44.000Z" title="Created 2020-04-17 06:34:44">2020-04-17</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline"><i class="fas fa-folder-open"></i><span>Categories</span></div><ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Linux/"><span class="card-category-list-name">Linux</span><span class="card-category-list-count">51</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Other/"><span class="card-category-list-name">Other</span><span class="card-category-list-count">4</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Windows/"><span class="card-category-list-name">Windows</span><span class="card-category-list-count">3</span></a></li>
+            
+            </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>Tags</span></div><div class="card-tag-cloud"><a href="/tags/18-09-5/" style="font-size: 1.1em; color: #999">18.09.5</a> <a href="/tags/Ansible/" style="font-size: 1.1em; color: #999">Ansible</a> <a href="/tags/Azure/" style="font-size: 1.3em; color: #99a1ac">Azure</a> <a href="/tags/DNS/" style="font-size: 1.1em; color: #999">DNS</a> <a href="/tags/Docker/" style="font-size: 1.1em; color: #999">Docker</a> <a href="/tags/ES/" style="font-size: 1.1em; color: #999">ES</a> <a href="/tags/Eviction-Thresholds/" style="font-size: 1.1em; color: #999">Eviction Thresholds</a> <a href="/tags/FTP/" style="font-size: 1.1em; color: #999">FTP</a> <a href="/tags/Git/" style="font-size: 1.2em; color: #999da3">Git</a> <a href="/tags/GitHub/" style="font-size: 1.1em; color: #999">GitHub</a> <a href="/tags/Harbor/" style="font-size: 1.1em; color: #999">Harbor</a> <a href="/tags/Hugo/" style="font-size: 1.1em; color: #999">Hugo</a> <a href="/tags/LVS/" style="font-size: 1.1em; color: #999">LVS</a> <a href="/tags/Linux/" style="font-size: 1.4em; color: #99a5b6">Linux</a> <a href="/tags/Nginx/" style="font-size: 1.2em; color: #999da3">Nginx</a> <a href="/tags/Puppet/" style="font-size: 1.1em; color: #999">Puppet</a> <a href="/tags/ace2-3/" style="font-size: 1.1em; color: #999">ace2.3</a> <a href="/tags/arm/" style="font-size: 1.1em; color: #999">arm</a> <a href="/tags/aws/" style="font-size: 1.1em; color: #999">aws</a> <a href="/tags/captain/" style="font-size: 1.1em; color: #999">captain</a> <a href="/tags/cli/" style="font-size: 1.3em; color: #99a1ac">cli</a> <a href="/tags/cos/" style="font-size: 1.1em; color: #999">cos</a> <a href="/tags/direct-lvm/" style="font-size: 1.1em; color: #999">direct-lvm</a> <a href="/tags/docker/" style="font-size: 1.1em; color: #999">docker</a> <a href="/tags/docker%E5%8D%87%E7%BA%A7/" style="font-size: 1.1em; color: #999">docker升级</a> <a href="/tags/etcd/" style="font-size: 1.1em; color: #999">etcd</a> <a href="/tags/firewalld/" style="font-size: 1.1em; color: #999">firewalld</a> <a href="/tags/helm/" style="font-size: 1.2em; color: #999da3">helm</a> <a href="/tags/hexo/" style="font-size: 1.1em; color: #999">hexo</a> <a href="/tags/hung-task-timeout-secs/" style="font-size: 1.1em; color: #999">hung_task_timeout_secs</a> <a href="/tags/image/" style="font-size: 1.1em; color: #999">image</a> <a href="/tags/iostat/" style="font-size: 1.1em; color: #999">iostat</a> <a href="/tags/iptables/" style="font-size: 1.3em; color: #99a1ac">iptables</a> <a href="/tags/k8s/" style="font-size: 1.4em; color: #99a5b6">k8s</a> <a href="/tags/kafka/" style="font-size: 1.1em; color: #999">kafka</a> <a href="/tags/kong/" style="font-size: 1.2em; color: #999da3">kong</a> <a href="/tags/linux/" style="font-size: 1.5em; color: #99a9bf">linux</a> <a href="/tags/log/" style="font-size: 1.1em; color: #999">log</a> <a href="/tags/lvm/" style="font-size: 1.1em; color: #999">lvm</a> <a href="/tags/overlay2/" style="font-size: 1.1em; color: #999">overlay2</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>Archives</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2021/01/"><span class="card-archive-list-date">January 2021</span><span class="card-archive-list-count">2</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2020/04/"><span class="card-archive-list-date">April 2020</span><span class="card-archive-list-count">10</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/08/"><span class="card-archive-list-date">August 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/07/"><span class="card-archive-list-date">July 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/06/"><span class="card-archive-list-date">June 2019</span><span class="card-archive-list-count">1</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/05/"><span class="card-archive-list-date">May 2019</span><span class="card-archive-list-count">5</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/03/"><span class="card-archive-list-date">March 2019</span><span class="card-archive-list-count">13</span></a></li><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2019/02/"><span class="card-archive-list-date">February 2019</span><span class="card-archive-list-count">18</span></a></li><li class="card-archive-list-item more is-center"><a class="card-archive-list-link-more" href="/archives/">
+              <span>More</span><i class="fas fa-angle-right"  ></i></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>Info</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">Article :</div><div class="item-count">60</div></div><div class="webinfo-item"><div class="item-name">UV :</div><div class="item-count" id="busuanzi_value_site_uv"></div></div><div class="webinfo-item"><div class="item-name">PV :</div><div class="item-count" id="busuanzi_value_site_pv"></div></div><div class="webinfo-item"><div class="item-name">Last Push :</div><div class="item-count" id="last-push-date" data-lastPushDate="2021-01-27T02:51:55.478Z"></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Adolf</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>

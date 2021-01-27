@@ -1,0 +1,343 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kubernetes Eviction Manager工作机制分析 | Adolf</title><meta name="keywords" content="linux,k8s"><meta name="author" content="Adolf"><meta name="copyright" content="Adolf"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="摘要为了极限的压榨资源，很多时候Kubernetes集群会运行一些Best-Effort Task，这样就会存在资源超配的情况，Kubernetes是如何控制Node上资源的使用，在压榨资源使用的同时又能保证Node的稳定性？本文就为你介绍其背后运行机制。我的下一篇博文，会对Kubelet Eviction Manager进行源码分析，感兴趣的同学可以关注。 研究过Kubernetes Resou">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes Eviction Manager工作机制分析">
+<meta property="og:url" content="http://example.com/2019/02/27/Kubernetes%20Eviction%20Manager%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Adolf">
+<meta property="og:description" content="摘要为了极限的压榨资源，很多时候Kubernetes集群会运行一些Best-Effort Task，这样就会存在资源超配的情况，Kubernetes是如何控制Node上资源的使用，在压榨资源使用的同时又能保证Node的稳定性？本文就为你介绍其背后运行机制。我的下一篇博文，会对Kubelet Eviction Manager进行源码分析，感兴趣的同学可以关注。 研究过Kubernetes Resou">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg">
+<meta property="article:published_time" content="2019-02-27T06:59:43.000Z">
+<meta property="article:modified_time" content="2021-01-27T02:25:26.038Z">
+<meta property="article:author" content="Adolf">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="k8s">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2019/02/27/Kubernetes%20Eviction%20Manager%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%88%86%E6%9E%90/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-01-27 10:25:26'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/null" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Adolf</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Kubernetes Eviction Manager工作机制分析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2019-02-27T06:59:43.000Z" title="Created 2019-02-27 14:59:43">2019-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2021-01-27T02:25:26.038Z" title="Updated 2021-01-27 10:25:26">2021-01-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Linux/">Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>为了极限的压榨资源，很多时候Kubernetes集群会运行一些Best-Effort Task，这样就会存在资源超配的情况，Kubernetes是如何控制Node上资源的使用，在压榨资源使用的同时又能保证Node的稳定性？本文就为你介绍其背后运行机制。我的下一篇博文，会对Kubelet Eviction Manager进行源码分析，感兴趣的同学可以关注。</p>
+<p>研究过Kubernetes Resource QoS的同学，肯定会有一个疑问：QoS中会通过Pod QoS和OOM Killer进行资源的回收，当发生资源紧缺的时候。那为什么Kubernetes会再搞一个Kubelet Eviction机制，来做几乎同样的事呢？</p>
+<p>首先，我们来谈一下kubelet通过OOM Killer来回收资源的缺点：</p>
+<ul>
+<li>System OOM events本来就是对资源敏感的，它会stall这个Node直到完成了OOM Killing Process。</li>
+<li>当OOM Killer干掉某些containers之后，kubernetes Scheduler可能很快又会调度一个新的Pod到该Node上或者container 直接在node上restart，马上又会触发该Node上的OOM Killer启动OOM Killing Process，事情可能会没完没了的进行，这可不妙啊。</li>
+</ul>
+<p>我们再来看看Kubelet Eviction有何不同：</p>
+<ul>
+<li>Kubelet通过pro-actively监控并阻止Node上资源的耗尽，一旦触发Eviction Signals，就会直接Fail一个或者多个Pod以回收资源，而不是通过Linux OOM Killer这样本身耗资源的组件进行回收。</li>
+<li>这样的Eviction Signals的可配置的，可以做到Pro-actively。</li>
+<li>另外，被Evicted Pods会在其他Node上重新调度，而不会再次触发本Node上的再次Eviction。</li>
+</ul>
+<p>下面，我们具体来研究一下Kubelet Eviction Policy的工作机制。</p>
+<ul>
+<li>kubelet预先监控本节点的资源使用，并且阻止资源被耗尽，这样保证node的稳定性。</li>
+<li>kubelet会预先Fail N(&gt;= 1)个Pod以回收出现紧缺的资源。</li>
+<li>kubelet会Fail一个Node时，会将Pod内所有Containners都kill掉，并把PodPhase设为Failed。</li>
+<li>kubelet通过事先人为设定Eviction Thresholds来触发Eviction动作以回收资源。<h2 id="Eviction-Signals"><a href="#Eviction-Signals" class="headerlink" title="Eviction Signals"></a>Eviction Signals</h2>支持如下Eviction Signals:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Eviction Signal</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>memory.available</td>
+<td>memory.available := node.status.capacity[memory] - node.stats.memory.workingSet</td>
+</tr>
+<tr>
+<td>nodefs.available</td>
+<td>nodefs.available := node.stats.fs.available</td>
+</tr>
+<tr>
+<td>nodefs.inodesFree</td>
+<td>nodefs.inodesFree := node.stats.fs.inodesFree</td>
+</tr>
+<tr>
+<td>imagefs.available</td>
+<td>imagefs.available := node.stats.runtime.imagefs.available</td>
+</tr>
+<tr>
+<td>imagefs.inodesFree</td>
+<td>imagefs.inodesFree := node.stats.runtime.imagefs.inodesFree</td>
+</tr>
+</tbody></table>
+<ul>
+<li>kubelet目前支持一下两种filesystem，其中imagefs为可选的。Kubelet通过cAdvisor来自动发现这些filesystem。 </li>
+<li>nodefs - Kubelet用来存储volume，logs等数据。 </li>
+<li>imagefs - 容器运行时(dockerd/rkt等)用来存放镜像和容器的Writable Layer。</li>
+</ul>
+<h2 id="Eviction-Thresholds"><a href="#Eviction-Thresholds" class="headerlink" title="Eviction Thresholds"></a>Eviction Thresholds</h2><p>前面也提到，kubelet通过事先人为设定Eviction Thresholds来触发Eviction动作以回收资源。</p>
+<ul>
+<li>Eviction Thresholds的形式为：<eviction-signal><operator><quantity></quantity></operator></eviction-signal></li>
+<li>quantity支持绝对值和相对百分比两种形式，比如： <ul>
+<li>memory.available&lt;10%</li>
+<li>memory.available&lt;1Gi</li>
+</ul>
+</li>
+</ul>
+<h2 id="Soft-Eviction-Thresholds"><a href="#Soft-Eviction-Thresholds" class="headerlink" title="Soft Eviction Thresholds"></a>Soft Eviction Thresholds</h2><p>Soft Eviction Thresholds是什么意思？<br>它指的是，当Eviction Signal中值达到Soft Eviction Thresholds配置的值时，并不会马上触发Kubelet去Evict Pods，而是会等待一个用户配置的grace period之后，再触发。相关的配置有三个，如下：</p>
+<ul>
+<li>eviction-soft - (e.g. memory.available&lt;1.5Gi) 触发Soft Eviction的Evication Signal阈值。</li>
+<li>eviction-soft-grace-period - (e.g. memory.available=1m30s) 当Eviction Signal的值达到配置eviction-soft值后，需要等待grace period，注意这期间，每10s会重新获取监控数据并维护Threshold的值。如果grace period最后一次监控数据仍然触发了阈值，才会再触发Evict Pods。这个参数就是配置这个grace period的。</li>
+<li>eviction-max-pod-grace-period - (e.g. memory.available=30s) 这个是配置Evict Pods时，Pod Termination的Max Grace Period。如果待Evict的Pod指定了pod.Spec.TerminationGracePeriodSeconds，则取min(eviction-max-pod-grace-period, pod.Spec.TerminationGracePeriodSeconds)作为Pod Termination真正的Grace Period。</li>
+</ul>
+<p>因此，从kubelet监控到的Eviction Signal达到指定的Soft Eviction Thresholds开始，到Pod真正被Kill，总共所需要的时间为：<br><code>sum(eviction-soft-grace-period + min(eviction-max-pod-grace-period,pod.Spec.TerminationGracePeriodSeconds))</code></p>
+<h2 id="Hard-Eviction-Thresholds"><a href="#Hard-Eviction-Thresholds" class="headerlink" title="Hard Eviction Thresholds"></a>Hard Eviction Thresholds</h2><p>理解了Soft Eviction Thresholds,那么Hard Eviction Thresholds就很简单了，它是指：当Eviction Signal中值达到Hard Eviction Thresholds配置的值时，会立刻触发Kubelet去Evict Pods，并且也不会有Pod Termination Grace Period，而是立刻kill Pods，即使待Evict的Pod指定了pod.Spec.TerminationGracePeriodSeconds。</p>
+<p>总之，Hard Eviction Thresholds就是来硬的，一旦触发，kubelet立刻马上kill相关的pods。</p>
+<p>因此，kubelet关于Hard Eviction Thresholds的配置也只有一个：</p>
+<ul>
+<li>eviction-hard - (e.g. memory.available&lt;1Gi) 这个值，要设置的比eviction-soft更低才有意义。</li>
+</ul>
+<h2 id="Eviction-Monitoring-Interval"><a href="#Eviction-Monitoring-Interval" class="headerlink" title="Eviction Monitoring Interval"></a>Eviction Monitoring Interval</h2><p>kubelet会通过监控Eviction Signal的值，当达到配置的阈值时，就会触发Evict Pods。 </p>
+<p>kubelet对应的监控周期，就通过cAdvisor的housekeeping-interval配置的，默认10s。</p>
+<h2 id="Node-Conditions"><a href="#Node-Conditions" class="headerlink" title="Node Conditions"></a>Node Conditions</h2><p>当Hard Eviction Thresholds或Soft Eviction Thresholds被触及后，Kubelet会将对应的Eviction Signals映射到对应的Node Conditions，其映射关系如下：</p>
+<table>
+<thead>
+<tr>
+<th>Node Condition</th>
+<th>Eviction Signal</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MemoryPressure</td>
+<td>memory.available</td>
+<td>Available memory on the node has satisfied an eviction threshold</td>
+</tr>
+<tr>
+<td>DiskPressure</td>
+<td>nodefs.available, nodefs.inodesFree, imagefs.available, or imagefs.inodesFree</td>
+<td>Available disk space and inodes on either the node’s root filesystem or image filesystem has satisfied an eviction threshold</td>
+</tr>
+</tbody></table>
+<p>kubelet映射了Node Condition之后，会继续按照–node-status-update-frequency(default 10s)配置的时间间隔，周期性的与kube-apiserver进行node status updates。</p>
+<h2 id="Oscillation-of-node-conditions"><a href="#Oscillation-of-node-conditions" class="headerlink" title="Oscillation of node conditions"></a>Oscillation of node conditions</h2><p>想象一下，如果一个Node上监控到的Soft Eviction Signals的值，一直在eviction-soft水平线上下波动，那么Kubelet就会将该Node对应的Node Condition在true和false频繁切换。这可不是什么好事，它可能会带来kube-scheduler做出错误的调度决定。kubelet是怎么处理这种情况的呢？</p>
+<p>很简单，Kubelet通过添加参数eviction-pressure-transition-period(default 5m0s)配置，使Kubelet在解除由Evicion Signal映射的Node Pressure之前，必须等待这么长的时间。</p>
+<p>因此，逻辑就变成这样了：</p>
+<ul>
+<li>Soft Evction Singal高于Soft Eviction Thresholds时，Kubelet还是会立刻设置对应的MemoryPressure Or DiskPressure为True。</li>
+<li>当MemoryPressure Or DiskPressure为True的前提下，发生了Soft Evction Singal低于Soft Eviction Thresholds的情况，则需要等待eviction-pressure-transition-period(default 5m0s)配置的这么长时间，才会将condition pressure切换回False。<blockquote>
+<p>一句话总结：Node Condition Pressure成为True容易，切换回False则要等eviction-pressure-transition-period。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="Eviction-of-Pods"><a href="#Eviction-of-Pods" class="headerlink" title="Eviction of Pods"></a>Eviction of Pods</h2><p>Kubelet的Eviction流程概括如下：</p>
+<ul>
+<li>在每一个监控周期内，如果Eviction Thresholds被触及，则： </li>
+<li>获取候选Pod</li>
+<li>Fail the Pod</li>
+<li>等待该Pod被Terminated </li>
+<li>如果该Pod由于种种原因没有被成功Terminated，Kubelet将会再选一个Pod进行Fail Operation。其中，Fail Pod的时候，Kubelet是通过调用容器运行时的KillPod接口，如果接口返回True，则认为Fail Pod成功，否则视为失败。<h2 id="Eviction-Strategy"><a href="#Eviction-Strategy" class="headerlink" title="Eviction Strategy"></a>Eviction Strategy</h2>kubelet根据Pod的QoS Class实现了一套默认的Evication策略，内容见我的另外一篇博文Kubernetes Resource QoS机制解读中介绍的“如何根据不同的QoS回收Resource”,这里不再赘述。</li>
+</ul>
+<p>下面给出Eviction Strategy的图解：</p>
+<p><img src="/2019/02/27/Kubernetes%20Eviction%20Manager%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%88%86%E6%9E%90/Eviction.png" alt="Eviction"></p>
+<h2 id="Minimum-eviction-reclaim"><a href="#Minimum-eviction-reclaim" class="headerlink" title="Minimum eviction reclaim"></a>Minimum eviction reclaim</h2><p>有些情况下，eviction pods可能只能回收一小部分的资源就能使得Evication Signal的值低于Thresholds。但是，可能随着资源使用的波动或者新的调度Pod使得在该Node上很快又会触发evict pods的动作，eviction毕竟是耗时的动作，所以应该尽量避免这种情况的发生。</p>
+<p>Kubelet是通过–eviction-minimum-reclaim(e.g. memory.available=0Mi,nodefs.available=500Mi,imagefs.available=2Gi)来控制每次Evict Pods后，Node上对应的Resource不仅要比Eviction Thresholds低，还要保证最少比Eviction Thresholds低–eviction-minimum-reclaim中配置的数量。</p>
+<h2 id="Node-OOM-Behavior"><a href="#Node-OOM-Behavior" class="headerlink" title="Node OOM Behavior"></a>Node OOM Behavior</h2><p>正常情况下，但Node上资源利用率很高时，Node的资源回收是会通过Kubelet Eviction触发完成。但是存在这么一种情况，Kubelet配置的Soft/Hard memory.available还没触发，却先触发了Node上linux kernel oom_killer，这时回收内存资源的请求就被kernel oom_killer处理了，而不会经过Kubelet Eviction去完成。</p>
+<p>我的博文Kubernetes Resource QoS机制解读中介绍过，Kubelet根据Pod QoS给每个container都设置了oom_score_adj，整理如下：</p>
+<table>
+<thead>
+<tr>
+<th>Quality of Service</th>
+<th>oom_score_adj</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Guaranteed</td>
+<td>-998</td>
+</tr>
+<tr>
+<td>BestEffort</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>Burstable</td>
+<td>min(max(2, 1000 - (1000 * memoryRequestBytes) / machineMemoryCapacityBytes), 999)</td>
+</tr>
+</tbody></table>
+<p>oom_killer根据container使用的内存占Node总内存的百分比计算得到该container的oom_score，然后再将该oom_sore和前面对应的oom_score_adj相加作为最终的oom_score，Node上所有containers的最终oom_score进行排名，将oom_score得分最高的container kill掉。通过如此方式进行资源回收。</p>
+<p>oom_killer这样做的目标就是干掉QoS低的又消耗最多内存(相对request值)的容器首先被kill掉，如此回收内存。</p>
+<p>不同于Kubelet Evict Pods的是，Node OOM Behavior存在一个缺点：如果Pod中某个容器被oom_killer干掉之后，会根据该容器的RestartPolicy决定是否restart这个容器。如果这是个有问题的容器，restart之后，可能又很快消耗大量内存进而触发了再次Node OOM Behavior，如此循环反复，该Node没有真正的回收到内存资源。</p>
+<h2 id="Scheduler"><a href="#Scheduler" class="headerlink" title="Scheduler"></a>Scheduler</h2><p>前面提到，Kubelet会定期的将Node Condition传给kube-apiserver并存于etcd。kube-scheduler watch到Node Condition Pressure之后，会根据以下策略，阻止更多Pods Bind到该Node。</p>
+<table>
+<thead>
+<tr>
+<th>Node Condition</th>
+<th>Scheduler Behavior</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MemoryPressure</td>
+<td>No new BestEffort pods are scheduled to the node.</td>
+</tr>
+<tr>
+<td>DiskPressure</td>
+<td>No new pods are scheduled to the node.</td>
+</tr>
+</tbody></table>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>Kubelet通过Eviction Signal来记录监控到的Node节点使用情况。</li>
+<li>Eviction Signal支持：memory.available, nodefs.available, nodefs.inodesFree, imagefs.available, imagefs.inodesFree。</li>
+<li>通过设置Hard Eviction Thresholds和Soft Eviction Thresholds相关参数来触发Kubelet进行Evict Pods的操作。</li>
+<li>Evict Pods的时候根据Pod QoS和资源使用情况挑选Pods进行Kill。</li>
+<li>Kubelet通过eviction-pressure-transition-period防止Node Condition来回切换引起scheduler做出错误的调度决定。</li>
+<li>Kubelet通过–eviction-minimum-reclaim来保证每次进行资源回收后，Node的最少可用资源，以避免频繁被触发Evict Pods操作。</li>
+<li>当Node Condition为MemoryPressure时，Scheduler不会调度新的QoS Class为BestEffort的Pods到该Node。</li>
+<li>当Node Condition为DiskPressure时，Scheduler不会调度任何新的Pods到该Node。</li>
+</ul>
+<hr>
+<p>作者：WaltonWang<br>来源：CSDN<br>原文：<a target="_blank" rel="noopener" href="https://blog.csdn.net/WaltonWang/article/details/55804309">https://blog.csdn.net/WaltonWang/article/details/55804309</a><br>版权声明：本文为博主原创文章，转载请附上博文链接！</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Adolf</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2019/02/27/Kubernetes%20Eviction%20Manager%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%88%86%E6%9E%90/">http://example.com/2019/02/27/Kubernetes%20Eviction%20Manager%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%88%86%E6%9E%90/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/linux/">linux</a><a class="post-meta__tags" href="/tags/k8s/">k8s</a></div><div class="post_share"><div class="social-share" data-image="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2019/02/28/k8s%E5%AE%B9%E5%99%A8%E4%B8%80%E7%9B%B4%E9%87%8D%E5%90%AF%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/"><img class="prev-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">K8s容器一直重启问题排查</div></div></a></div><div class="next-post pull-right"><a href="/2019/02/27/Kubernetes%E7%9A%84%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">Kubernetes的使用技巧</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2019/02/26/Get the value of a variable error within the pod K8S/" title="K8S的pod内获取变量的值错误"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-26</div><div class="title">K8S的pod内获取变量的值错误</div></div></a></div><div><a href="/2019/02/27/K8S的 QoS策略/" title="K8S的 QoS策略"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-27</div><div class="title">K8S的 QoS策略</div></div></a></div><div><a href="/2019/05/06/Kubernetes之pod调度/" title="Kubernetes之pod调度"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-05-06</div><div class="title">Kubernetes之pod调度</div></div></a></div><div><a href="/2019/02/27/Kubernetes的使用技巧/" title="Kubernetes的使用技巧"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-27</div><div class="title">Kubernetes的使用技巧</div></div></a></div><div><a href="/2019/08/29/etcd集群运维/" title="Etcd集群运维"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-08-29</div><div class="title">Etcd集群运维</div></div></a></div><div><a href="/2019/02/27/k8s的一次路由故障/" title="K8s的一次路由故障"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2019-02-27</div><div class="title">K8s的一次路由故障</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/null" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">Adolf</div><div class="author-info__description">xxx</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">60</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">61</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%91%98%E8%A6%81"><span class="toc-number">1.</span> <span class="toc-text">摘要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Eviction-Signals"><span class="toc-number">2.</span> <span class="toc-text">Eviction Signals</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Eviction-Thresholds"><span class="toc-number">3.</span> <span class="toc-text">Eviction Thresholds</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Soft-Eviction-Thresholds"><span class="toc-number">4.</span> <span class="toc-text">Soft Eviction Thresholds</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hard-Eviction-Thresholds"><span class="toc-number">5.</span> <span class="toc-text">Hard Eviction Thresholds</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Eviction-Monitoring-Interval"><span class="toc-number">6.</span> <span class="toc-text">Eviction Monitoring Interval</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Node-Conditions"><span class="toc-number">7.</span> <span class="toc-text">Node Conditions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Oscillation-of-node-conditions"><span class="toc-number">8.</span> <span class="toc-text">Oscillation of node conditions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Eviction-of-Pods"><span class="toc-number">9.</span> <span class="toc-text">Eviction of Pods</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Eviction-Strategy"><span class="toc-number">10.</span> <span class="toc-text">Eviction Strategy</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Minimum-eviction-reclaim"><span class="toc-number">11.</span> <span class="toc-text">Minimum eviction reclaim</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Node-OOM-Behavior"><span class="toc-number">12.</span> <span class="toc-text">Node OOM Behavior</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Scheduler"><span class="toc-number">13.</span> <span class="toc-text">Scheduler</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">14.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="hexo中图片无法加载"/></a><div class="content"><a class="title" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载">hexo中图片无法加载</a><time datetime="2021-01-26T15:59:21.000Z" title="Created 2021-01-26 23:59:21">2021-01-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/01/25/hello-world/" title="Hello World"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Hello World"/></a><div class="content"><a class="title" href="/2021/01/25/hello-world/" title="Hello World">Hello World</a><time datetime="2021-01-25T10:57:47.958Z" title="Created 2021-01-25 18:57:47">2021-01-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SLUB:Unable to Allocate Memory"/></a><div class="content"><a class="title" href="/2020/04/22/SLUB:Unable%20to%20allocate%20memory/" title="SLUB:Unable to Allocate Memory">SLUB:Unable to Allocate Memory</a><time datetime="2020-04-22T05:40:38.000Z" title="Created 2020-04-22 13:40:38">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="重启服务器导致docker中redis无法启动的问题解决"/></a><div class="content"><a class="title" href="/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" title="重启服务器导致docker中redis无法启动的问题解决">重启服务器导致docker中redis无法启动的问题解决</a><time datetime="2020-04-21T23:11:33.000Z" title="Created 2020-04-22 07:11:33">2020-04-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用etcd快照恢复集群数据"/></a><div class="content"><a class="title" href="/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" title="使用etcd快照恢复集群数据">使用etcd快照恢复集群数据</a><time datetime="2020-04-16T22:34:44.000Z" title="Created 2020-04-17 06:34:44">2020-04-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2021 By Adolf</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>
