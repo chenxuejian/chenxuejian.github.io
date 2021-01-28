@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Adolf</title>
+  
+  <subtitle>xxx</subtitle>
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2021-01-28T07:03:09.822Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>Adolf</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>如何有效的修改Linux云服务器的hosts配置</title>
+    <link href="http://example.com/2021/01/28/%E5%A6%82%E4%BD%95%E6%9C%89%E6%95%88%E7%9A%84%E4%BF%AE%E6%94%B9Linux%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84hosts%E9%85%8D%E7%BD%AE/"/>
+    <id>http://example.com/2021/01/28/%E5%A6%82%E4%BD%95%E6%9C%89%E6%95%88%E7%9A%84%E4%BF%AE%E6%94%B9Linux%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84hosts%E9%85%8D%E7%BD%AE/</id>
+    <published>2021-01-28T06:42:35.000Z</published>
+    <updated>2021-01-28T07:03:09.822Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;操作场景&quot;&gt;&lt;a href=&quot;#操作场景&quot; class=&quot;headerlink&quot; title=&quot;操作场景&quot;&gt;&lt;/a&gt;操作场景&lt;/h2&gt;&lt;p&gt;在2018年3月1号之后，腾讯云官网提供的 Linux 公有镜像预安装了纯开源的工具 Cloud-Init，并通过</summary>
+        
+      
+    
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="腾讯云" scheme="http://example.com/tags/%E8%85%BE%E8%AE%AF%E4%BA%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>hexo中图片无法加载</title>
+    <link href="http://example.com/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/"/>
+    <id>http://example.com/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/</id>
+    <published>2021-01-26T15:59:21.000Z</published>
+    <updated>2021-01-26T16:24:21.163Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;配置开关&quot;&gt;&lt;a href=&quot;#配置开关&quot; class=&quot;headerlink&quot; title=&quot;配置开关&quot;&gt;&lt;/a&gt;配置开关&lt;/h2&gt;&lt;p&gt;首先确认根目录_config.yml中有:&lt;/p&gt;
+&lt;figure class=&quot;highlight</summary>
+        
+      
+    
+    
+    
+    
+    <category term="linux" scheme="http://example.com/tags/linux/"/>
+    
+    <category term="hexo" scheme="http://example.com/tags/hexo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://example.com/2021/01/25/hello-world/"/>
+    <id>http://example.com/2021/01/25/hello-world/</id>
+    <published>2021-01-25T10:57:47.958Z</published>
+    <updated>2021-01-25T10:57:47.958Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt;</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>SLUB:Unable to Allocate Memory</title>
+    <link href="http://example.com/2020/04/22/SLUB:Unable%20to%20allocate%20memory/"/>
+    <id>http://example.com/2020/04/22/SLUB:Unable%20to%20allocate%20memory/</id>
+    <published>2020-04-22T05:40:38.000Z</published>
+    <updated>2021-01-27T02:25:26.042Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;故障&quot;&gt;&lt;a href=&quot;#故障&quot; class=&quot;headerlink&quot; title=&quot;故障&quot;&gt;&lt;/a&gt;故障&lt;/h2&gt;&lt;p&gt;&lt;img</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>重启服务器导致docker中redis无法启动的问题解决</title>
+    <link href="http://example.com/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/"/>
+    <id>http://example.com/2020/04/22/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</id>
+    <published>2020-04-21T23:11:33.000Z</published>
+    <updated>2021-01-27T02:25:26.055Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;故障现像&quot;&gt;&lt;a href=&quot;#故障现像&quot; class=&quot;headerlink&quot; title=&quot;故障现像&quot;&gt;&lt;/a&gt;故障现像&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;harbor服务里的redis容器启动失败&lt;/p&gt;
+&lt;figure class=&quot;highlight</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用etcd快照恢复集群数据</title>
+    <link href="http://example.com/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/"/>
+    <id>http://example.com/2020/04/17/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/</id>
+    <published>2020-04-16T22:34:44.000Z</published>
+    <updated>2021-01-27T02:25:26.054Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;备份etcd及相关证书&quot;&gt;&lt;a href=&quot;#备份etcd及相关证书&quot; class=&quot;headerlink&quot; title=&quot;备份etcd及相关证书&quot;&gt;&lt;/a&gt;备份etcd及相关证书&lt;/h3&gt;&lt;figure class=&quot;highlight</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>理解和配置Out of Memory: Kill Process</title>
+    <link href="http://example.com/2020/04/17/%E7%90%86%E8%A7%A3%E5%92%8C%E9%85%8D%E7%BD%AEOut%20of%20memory:%20Kill%20process/"/>
+    <id>http://example.com/2020/04/17/%E7%90%86%E8%A7%A3%E5%92%8C%E9%85%8D%E7%BD%AEOut%20of%20memory:%20Kill%20process/</id>
+    <published>2020-04-16T22:24:15.000Z</published>
+    <updated>2021-01-27T02:25:26.055Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;理解-OOM-killer&quot;&gt;&lt;a href=&quot;#理解-OOM-killer&quot; class=&quot;headerlink&quot; title=&quot;理解 OOM killer&quot;&gt;&lt;/a&gt;理解 OOM killer&lt;/h3&gt;&lt;p&gt;最近有位 VPS 客户抱怨 MySQL</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Captain 运维手册</title>
+    <link href="http://example.com/2020/04/04/captain%20%E8%BF%90%E7%BB%B4%E6%89%8B%E5%86%8C/"/>
+    <id>http://example.com/2020/04/04/captain%20%E8%BF%90%E7%BB%B4%E6%89%8B%E5%86%8C/</id>
+    <published>2020-04-03T22:48:54.000Z</published>
+    <updated>2021-01-27T02:25:26.043Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;captain-安装&quot;&gt;&lt;a href=&quot;#captain-安装&quot; class=&quot;headerlink&quot; title=&quot;captain 安装&quot;&gt;&lt;/a&gt;captain 安装&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;安装包&lt;/p&gt;
+&lt;figure</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="captain" scheme="http://example.com/tags/captain/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Helm常用命令手册</title>
+    <link href="http://example.com/2020/04/04/helm%E5%B8%B8%E7%94%A8%E6%89%8B%E5%86%8C/"/>
+    <id>http://example.com/2020/04/04/helm%E5%B8%B8%E7%94%A8%E6%89%8B%E5%86%8C/</id>
+    <published>2020-04-03T22:35:29.000Z</published>
+    <updated>2021-01-27T02:25:26.044Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;Helm-常用命令&quot;&gt;&lt;a href=&quot;#Helm-常用命令&quot; class=&quot;headerlink&quot; title=&quot;Helm 常用命令&quot;&gt;&lt;/a&gt;Helm 常用命令&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;查看版本 &lt;figure class=&quot;highlight</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="helm" scheme="http://example.com/tags/helm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>升级docker1.12.6到18.09,并切换存储direct-lvm到overlay2</title>
+    <link href="http://example.com/2020/04/03/%E5%8D%87%E7%BA%A7docker1.12.6%E5%88%B018.09.5%EF%BC%8C%E5%B9%B6%E5%88%87%E6%8D%A2%E5%AD%98%E5%82%A8direct-lvm%E5%88%B0overlay2/"/>
+    <id>http://example.com/2020/04/03/%E5%8D%87%E7%BA%A7docker1.12.6%E5%88%B018.09.5%EF%BC%8C%E5%B9%B6%E5%88%87%E6%8D%A2%E5%AD%98%E5%82%A8direct-lvm%E5%88%B0overlay2/</id>
+    <published>2020-04-03T08:46:41.000Z</published>
+    <updated>2021-01-27T02:25:26.053Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;ul&gt;
+&lt;li&gt;先确保操作系统内核为：3.10.0.862及其以上版本，可通过 &lt;code&gt;uname -r&lt;/code&gt; 查看&lt;/li&gt;
+&lt;li&gt;停止并卸载docker&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="direct-lvm" scheme="http://example.com/tags/direct-lvm/"/>
+    
+    <category term="overlay2" scheme="http://example.com/tags/overlay2/"/>
+    
+    <category term="18.09.5" scheme="http://example.com/tags/18-09-5/"/>
+    
+    <category term="docker升级" scheme="http://example.com/tags/docker%E5%8D%87%E7%BA%A7/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>overlay2 use xfs filesystem cause system hang</title>
+    <link href="http://example.com/2020/04/03/overlay2%20use%20xfs%20filesystem%20cause%20system%20hang/"/>
+    <id>http://example.com/2020/04/03/overlay2%20use%20xfs%20filesystem%20cause%20system%20hang/</id>
+    <published>2020-04-03T08:38:33.000Z</published>
+    <updated>2021-01-27T02:25:26.050Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;日志报错&quot;&gt;&lt;a href=&quot;#日志报错&quot; class=&quot;headerlink&quot; title=&quot;日志报错&quot;&gt;&lt;/a&gt;日志报错&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;报错信息  &lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="xfs" scheme="http://example.com/tags/xfs/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>K8s环境使用老IP添加一个新的master节点</title>
+    <link href="http://example.com/2020/04/03/k8s%E7%8E%AF%E5%A2%83%E4%BD%BF%E7%94%A8%E8%80%81IP%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84master%E8%8A%82%E7%82%B9/"/>
+    <id>http://example.com/2020/04/03/k8s%E7%8E%AF%E5%A2%83%E4%BD%BF%E7%94%A8%E8%80%81IP%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84master%E8%8A%82%E7%82%B9/</id>
+    <published>2020-04-03T03:58:53.000Z</published>
+    <updated>2021-01-27T02:25:26.047Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;注：以下为k8s 1.16版本，并且是新加节点，无备份的操作&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;备份&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;配置etcd 3&lt;figure class=&quot;highlight</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>k8s1.13证书升级(包含etcd证书)</title>
+    <link href="http://example.com/2020/04/03/k8s1.13%E8%AF%81%E4%B9%A6%E5%8D%87%E7%BA%A7(%E5%8C%85%E5%90%ABetcd%E8%AF%81%E4%B9%A6)/"/>
+    <id>http://example.com/2020/04/03/k8s1.13%E8%AF%81%E4%B9%A6%E5%8D%87%E7%BA%A7(%E5%8C%85%E5%90%ABetcd%E8%AF%81%E4%B9%A6)/</id>
+    <published>2020-04-03T03:53:32.000Z</published>
+    <updated>2021-01-27T02:25:26.045Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;一、etcd备份：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;脚本中对k8s做了备份，但是没有对etcd数据做备份，需要对etcd数据做备份。&lt;/li&gt;
+&lt;li&gt;参考etcd(V3版api)备份和恢复&lt;br&gt;二</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Etcd集群运维</title>
+    <link href="http://example.com/2019/08/29/etcd%E9%9B%86%E7%BE%A4%E8%BF%90%E7%BB%B4/"/>
+    <id>http://example.com/2019/08/29/etcd%E9%9B%86%E7%BE%A4%E8%BF%90%E7%BB%B4/</id>
+    <published>2019-08-29T00:24:19.000Z</published>
+    <updated>2021-01-27T02:25:26.043Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;集群的备份和恢复&quot;&gt;&lt;a href=&quot;#集群的备份和恢复&quot; class=&quot;headerlink&quot; title=&quot;集群的备份和恢复&quot;&gt;&lt;/a&gt;集群的备份和恢复&lt;/h2&gt;&lt;h3 id=&quot;添加备份&quot;&gt;&lt;a href=&quot;#添加备份&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="linux" scheme="http://example.com/tags/linux/"/>
+    
+    <category term="k8s" scheme="http://example.com/tags/k8s/"/>
+    
+    <category term="etcd" scheme="http://example.com/tags/etcd/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux 安装腾讯 COS FTP SERVER</title>
+    <link href="http://example.com/2019/07/10/Linux%20%E5%AE%89%E8%A3%85%E8%85%BE%E8%AE%AF%20COS%20FTP%20SERVER/"/>
+    <id>http://example.com/2019/07/10/Linux%20%E5%AE%89%E8%A3%85%E8%85%BE%E8%AE%AF%20COS%20FTP%20SERVER/</id>
+    <published>2019-07-09T23:49:32.000Z</published>
+    <updated>2021-01-27T02:25:26.040Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;官方文档&quot;&gt;&lt;a href=&quot;#官方文档&quot; class=&quot;headerlink&quot; title=&quot;官方文档&quot;&gt;&lt;/a&gt;官方文档&lt;/h3&gt;&lt;p&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="cos" scheme="http://example.com/tags/cos/"/>
+    
+    <category term="FTP" scheme="http://example.com/tags/FTP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>鼠须管五笔输入法安装配置</title>
+    <link href="http://example.com/2019/06/28/%E9%BC%A0%E9%A1%BB%E7%AE%A1%E4%BA%94%E7%AC%94%E8%BE%93%E5%85%A5%E6%B3%95%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/"/>
+    <id>http://example.com/2019/06/28/%E9%BC%A0%E9%A1%BB%E7%AE%A1%E4%BA%94%E7%AC%94%E8%BE%93%E5%85%A5%E6%B3%95%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</id>
+    <published>2019-06-27T17:51:03.000Z</published>
+    <updated>2021-01-27T02:50:53.383Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;写在前边的话&quot;&gt;&lt;a href=&quot;#写在前边的话&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Other" scheme="http://example.com/categories/Other/"/>
+    
+    
+    <category term="linux" scheme="http://example.com/tags/linux/"/>
+    
+    <category term="五笔" scheme="http://example.com/tags/%E4%BA%94%E7%AC%94/"/>
+    
+    <category term="鼠须管" scheme="http://example.com/tags/%E9%BC%A0%E9%A1%BB%E7%AE%A1/"/>
+    
+    <category term="输入法" scheme="http://example.com/tags/%E8%BE%93%E5%85%A5%E6%B3%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Helm安装使用</title>
+    <link href="http://example.com/2019/05/09/helm%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/"/>
+    <id>http://example.com/2019/05/09/helm%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8/</id>
+    <published>2019-05-09T00:16:06.000Z</published>
+    <updated>2021-01-27T02:25:26.044Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h2&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/helm/helm&quot;&gt;Helm&lt;/a&gt; 是一个类似于</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="linux" scheme="http://example.com/tags/linux/"/>
+    
+    <category term="helm" scheme="http://example.com/tags/helm/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>K8s部署kong之docker</title>
+    <link href="http://example.com/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Bdocker/"/>
+    <id>http://example.com/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Bdocker/</id>
+    <published>2019-05-08T19:03:41.000Z</published>
+    <updated>2021-01-27T02:25:26.046Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h3 id=&quot;Kong-官方镜像&quot;&gt;&lt;a href=&quot;#Kong-官方镜像&quot; class=&quot;headerlink&quot; title=&quot;Kong 官方镜像&quot;&gt;&lt;/a&gt;Kong 官方镜像&lt;/h3&gt;&lt;p&gt; &lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="linux" scheme="http://example.com/tags/linux/"/>
+    
+    <category term="kong" scheme="http://example.com/tags/kong/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>K8s部署kong之yaml</title>
+    <link href="http://example.com/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/"/>
+    <id>http://example.com/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/</id>
+    <published>2019-05-08T19:03:31.000Z</published>
+    <updated>2021-01-27T02:25:26.046Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;官方文档&quot;&gt;&lt;a href=&quot;#官方文档&quot; class=&quot;headerlink&quot; title=&quot;官方文档&quot;&gt;&lt;/a&gt;官方文档&lt;/h2&gt;&lt;p&gt;官方安装：&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="linux" scheme="http://example.com/tags/linux/"/>
+    
+    <category term="kong" scheme="http://example.com/tags/kong/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kafka入门教程</title>
+    <link href="http://example.com/2019/05/08/kafka%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/"/>
+    <id>http://example.com/2019/05/08/kafka%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/</id>
+    <published>2019-05-07T23:44:31.000Z</published>
+    <updated>2021-01-27T02:25:26.049Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;1、认识kafka&quot;&gt;&lt;a href=&quot;#1、认识kafka&quot; class=&quot;headerlink&quot; title=&quot;1、认识kafka&quot;&gt;&lt;/a&gt;1、认识kafka&lt;/h1&gt;&lt;h2 id=&quot;1-1-kafka简介&quot;&gt;&lt;a href=&quot;#1-1-kafka简介&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="Linux" scheme="http://example.com/categories/Linux/"/>
+    
+    
+    <category term="linux" scheme="http://example.com/tags/linux/"/>
+    
+    <category term="kafka" scheme="http://example.com/tags/kafka/"/>
+    
+  </entry>
+  
+</feed>
