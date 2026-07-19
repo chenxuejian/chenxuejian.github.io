@@ -1,0 +1,209 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>linux 进入单用户重置密码 | Hexo</title><meta name="author" content="John Doe"><meta name="copyright" content="John Doe"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="进入单用户重置密码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux 进入单用户重置密码">
+<meta property="og:url" content="https://linuxops.dev/2026/07/19/linux-%E8%BF%9B%E5%85%A5%E5%8D%95%E7%94%A8%E6%88%B7%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="进入单用户重置密码">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://linuxops.dev/img/butterfly-icon.png">
+<meta property="article:published_time" content="2026-07-19T03:31:12.000Z">
+<meta property="article:modified_time" content="2026-07-19T03:39:46.894Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="系统运维">
+<meta property="article:tag" content="重置Linux密码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://linuxops.dev/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "linux 进入单用户重置密码",
+  "url": "https://linuxops.dev/2026/07/19/linux-%E8%BF%9B%E5%85%A5%E5%8D%95%E7%94%A8%E6%88%B7%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81/",
+  "image": "https://linuxops.dev/img/butterfly-icon.png",
+  "datePublished": "2026-07-19T03:31:12.000Z",
+  "dateModified": "2026-07-19T03:39:46.894Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "John Doe",
+      "url": "https://linuxops.dev"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://linuxops.dev/2026/07/19/linux-%E8%BF%9B%E5%85%A5%E5%8D%95%E7%94%A8%E6%88%B7%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.6.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'linux 进入单用户重置密码',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.2"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Hexo</span></a><a class="nav-page-title" href="/"><span class="site-name">linux 进入单用户重置密码</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  Back to Home</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">linux 进入单用户重置密码</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2026-07-19T03:31:12.000Z" title="Created 2026-07-19 11:31:12">2026-07-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2026-07-19T03:39:46.894Z" title="Updated 2026-07-19 11:39:46">2026-07-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Linux/">Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="一、centos7"><a href="#一、centos7" class="headerlink" title="一、centos7"></a>一、centos7</h2><h3 id="第一种方法"><a href="#第一种方法" class="headerlink" title="第一种方法"></a>第一种方法</h3><p>1、开机后再出现内核选项时快速敲击“e”<br>2、找到linux16行末尾输入rd.break，然后执行ctrl+x<br>3、进入之后是switch_root:&#x2F;#输入mount -o rw,remount &#x2F;sysroot以读写方式重新挂载&#x2F;sysroot<br>4、chroot &#x2F;sysroot 切换到chroot安全加固模式，此时&#x2F;sysroot被视为文件系统的根<br>5、passwd root然后输入新密码并确认密码<br>6、touch &#x2F;.autorelabel<br>7、exit退出加固模式<br>8、reboot</p>
+<h3 id="第二种方法："><a href="#第二种方法：" class="headerlink" title="第二种方法："></a>第二种方法：</h3><p>看到此界面后，快速按“e”进入编辑<br><img src="/img/linux-password-01.png" alt="Linux重置密码"><br>进入之后，找到linux16开头的一行，找到关键字“ro”<br><img src="/img/linux-password-02.png" alt="Linux重置密码"><br>把关键字“ro”修改为“rw”，后面还要加上 init&#x3D;&#x2F;sysroot&#x2F;bin&#x2F;sh（rw  init&#x3D;&#x2F;sysroot&#x2F;bin&#x2F;sh）<br><img src="/img/linux-password-03.png" alt="Linux重置密码"><br>按“Ctrl+X”按钮进入单用户模式<br><img src="/img/linux-password-04.png" alt="Linux重置密码"><br>使用命令：chroot    &#x2F;sysroot&#x2F;切换到系统，输入：passwd    root修改root用户的密码（如果之前系统是中文安装，就会出现乱码，输入“LANG&#x3D;en”再次修改密码就能正常看到英文提示）<br><img src="/img/linux-password-05.png" alt="Linux重置密码"><br>修改完密码建议输入：touch    &#x2F;.autorelabel 更新系统信息（(执行命令touch   &#x2F;.autorelabel   ,在&#x2F;下创建一个.autorelabel文件，有这个文件存在，系统在重启时就会对整个文件系统进行relabeling重新标记，也可以理解为对文件进行底层权限的控制和标记)，如果selinux属于关闭状态则不需要执行这条命令。）<br><img src="/img/linux-password-06.png" alt="Linux重置密码"><br>最后重启系统，在命令行重启或者在界面都行</p>
+<h2 id="二、centos6"><a href="#二、centos6" class="headerlink" title="二、centos6"></a>二、centos6</h2><p>1、开机后再出现内核选项时快速敲击“e”<br>2、将光标移动到kernel行，再次按字母e编辑<br>3、将光标移动到quiet的末尾，在空格后面添加数字“1”，然后按回车<br>4、按“b”引导使用内核并引导到运行级别1（单用户模式）<br>5、当看到#提示符时，执行passwd root回车，输入两次密码<br>6、reboot</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://linuxops.dev">John Doe</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://linuxops.dev/2026/07/19/linux-%E8%BF%9B%E5%85%A5%E5%8D%95%E7%94%A8%E6%88%B7%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81/">https://linuxops.dev/2026/07/19/linux-%E8%BF%9B%E5%85%A5%E5%8D%95%E7%94%A8%E6%88%B7%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Linux/">Linux</a><a class="post-meta__tags" href="/tags/%E9%87%8D%E7%BD%AELinux%E5%AF%86%E7%A0%81/">重置Linux密码</a><a class="post-meta__tags" href="/tags/%E7%B3%BB%E7%BB%9F%E8%BF%90%E7%BB%B4/">系统运维</a></div><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/07/19/%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8BLinux%E7%BD%91%E5%8D%A1%E5%87%BA%E5%8F%A3%E6%B5%81%E9%87%8F/" title="如何查看Linux网卡出口流量"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">如何查看Linux网卡出口流量</div></div><div class="info-2"><div class="info-item-1">iftop命令 eg： iftop -i bond0 -P -n -f “host 10.134.144.200” 注：意思是：本机的bond0网口，与10.134.144.200的所有流量    </div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/19/%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8BLinux%E7%BD%91%E5%8D%A1%E5%87%BA%E5%8F%A3%E6%B5%81%E9%87%8F/" title="如何查看Linux网卡出口流量"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-19</div><div class="info-item-2">如何查看Linux网卡出口流量</div></div><div class="info-2"><div class="info-item-1">iftop命令 eg： iftop -i bond0 -P -n -f “host 10.134.144.200” 注：意思是：本机的bond0网口，与10.134.144.200的所有流量    </div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">John Doe</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">63</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81centos7"><span class="toc-number">1.</span> <span class="toc-text">一、centos7</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E7%A7%8D%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">第一种方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E7%A7%8D%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">第二种方法：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81centos6"><span class="toc-number">2.</span> <span class="toc-text">二、centos6</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/19/linux-%E8%BF%9B%E5%85%A5%E5%8D%95%E7%94%A8%E6%88%B7%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81/" title="linux 进入单用户重置密码">linux 进入单用户重置密码</a><time datetime="2026-07-19T03:31:12.000Z" title="Created 2026-07-19 11:31:12">2026-07-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/19/%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8BLinux%E7%BD%91%E5%8D%A1%E5%87%BA%E5%8F%A3%E6%B5%81%E9%87%8F/" title="如何查看Linux网卡出口流量">如何查看Linux网卡出口流量</a><time datetime="2026-07-19T03:23:03.000Z" title="Created 2026-07-19 11:23:03">2026-07-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/28/%E5%A6%82%E4%BD%95%E6%9C%89%E6%95%88%E7%9A%84%E4%BF%AE%E6%94%B9Linux%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84hosts%E9%85%8D%E7%BD%AE/" title="如何有效的修改Linux云服务器的hosts配置">如何有效的修改Linux云服务器的hosts配置</a><time datetime="2021-01-27T16:00:00.000Z" title="Created 2021-01-28 00:00:00">2021-01-28</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/" title="hexo中图片无法加载">hexo中图片无法加载</a><time datetime="2021-01-25T16:00:00.000Z" title="Created 2021-01-26 00:00:00">2021-01-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/25/Hello%20World/" title="Hello World">Hello World</a><time datetime="2021-01-24T16:00:00.000Z" title="Created 2021-01-25 00:00:00">2021-01-25</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By John Doe</span><span class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.6.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.6.0"></script><script src="/js/main.js?v=5.6.0"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
