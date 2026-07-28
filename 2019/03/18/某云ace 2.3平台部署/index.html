@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      某云ace 2.3平台部署 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">某云ace 2.3平台部署</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:44
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <h2 id="需要环境"><a href="#需要环境" class="headerlink" title="需要环境"></a>需要环境</h2><ul>
+<li>一台数据库机器</li>
+<li>一台ake机器，也就是部署机</li>
+<li>三台master</li>
+<li>三台global</li>
+<li>三台es</li>
+</ul>
+<blockquote>
+<p>注: 所有主机都需要单独挂载一块数据盘</p>
+</blockquote>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><ul>
+<li>将所有主机启动</li>
+<li>创建一个外网clb</li>
+<li>在clb上进行绑定，32001-32006（挂载三台master)、3306（挂载mysql主机）端口</li>
+</ul>
+<blockquote>
+<p>注：此文档安装docker为1.12.6，使用devicemapper存储</p>
+</blockquote>
+<h2 id="部署mysql"><a href="#部署mysql" class="headerlink" title="部署mysql"></a>部署mysql</h2><ul>
+<li><p>安装docker及docker-compose</p>
+<pre><code>yum -y install docker docker-compose
+</code></pre>
+</li>
+<li><p>编辑mysql yaml文件</p>
+<pre><code>vim mysql-master.yaml
+  version: &#39;2&#39;
+  services:
+    mysql:
+      network_mode: &quot;bridge&quot;
+      ports:
+        - &quot;3306:3306&quot;
+      container_name: mysql-master
+      image: mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: &quot;xxxx&quot;   ### 密码自行修改
+      image:  index.alauda.cn/alaudaorg/mysql-master:latest              ###### 注意此处images镜像的仓库地址需要更换，更换私有环境的镜像仓库IP
+      privileged: true
+      restart: always
+      volumes:
+        - /alauda/data/mysql/db:/var/lib/mysql
+</code></pre>
+</li>
+<li><p>登录镜像仓库<code>index.alauda.cn</code></p>
+<pre><code>docker login index.alauda.cn
+</code></pre>
+</li>
+<li><p>执行yaml文件，启动数据库</p>
+<pre><code>docker-compose -f mysql-master.yaml up -d
+</code></pre>
+</li>
+<li><p>进入数据库修改内容</p>
+<pre><code>docker exec -it mysql-master bash
+  mysql -u root -psgOnxrI9WN638Hj8;
+  grant replication slave on *.* to &#39;master&#39;@&#39;%&#39; identified by &#39;sgOnxrI9WN638Hj8&#39;;
+  flush privileges;
+  show master status;
+
+  +-------------------------+----------+--------------+------------------+-------------------+ 
+  | File                    | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set | 
+  +-------------------------+----------+--------------+------------------+-------------------+ 
+  | mysql-master-bin.000003 |      455 |              |                  |                   | 
+  +-------------------------+----------+--------------+------------------+-------------------+ 
+  1 row in set (0.00 sec)
+</code></pre>
+</li>
+</ul>
+<h2 id="配置安装"><a href="#配置安装" class="headerlink" title="配置安装"></a>配置安装</h2><blockquote>
+<p>注：建议单独挂一块大于100G的磁盘</p>
+</blockquote>
+<ul>
+<li><p>下载安装包</p>
+<pre><code>scp alauda@xxxxxxx:/mnt/package/ALAUDA-release/ACE_2.3-1xxxxxx.tar.gz  &lt;你的安装包目录&gt;
+  密码: xxxxx
+  md5sum：xxxx  
+  文件大小：  xxx 
+</code></pre>
+</li>
+<li><p>所有主机配置hostname及hosts文件，并安装jq sshpass命令（建议使用ansible)</p>
+</li>
+<li><p>所有主机将单独的磁盘配置成lvm</p>
+</li>
+<li><p>进入数据目录<code>/data/mnt/package/ace/ace_xxxxxx</code> 编写<code>server_list.json</code>文件</p>
+</li>
+<li><p>修改所有主机内核参数：</p>
+<pre><code>echo &quot;vm.max_map_count=262144&quot; &gt;&gt; /etc/sysctl.conf;sysctl -p
+</code></pre>
+</li>
+<li><p>执行<code>up-alaudaace.sh</code>脚本开始安装</p>
+<pre><code>./up-alaudaee.sh --network-interface=eth0 --kube_controlplane_endpoint clb-ip --alaudaee-domain-name clb-ip --db-info=&#39;DB_HOST=clb-ip;DB_PORT=3306;DB_USER=root;DB_PASSWORD=sgOnxrI9WN638Hj8;DB_ENGINE=mysql&#39; --debug
+
+  &gt;注：命令中的用户名及密码可能需要修改，需要改成上边yaml里的
+  以下为相关参数
+  --network-interface                    用来指定网卡
+  --alaudaee-domain-name                 global 的域名或者IP，具体解释请看白皮书
+  --kube_controlplane_endpoint           k8s api lb 的地址，k8s api 的 vip 配置到这个 lb 上，具体解释请看白皮书
+  --db-info                              数据库信息，其中DB_HOST、DB_PORT、DB_USER、DB_PASSWORD分别是数据库地址、端口、用户名和密码。DB_ENGINE是数据库类型，只有postgreql、mysql 两种
+  --master-is-node                       可选参数，如果规划角色的时候，选择 k8s 集群的 master 也作为计算节点，就需要加上这个参数
+  --debug                                可选参数，加上之后，ake 部署 k8s 集群的时候，会输出更多的信息，方便排除错误
+  --not-deploy-k8s                       可选参数，不部署 k8s 集群，server_list.json 中记录的服务器，就是已经部署成功的 k8s 集群的所有服务器
+</code></pre>
+</li>
+</ul>
+<h2 id="访问web"><a href="#访问web" class="headerlink" title="访问web"></a>访问web</h2><ul>
+<li>ace</li>
+</ul>
+<p>http:&#x2F;&#x2F;&lt;–alaudaee-domain-name 参数指定的地址&gt;:32005</p>
+<p>账号&#x2F;密码：alauda&#x2F;alauda</p>
+<ul>
+<li>acp</li>
+</ul>
+<p>https:&#x2F;&#x2F;&lt;–kube_controlplane_endpoint 参数指定的地址&gt;</p>
+<p>账号&#x2F;密码：<a href="mailto:&#97;&#x64;&#109;&#105;&#110;&#64;&#x61;&#x6c;&#x61;&#x75;&#x64;&#x61;&#x2e;&#105;&#111;">admin@alauda.io</a>&#x2F;password</p>
+<h2 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h2><ul>
+<li><p>在快启动完成时会有两个Pod一直启动失败，需要手动删除</p>
+<pre><code>[root@xuejian-ace-update-m1 ~]# kubectl get deploy --all-namespaces | grep jaeger
+  alauda-system   jaeger-collector             1         1         1            0           21m
+  alauda-system   jaeger-query                 1         1         1            0           21m
+
+  编辑deploy里的replicas参数，设置为0
+  [root@xuejian-ace-update-m1 ~]# kubectl edit deploy -n alauda-system   jaeger-collector
+</code></pre>
+</li>
+<li><p>k8s安装完成后，在执行helm时会报错</p>
+</li>
+</ul>
+<p>在所有node上执行clear-all.sh脚本，重新运行脚本</p>
+<ul>
+<li>upload chart 出错</li>
+</ul>
+<p>找到chart-repo 容器挂载的卷，将权限改成777 即可，挂载的目录一般是安装目录下的ACP&#x2F;chartmuseum ，执行 cat &#x2F;alauda&#x2F;.run_chart_repo.sh 可以看到具体的目录</p>
+<ul>
+<li><p>若没有system项目，或未接入集群信息</p>
+<ul>
+<li><p>在 jakiro 容器中手动运行：</p>
+<pre><code>curl --request POST \
+    --url http://127.0.0.1/v1/project-templates/&lt;org_name&gt;/ \
+    --header &#39;authorization: Token &lt;token&gt;&#39; \
+    --header &#39;content-type: application/json&#39; \
+    --data &#39;{
+      &quot;name&quot;: &quot;empty-template&quot;,
+      &quot;resource_actions&quot;: [
+          &quot;project_template:create&quot;,
+          &quot;project_template:delete&quot;,
+          &quot;project_template:view&quot;
+      ],
+      &quot;resources&quot;: [
+
+      ],
+      &quot;roles&quot;: [
+      ]
+  }
+  &#39;
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>注： </p>
+</blockquote>
+<blockquote>
+<p><code>&lt;org_name&gt;</code>：根账号名称</p>
+</blockquote>
+<blockquote>
+<p><code>&lt;token&gt;</code>：根账号token，在用户中心页面查看</p>
+</blockquote>
+<p>建议删掉jakiro 的数据库，重新给jakiro 做migrate 重新添加跟用户，重新对接ACE 集群。如果对上述操作不熟悉，也可以清空环境重新部署</p>
+<pre><code>* 获取集群secret
+      
+      kubectl get secret -n kube-system | awk &#39;/^clusterrole-aggregation-controller-token/{print $1}&#39;
+
+* 获取集群token并记录
+      
+      kubectl get secret -n kube-system 集群secret -o jsonpath=&#39;{.data.token}&#39; | base64 -d
+
+* 删除数据库
+      
+      DROP DATABASE jakirodb;
+
+* 创建数据库
+      
+      create database jakirodb;
+
+* 数据库初始化，进入jakiro容器执行
+      
+      python manage.py makemigrations
+      
+        python manage.py migrate
+
+* 创建根用户
+      
+      curl -X POST \
+        -H &#39;Content-Type:application/json&#39; \
+        -d &#39;{
+        &quot;username&quot;:&quot;&#39;alauda&#39;&quot;,
+        &quot;password&quot;:&quot;alauda&quot;,
+        &quot;realname&quot;:&quot;alauda&quot;,
+        &quot;email&quot;:&quot;alauda@alauda.io&quot;,
+        &quot;reference_code_id&quot;:&quot;cn&quot;,
+        &quot;city&quot;:&quot;beijing&quot;,
+        &quot;company&quot;:&quot;alauda&quot;,
+        &quot;is_active&quot;: true,
+        &quot;informed_way&quot;:&quot;others&quot;,
+        &quot;industry&quot;:&quot;others&quot;,
+        &quot;mobile&quot;:&quot;123123123123&quot;,
+        &quot;position&quot;:&quot;beijing&quot;,
+        &quot;currency&quot;:&quot;CNY&quot;
+        }&#39; http://api-server:32001/v1/auth/register/
+
+* 接入集群
+</code></pre>
+<p>点击平台的接入集群按钮</p>
+<p>填写集群地址 （f5的地址或者alb的地址）</p>
+<p>填写集群token （第二步获取的token）</p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2019/03/14/%E4%BD%BF%E7%94%A8Harbor%E7%AE%A1%E7%90%86Docker%E9%95%9C%E5%83%8F/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:44
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2019/03/20/%E6%B7%B1%E5%85%A5%20Nginx%20%E4%B9%8B%E9%85%8D%E7%BD%AE%E7%AF%87/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9C%80%E8%A6%81%E7%8E%AF%E5%A2%83"><span class="toc-text">需要环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="toc-text">环境准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2mysql"><span class="toc-text">部署mysql</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%AE%89%E8%A3%85"><span class="toc-text">配置安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BF%E9%97%AEweb"><span class="toc-text">访问web</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="toc-text">常见问题</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E6%9F%90%E4%BA%91ace%202.3%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2 + '&url=' + https%3A%2F%2Flinuxops.dev%2F2019%2F03%2F18%2F%25E6%259F%2590%25E4%25BA%2591ace%25202.3%25E5%25B9%25B3%25E5%258F%25B0%25E9%2583%25A8%25E7%25BD%25B2%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2019/03/18/%E6%9F%90%E4%BA%91ace%202.3%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

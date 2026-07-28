@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      灵雀云K8s集群对接Prometheus 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">灵雀云K8s集群对接Prometheus</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:44
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <h2 id="安装helm"><a href="#安装helm" class="headerlink" title="安装helm"></a>安装helm</h2><h3 id="安装helm-1"><a href="#安装helm-1" class="headerlink" title="安装helm"></a>安装helm</h3><pre><code>docker run -ti --rm -v /usr/local/bin/:/var/log/abc index.alauda.cn/claas/helm:v2.10.0-rc.2 sh -c &quot;cp /systembin/helm /var/log/abc&quot;
+</code></pre>
+<h3 id="安装chart-repo源-我自己的平台已经安装，所以不需要操作"><a href="#安装chart-repo源-我自己的平台已经安装，所以不需要操作" class="headerlink" title="安装chart_repo源(我自己的平台已经安装，所以不需要操作)"></a>安装chart_repo源(我自己的平台已经安装，所以不需要操作)</h3><pre><code>docker run -d \
+-p 8088:8080 \
+-e PORT=8080 \
+-e DEBUG=1 \
+-e STORAGE=&quot;local&quot; \
+-e STORAGE_LOCAL_ROOTDIR=&quot;/data&quot; \
+-e BASIC_AUTH_USER=&quot;chartmuseum&quot; \
+-e BASIC_AUTH_PASS=&quot;chartmuseum&quot; \
+-v /data:/data \
+chartmuseum/chartmuseum:latest
+</code></pre>
+<h3 id="检查确定安装成功"><a href="#检查确定安装成功" class="headerlink" title="检查确定安装成功"></a>检查确定安装成功</h3><pre><code>helm repo list
+NAME      URL
+local     http://127.0.0.1:8879/charts
+stable    http://chartmuseum:chartmuseum@172.16.16.21:8088
+</code></pre>
+<h3 id="执行helm-init-初始化"><a href="#执行helm-init-初始化" class="headerlink" title="执行helm init 初始化"></a>执行helm init 初始化</h3><pre><code>helm init --stable-repo-url=http://chartmuseum:chartmuseum@172.16.16.21:8088  --tiller-image=index.alauda.cn/claas/tiller:v2.11.0
+</code></pre>
+<h3 id="添加相关权限"><a href="#添加相关权限" class="headerlink" title="添加相关权限"></a>添加相关权限</h3><pre><code>kubectl create serviceaccount --namespace kube-system tiller
+kubectl patch deploy --namespace kube-system tiller-deploy -p &#39;{&quot;spec&quot;:{&quot;template&quot;:{&quot;spec&quot;:{&quot;serviceAccount&quot;:&quot;tiller&quot;}}}}&#39;
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+</code></pre>
+<h3 id="等待tiller-pod启动"><a href="#等待tiller-pod启动" class="headerlink" title="等待tiller pod启动"></a>等待tiller pod启动</h3><pre><code>kubectl  get pods --all-namespaces |grep tiller
+</code></pre>
+<h3 id="检查helm安装成功"><a href="#检查helm安装成功" class="headerlink" title="检查helm安装成功"></a>检查helm安装成功</h3><pre><code>helm version
+Client: &amp;version.Version{SemVer:&quot;v2.11.0&quot;, GitCommit:&quot;2e55dbe1fdbxxxxxxxxxxxx44a339489417b146b&quot;, GitTreeState:&quot;clean&quot;}
+Server: &amp;version.Version{SemVer:&quot;v2.11.0&quot;, GitCommit:&quot;2e55dbe1fdbxxxxxxxxxxxx44a339489417b146b&quot;, GitTreeState:&quot;clean&quot;}
+</code></pre>
+<h2 id="部署prometheus"><a href="#部署prometheus" class="headerlink" title="部署prometheus"></a>部署prometheus</h2><h3 id="创建所需要的secret"><a href="#创建所需要的secret" class="headerlink" title="创建所需要的secret"></a>创建所需要的secret</h3><pre><code>kubectl -n alauda-system create secret generic etcd-certs --from-file=/etc/kubernetes/pki/etcd/healthcheck-client.crt --from-file=/etc/kubernetes/pki/etcd/healthcheck-client.key --from-file=/etc/kubernetes/pki/etcd/ca.crt
+</code></pre>
+<h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><ul>
+<li><p>kube-scheduler：在各master节点上，编辑</p>
+<pre><code>vi /etc/kubernetes/manifests/kube-scheduler.yaml
+</code></pre>
+</li>
+</ul>
+<p>将其中的“–address&#x3D;127.0.0.1”，替换为“–address&#x3D;0.0.0.0”,保存退出</p>
+<ul>
+<li><p>kube-controller-manager：在各master节点上，编辑</p>
+<pre><code>vi /etc/kubernetes/manifests/kube-controller-manager.yaml
+</code></pre>
+</li>
+</ul>
+<p>将其中的“–address&#x3D;127.0.0.1”，替换为“–address&#x3D;0.0.0.0”,保存退出</p>
+<ul>
+<li><p>kube-proxy: 编辑cm kube-proxy</p>
+<pre><code>kubectl edit -n kube-system cm kube-proxy
+</code></pre>
+</li>
+</ul>
+<p>将“metricsBindAddress: 127.0.0.1:10249”替换为“metricsBindAddress: 0.0.0.0:10249”，保存退出；并杀掉kube-proxy的pod</p>
+<blockquote>
+<p>注： dockerd： ACE-2.3&#x2F;ACP-1.4采用docker v1.12.6。这个版本的docker不支持metrics-addr功能，导致prometheus获取不到dockerd相关数据。则grafana关于docker状态获取不到。</p>
+</blockquote>
+<h3 id="安装prometheus-operator"><a href="#安装prometheus-operator" class="headerlink" title="安装prometheus-operator"></a>安装prometheus-operator</h3><pre><code>helm install &lt;stable&gt;/prometheus-operator --namespace=alauda-system --name prometheus-operator --set global.registry.address=&lt;registry&gt; --timeout=3000
+</code></pre>
+<blockquote>
+<p>注:</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>–set global.registry.address&#x3D;是设置当前环境的registry地址</li>
+<li>stable 为helm repo list 命令执行后，列出来的某一个repo源的name(是name，不是url)，此处可以不同过chart repo源下载安装，也可以将chart下载到master机器上，指定chart路径部署。</li>
+</ul>
+</blockquote>
+<h3 id="安装kube-prometheus"><a href="#安装kube-prometheus" class="headerlink" title="安装kube-prometheus"></a>安装kube-prometheus</h3><ul>
+<li><p>对接LocalVolume作为存储</p>
+<ul>
+<li><p>给集群中的一个node添加 monitoring&#x3D;enabled的label，用于local volume的调度，命令如下如下：</p>
+<pre><code>kubectl label --overwrite nodes &lt;node hostname&gt; monitoring=enabled
+</code></pre>
+</li>
+<li><p>在该node上创建以下目录用作持久化目录，保证空间 granafa 2G&#x2F;prometheus 20G&#x2F;alertmanager 1G，命令如下：</p>
+<pre><code>mkdir -p /var/lib/monitoring/{grafana,prometheus,alertmanager}
+</code></pre>
+</li>
+<li><p>如果要使用上述目录之外的其他目录，安装kube-prometheus指定以下参数即可（同样需要提前创建）</p>
+<pre><code>--set grafana.storageSpec.persistentVolumeSpec.local.path=&lt;Your Path&gt;
+  --set prometheus.storageSpec.persistentVolumeSpec.local.path=&lt;Your Path&gt;
+  --set alertmanager.storageSpec.persistentVolumeSpec.local.path=&lt;Your Path&gt;
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>对接StorageClass作为存储</p>
+<ul>
+<li><p>在安装kube-prometheus指定以下参数即可</p>
+<pre><code>--set grafana.storageSpec.volumeClaimTemplate.spec.storageClassName=&lt;sc name&gt;        # grafana对接现有的StorageClass
+  --set prometheus.storageSpec.volumeClaimTemplate.spec.storageClassName=&lt;sc name&gt;     # prometheus对接现有的StorageClass
+  --set alertmanager.storageSpec.volumeClaimTemplate.spec.storageClassName=&lt;sc name&gt;   # alertmanager对接现有的StorageClass
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>安装kube-prometheus</p>
+<pre><code>helm install stable/kube-prometheus --name kube-prometheus --namespace alauda-system --timeout=30000 \
+  --set global.platform=&lt;ACE/ACP&gt; \
+  --set prometheus.service.type=NodePort \
+  --set grafana.service.type=NodePort \
+  --set grafana.crd.accessUrl=http://&lt;ip&gt; \
+  --set global.registry.address=&lt;registry&gt; \
+  --set deployKubeDNS=&lt;true&gt; --set deployCoreDNS=&lt;false&gt; \
+  --set alertmanager.configForACE.global.http_config.basic_auth.username=&lt;username&gt; \
+  --set alertmanager.configForACE.global.http_config.basic_auth.password=&lt;password&gt; \
+  --set alertmanager.configForACE.receivers[0].name=default-receiver \
+  --set alertmanager.configForACE.receivers[0].webhook_configs[0].url=&lt;http://118.24.232.56:20081/v1/alerts/region_name/router&gt; \
+  --set exporter-dockerd.endpoints=&lt;dockerd host ip&gt;
+  # 以下参数均是可选的，如果你确认要修改这些配置可以加上这些参数，否则请不要随意设置这些参数
+  --set exporter-node.resources.requests.memory=300Mi \
+  --set exporter-node.resources.limits.memory=500Mi
+</code></pre>
+<ul>
+<li>–set global.platform&#x3D;&lt;ACE&#x2F;ACP&gt;是设置当前环境是ACP还是ACE【ACP&#x2F;ACE二者选其一】</li>
+<li>–set global.registry.address&#x3D;是设置当前环境的registry地址【ACP&#x2F;ACE均要设置】</li>
+<li>–set grafana.crd.accessUrl&#x3D;http:&#x2F;&#x2F;是设置ACP的grafana的访问地址 【ACP需要设置】</li>
+<li>–set deployKubeDNS&#x3D;true –set deployCoreDNS&#x3D;false如果部署的是kubedns,就像上述设置即可；如果dns是coredns，则需要设置–set deployKubeDNS&#x3D;false –set deployCoreDNS&#x3D;true【ACP&#x2F;ACE均要设置】</li>
+<li>–set alertmanager.configForACE.global.http_config.basic_auth.username&#x3D;是设置登录Global平台的用户名【ACE需要设置】</li>
+<li>–set alertmanager.configForACE.global.http_config.basic_auth.password&#x3D;是设置登录Global平台的密码【ACE需要设置】</li>
+<li>–set alertmanager.configForACE.receivers[0].webhook_configs[0].url&#x3D;<a target="_blank" rel="noopener" href="http://118.24.232.56:20081/v1/alerts/region_name/router">http://118.24.232.56:20081/v1/alerts/region_name/router</a>是设置alertmanager的Webhook的地址，其中118.24.232.56:20081是当前环境的jakiro的地址，region_name是当前私有区的名字【ACE需要设置】</li>
+<li>–set exporter-dockerd.endpoints&#x3D; 是指定有dockerd主机上ip地址，不然检测不到相关主机上的dockerd的metrics，参数示例：{10.0.96.19,10.0.96.22,10.0.96.33,10.0.96.30,10.0.96.40,10.0.96.42}(有两个以上的机器时，注意格式，前面的ip后面要加)</li>
+<li>–set exporter-node.resources.requests.memory&#x3D;&lt;300Mi&gt;设置node-exporter的resource requests【可选，ACP&#x2F;ACE均可选配置】</li>
+<li>–set exporter-node.resources.limits.memory&#x3D;&lt;500Mi&gt;设置node-exporter的resource limits【可选，ACP&#x2F;ACE均可选配置】</li>
+</ul>
+</li>
+</ul>
+<h3 id="检查pod"><a href="#检查pod" class="headerlink" title="检查pod"></a>检查pod</h3><pre><code># kubectl get pods -n alauda-system
+NAME                                                   READY     STATUS    RESTARTS   AGE
+alertmanager-kube-prometheus-0                         2/2       Running   0          2h
+kube-prometheus-exporter-kube-state-78b57fd848-gmsc7   2/2       Running   0          2h
+kube-prometheus-exporter-node-7klhv                    1/1       Running   0          2h
+kube-prometheus-exporter-node-xsx5g                    1/1       Running   0          2h
+kube-prometheus-grafana-f95c87485-79zt5                3/3       Running   0          2h
+prometheus-kube-prometheus-0                           3/3       Running   1          2h
+prometheus-operator-6dd688ff7f-gd4px                   1/1       Running   0          2h
+</code></pre>
+<h3 id="检查kubelet的配置文件"><a href="#检查kubelet的配置文件" class="headerlink" title="检查kubelet的配置文件"></a>检查kubelet的配置文件</h3><ul>
+<li><p>找到配置文件</p>
+<pre><code>systemctl status kubelet
+  kubelet.service - kubelet: The Kubernetes Node Agent
+  Loaded: loaded (/etc/systemd/system/kubelet.service; enabled; vendor preset: disabled)
+  Active: active (running) since Thu 2019-02-28 11:33:42 CST; 3 weeks 1 days ago
+      Docs: http://kubernetes.io/docs/
+  Main PID: 21723 (kubelet)
+</code></pre>
+</li>
+<li><p>添加以下内容（如果有可不添加）</p>
+<pre><code>vim /etc/systemd/system/kubelet.service
+  [Service]
+  Environment=&quot;KUBELET_AUTHZ_ARGS=--authorization-mode=Webhook --client-ca-file=/etc/kubernetes/pki/ca.crt --authentication-token-webhook=true&quot;
+</code></pre>
+</li>
+<li><p>重启kubelet </p>
+<pre><code>systemctl daemon-reload
+  systemctl restart kubelet
+</code></pre>
+</li>
+<li><p>检查kubelet可以正常启动</p>
+<pre><code>system status kublet
+</code></pre>
+</li>
+</ul>
+<h3 id="访问Grafan-Prometheus"><a href="#访问Grafan-Prometheus" class="headerlink" title="访问Grafan&#x2F;Prometheus"></a>访问Grafan&#x2F;Prometheus</h3><ul>
+<li>grafana</li>
+</ul>
+<p>kubernetes集群中任何一个节点的ip:30902</p>
+<ul>
+<li>prometheus</li>
+</ul>
+<p>kubernetes集群中任何一个节点的ip:30900，默认用户名和密码为: admin&#x2F;admin</p>
+<h3 id="删除prometheus"><a href="#删除prometheus" class="headerlink" title="删除prometheus"></a>删除prometheus</h3><ul>
+<li><p>删除 kube-prometheus</p>
+<pre><code>helm delete --purge kube-prometheus
+  kubectl delete pvc -n alauda-system prometheus-kube-prometheus-db-prometheus-kube-prometheus-0
+  kubectl delete pvc -n alauda-system alertmanager-kube-prometheus-db-alertmanager-kube-prometheus-0
+</code></pre>
+</li>
+<li><p>删除 prometheus-operator</p>
+<pre><code>helm delete --purge prometheus-operator
+  kubectl delete --ignore-not-found customresourcedefinitions alertmanagers.monitoring.coreos.com prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com
+</code></pre>
+</li>
+</ul>
+<h2 id="集群对接Prometheus监控"><a href="#集群对接Prometheus监控" class="headerlink" title="集群对接Prometheus监控"></a>集群对接Prometheus监控</h2><ul>
+<li><p>集成中心添加PrometheusOperator 类型的特性</p>
+<ul>
+<li><p>进入”管理视图”，打开”集成中心”，选择”特性”栏，进入”添加集成”页面</p>
+</li>
+<li><p>选择 场景”特性”，类型”PrometheusOperator”</p>
+</li>
+<li><p>填写PrometheusOPerator有关集成信息</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2019/03/22/k8s%E9%9B%86%E7%BE%A4%E5%AF%B9%E6%8E%A5prometheus/prometheus.png" alt="prometheus.png"></p>
+<pre><code>* 点击”创建”后，完成Prometheus集成实例的创建
+</code></pre>
+<ul>
+<li><p>集群对接Prometheus监控服务</p>
+<ul>
+<li>进入”管理视图”，进入对应的集群。并依次点击”操作”、”集群特性管理”，进入”集群特性管理”页面</li>
+<li>进入集群特性管理页面，查看”监控服务”，点击”对接第三方”。选择对应的Prometheus实例</li>
+<li>查看集群相关的Cluster、Node、应用有监控数据出现</li>
+</ul>
+</li>
+</ul>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2019/03/20/Linux%20%E6%80%A7%E8%83%BD%E7%9B%91%E6%8E%A7%E5%B7%A5%E5%85%B7/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:44
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2019/03/21/K8s%E9%BB%98%E8%AE%A4%E7%9A%84services%20ip%E4%B8%8D%E9%80%9A/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85helm"><span class="toc-text">安装helm</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85helm-1"><span class="toc-text">安装helm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85chart-repo%E6%BA%90-%E6%88%91%E8%87%AA%E5%B7%B1%E7%9A%84%E5%B9%B3%E5%8F%B0%E5%B7%B2%E7%BB%8F%E5%AE%89%E8%A3%85%EF%BC%8C%E6%89%80%E4%BB%A5%E4%B8%8D%E9%9C%80%E8%A6%81%E6%93%8D%E4%BD%9C"><span class="toc-text">安装chart_repo源(我自己的平台已经安装，所以不需要操作)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5%E7%A1%AE%E5%AE%9A%E5%AE%89%E8%A3%85%E6%88%90%E5%8A%9F"><span class="toc-text">检查确定安装成功</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%A7%E8%A1%8Chelm-init-%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-text">执行helm init 初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E7%9B%B8%E5%85%B3%E6%9D%83%E9%99%90"><span class="toc-text">添加相关权限</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AD%89%E5%BE%85tiller-pod%E5%90%AF%E5%8A%A8"><span class="toc-text">等待tiller pod启动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5helm%E5%AE%89%E8%A3%85%E6%88%90%E5%8A%9F"><span class="toc-text">检查helm安装成功</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2prometheus"><span class="toc-text">部署prometheus</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E6%89%80%E9%9C%80%E8%A6%81%E7%9A%84secret"><span class="toc-text">创建所需要的secret</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE"><span class="toc-text">修改配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85prometheus-operator"><span class="toc-text">安装prometheus-operator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85kube-prometheus"><span class="toc-text">安装kube-prometheus</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5pod"><span class="toc-text">检查pod</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A3%80%E6%9F%A5kubelet%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">检查kubelet的配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BF%E9%97%AEGrafan-Prometheus"><span class="toc-text">访问Grafan&#x2F;Prometheus</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A0%E9%99%A4prometheus"><span class="toc-text">删除prometheus</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E5%AF%B9%E6%8E%A5Prometheus%E7%9B%91%E6%8E%A7"><span class="toc-text">集群对接Prometheus监控</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E7%81%B5%E9%9B%80%E4%BA%91K8s%E9%9B%86%E7%BE%A4%E5%AF%B9%E6%8E%A5Prometheus + '&url=' + https%3A%2F%2Flinuxops.dev%2F2019%2F03%2F21%2F%25E7%2581%25B5%25E9%259B%2580%25E4%25BA%2591K8s%25E9%259B%2586%25E7%25BE%25A4%25E5%25AF%25B9%25E6%258E%25A5Prometheus%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2019/03/21/%E7%81%B5%E9%9B%80%E4%BA%91K8s%E9%9B%86%E7%BE%A4%E5%AF%B9%E6%8E%A5Prometheus/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

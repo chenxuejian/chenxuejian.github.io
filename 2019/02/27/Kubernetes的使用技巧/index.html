@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      Kubernetes的使用技巧 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">Kubernetes的使用技巧</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:44
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <h2 id="1-bash针对kubectl命令的自动补充"><a href="#1-bash针对kubectl命令的自动补充" class="headerlink" title="1. bash针对kubectl命令的自动补充"></a>1. bash针对kubectl命令的自动补充</h2><p>这可能是在使用Kubernetes过程中最容易做的事，但它也是其中一个最有用的。要添加自动补充功能，如果使用bash，只需执行以下命令：</p>
+<pre><code>echo &quot;source &lt;(kubectl completion bash)&quot; &gt;&gt; ~/.bashrc
+</code></pre>
+<p>它将添加自动补全命令到你的.bashrc文件。因此每个你打开的shell窗口都支持该功能。我发现自动补全对一些长的参数，比如–all-namespaces特别有用。</p>
+<h2 id="2-给每个namespace添加默认的内存和CPU限额"><a href="#2-给每个namespace添加默认的内存和CPU限额" class="headerlink" title="2. 给每个namespace添加默认的内存和CPU限额"></a>2. 给每个namespace添加默认的内存和CPU限额</h2><p>是人就会犯错。我们假定某人写了个应用，他每秒就会打开一个数据库连接，但是不会关闭。这样集群中就有了一个内存泄漏的应用。假定我们把该应用部署到了没有限额设置的集群，那么该应用就会crash掉一个节点。<br>为了避免这种情况，Kubernetes允许为每个namespace设置默认的限额。要做到这很简单，我们只需创建一个limit range 的 yaml 并应用到特定namespace。以下是一个例子：</p>
+<pre><code>apiVersion: v1  
+ kind: LimitRange  
+ metadata:  
+   name: mem-limit-range  
+ spec:  
+   limits:  
+   - default:  
+       memory: 512Mi  
+     defaultRequest:  
+       memory: 256Mi  
+     type: Container
+</code></pre>
+<p>将该内容创建一个yaml文件并将它应用到任何你想应用的namespace，例如namespace limit-example。使用了限额后，任何部署到该namespace的应用，假如没有主动设置限额，都将得到一个默认的512Mi的内存限额。</p>
+<h2 id="3-kebelet可以帮我清理掉Docker镜像吗"><a href="#3-kebelet可以帮我清理掉Docker镜像吗" class="headerlink" title="3. kebelet可以帮我清理掉Docker镜像吗"></a>3. kebelet可以帮我清理掉Docker镜像吗</h2><p>这是kubelet默认已实现的功能。如果kubelet启动时没有设置flag，当&#x2F;var&#x2F;lib&#x2F;docker目录到达90%的容量时，它就会自动进行垃圾回收。这是极好的，但是针对inode阈值它没有默认设置（Kubernetes 1.7之前）。<br>你可能会遇到&#x2F;var&#x2F;lib&#x2F;docker只使用了50%磁盘空间，但是inode全部用光的情况。这可能会引起工作节点各种各样的问题。如果你运行的kubelet版本在1.4到1.6之间，那你得给kubelet添加以下flag：</p>
+<pre><code>--eviction-hard
+=memory.available&lt;100Mi,nodefs.available&lt;10%,nodefs.inodesFree&lt;5%
+</code></pre>
+<p>如果kubelet版本是1.7或更高，它默认就有这个配置。1.6默认不会监控inode的使用率，所以得添加那个flag来解决这个问题。</p>
+<h2 id="4-minikube虽然是mini，但是本地使用功能强大"><a href="#4-minikube虽然是mini，但是本地使用功能强大" class="headerlink" title="4. minikube虽然是mini，但是本地使用功能强大"></a>4. minikube虽然是mini，但是本地使用功能强大</h2><p>minikube绝对是本地启动Kubernetes集群最容易的方式。你只需遵循这个[1]指南去下载所有东西。<br>一旦所有组件安装完毕，你只需运行如下命令：</p>
+<pre><code>minikube start
+</code></pre>
+<p>待命令执行完毕，你本地就有一个运行的Kubernetes集群了。<br>当你想在本地构建一个应用并在本地运行时，有一个技巧。当你在本地构建一个Docker镜像时，如果不运行其它命令，你的镜像将被构建在你的本地计算机。<br>为了使你构建的Docker镜像能够直接push到本地Kubernetes集群，你需要使用如下命令告知Docker机器：</p>
+<pre><code>eval $(minikube docker-env)
+</code></pre>
+<p>这将使你能直接推送本地构建的应用到你的本地集群。</p>
+<h2 id="5-不要将kubectl的权限开放给所有人"><a href="#5-不要将kubectl的权限开放给所有人" class="headerlink" title="5. 不要将kubectl的权限开放给所有人"></a>5. 不要将kubectl的权限开放给所有人</h2><p>这可能是一个明摆着的事，但是当多个团队部署应用到同一个集群时，而这种场景就是Kubernetes的目标，不要开放一个通用的kubectl给每个人。我的建议是基于namespace来隔离团队，然后使用RBAC策略来限制能且仅能访问那个namespace。</p>
+<p>在权限被控制之后，你可能会变得疯狂，比如只能基于Pod来读取，创建和删除Pod。但是其中一个最需要做的事是只能访问管理员凭证，这样可以隔离谁能管理集群，而谁只能在集群上部署应用。</p>
+<p>这个话题我期待着后续单独开一篇博客来进行更详细的分析。</p>
+<h2 id="6-Pod中断预算（Pod-Disruption-Budgets）是你的朋友"><a href="#6-Pod中断预算（Pod-Disruption-Budgets）是你的朋友" class="headerlink" title="6. Pod中断预算（Pod Disruption Budgets）是你的朋友"></a>6. Pod中断预算（Pod Disruption Budgets）是你的朋友</h2><p>在Kubernetes集群中我们如何确保应用零宕机？</p>
+<p>PodDisruptionBudgetPodDisruptionBudgetPodDisruptionBudget</p>
+<p>集群会更新。节点会打上drain标签且Pod会被移除，这没法避免。所以我们应该针对每个deployment都设置一个PDB，保证至少有一个实例。我们可以使用一个简单的yaml来创建一个PDB，应用到集群里，并使用标签选择器来确定这个PDB覆盖了哪些资源。</p>
+<p>注意：PDB只对自愿中断的资源负责，某些如硬件失败这种错误，PDB无法起作用。</p>
+<p>PDB例子如下：</p>
+<pre><code>apiVersion: policy/v1beta1  
+ kind: PodDisruptionBudget  
+ metadata:  
+   name: app-a-pdb  
+ spec:  
+   minAvailable: 2  
+   selector:  
+       matchLabels:  
+         app: app-a
+</code></pre>
+<p>两个最需要关注的字段是matchLabels和minAvailable。</p>
+<p>matchLabels字段用来确定是否一个deployment可以关联到这个PDB。</p>
+<p>例如，如果我有一个带标签app:app-a的deployment，和另一个带标签app:app-b的deployment，例子中的PDB将只对第一个deployment起作用。</p>
+<p>minAvailable字段是Kubernetes在某些场景下，比如node被打上drain标签时，进行操作的依据。假设app-a运行在node1上，如果node1被打上了drain标签，那么kubernetes只会清除那些有至少2个实例的app-a。</p>
+<p>这允许你在任何时候都可控制运行的实例数。</p>
+<h2 id="7-你的APP还活着且可用吗"><a href="#7-你的APP还活着且可用吗" class="headerlink" title="7. 你的APP还活着且可用吗"></a>7. 你的APP还活着且可用吗</h2><p>Kubernetes允许我们定义探针，供kubelet确认我们的Pod和APP是否是健康的。</p>
+<p>Kubernetes提供了两种类型的探针，Readiness探针和Liveness探针。</p>
+<p>Readiness探针用来确认容器是否可接受流量。</p>
+<p>Liveness探针用来确认容器是否是健康的，或者需要被重启。</p>
+<p>这些配置可以很容易得追加到deployment的yaml，并且可以自定义超时时间，重试次数，延时时间等。需要更进一步得了解如何使用它们的，请阅读此文[2]。</p>
+<h2 id="8-给所有事物都打上标签"><a href="#8-给所有事物都打上标签" class="headerlink" title="8. 给所有事物都打上标签"></a>8. 给所有事物都打上标签</h2><p>标签是Kubernetes的其中一个基石。它使得对象和对象之间保持松耦合，且允许我们根据标签来查询对象。你甚至可以使用go client根据标签来监控事件。</p>
+<p>你几乎可以用标签做任何事，其中一个极佳的例子是同一集群中的多个环境。</p>
+<p>我们假定你在dev和qa环境使用了相同的集群。这说明你将在dev和qa环境同时运行一个app-a应用。</p>
+<p>为了达到这个目的，最简单的方式是使用service对象，其中一个选择带标签app:app-a和environment:dev的Pod，而另一个，则选择带标签app:app-a和environment:qa的Pod。</p>
+<p>这样做的好处是，两个相同的APP，每一个有不同的endpoint，这样就支持同时测试。</p>
+<h2 id="9-主动清理"><a href="#9-主动清理" class="headerlink" title="9. 主动清理"></a>9. 主动清理</h2><p>Kubernetes是一个非常非常强大的系统，但是和其它系统一样，它最终也会陷入混乱。kubelet必须进行任何你告诉它的校验，同时它也进行自己的校验。</p>
+<p>当然，Kubernetes有一个服务无法连接了，系统是不会挂掉的，因为它支持扩缩容。但是一个服务一旦扩大到成千上万个endpoint，那么kubelet就会一下子陷入瘫痪。</p>
+<p>简单的说，不论你因为什么理由需要删除一个deployment（或者其它东西），你都必须确保清理干净和它相关的一切东西。</p>
+<h2 id="10-你热爱GO语言吗"><a href="#10-你热爱GO语言吗" class="headerlink" title="10. 你热爱GO语言吗"></a>10. 你热爱GO语言吗</h2><p>最后一点是我个人觉得最重要的：持续的学习GO语言。</p>
+<p>Kubernetes是由GO编写的，它的所有插件也是用GO写的，他们甚至还编写了一个GO语言的客户端。client-go可用来做各种有趣的事。你可以用它根据自己的爱好扩展kubernetes。比如数据收集，部署引擎，或者一个简单的清理应用。</p>
+<p>学习这个GO 客户端，并在Kubernetes中使用它，这是我给每个使用Kubernetes的用户的最大建议。</p>
+<p>原文链接：</p>
+<p><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/tasks/tools/install-minikube/">https://kubernetes.io/docs/tasks/tools/install-minikube/</a></p>
+<p><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes">https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes</a></p>
+<p>原文链接：<a target="_blank" rel="noopener" href="https://hackernoon.com/top-10-kubernetes-tips-and-tricks-27528c2d0222">https://hackernoon.com/top-10-kubernetes-tips-and-tricks-27528c2d0222</a></p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2019/02/26/K8S%E7%9A%84pod%E5%86%85%E8%8E%B7%E5%8F%96%E5%8F%98%E9%87%8F%E7%9A%84%E5%80%BC%E9%94%99%E8%AF%AF/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:44
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2019/02/27/Kubernetes%20Eviction%20Manager%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6%E5%88%86%E6%9E%90/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-bash%E9%92%88%E5%AF%B9kubectl%E5%91%BD%E4%BB%A4%E7%9A%84%E8%87%AA%E5%8A%A8%E8%A1%A5%E5%85%85"><span class="toc-text">1. bash针对kubectl命令的自动补充</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%BB%99%E6%AF%8F%E4%B8%AAnamespace%E6%B7%BB%E5%8A%A0%E9%BB%98%E8%AE%A4%E7%9A%84%E5%86%85%E5%AD%98%E5%92%8CCPU%E9%99%90%E9%A2%9D"><span class="toc-text">2. 给每个namespace添加默认的内存和CPU限额</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-kebelet%E5%8F%AF%E4%BB%A5%E5%B8%AE%E6%88%91%E6%B8%85%E7%90%86%E6%8E%89Docker%E9%95%9C%E5%83%8F%E5%90%97"><span class="toc-text">3. kebelet可以帮我清理掉Docker镜像吗</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-minikube%E8%99%BD%E7%84%B6%E6%98%AFmini%EF%BC%8C%E4%BD%86%E6%98%AF%E6%9C%AC%E5%9C%B0%E4%BD%BF%E7%94%A8%E5%8A%9F%E8%83%BD%E5%BC%BA%E5%A4%A7"><span class="toc-text">4. minikube虽然是mini，但是本地使用功能强大</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E4%B8%8D%E8%A6%81%E5%B0%86kubectl%E7%9A%84%E6%9D%83%E9%99%90%E5%BC%80%E6%94%BE%E7%BB%99%E6%89%80%E6%9C%89%E4%BA%BA"><span class="toc-text">5. 不要将kubectl的权限开放给所有人</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-Pod%E4%B8%AD%E6%96%AD%E9%A2%84%E7%AE%97%EF%BC%88Pod-Disruption-Budgets%EF%BC%89%E6%98%AF%E4%BD%A0%E7%9A%84%E6%9C%8B%E5%8F%8B"><span class="toc-text">6. Pod中断预算（Pod Disruption Budgets）是你的朋友</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E4%BD%A0%E7%9A%84APP%E8%BF%98%E6%B4%BB%E7%9D%80%E4%B8%94%E5%8F%AF%E7%94%A8%E5%90%97"><span class="toc-text">7. 你的APP还活着且可用吗</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-%E7%BB%99%E6%89%80%E6%9C%89%E4%BA%8B%E7%89%A9%E9%83%BD%E6%89%93%E4%B8%8A%E6%A0%87%E7%AD%BE"><span class="toc-text">8. 给所有事物都打上标签</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-%E4%B8%BB%E5%8A%A8%E6%B8%85%E7%90%86"><span class="toc-text">9. 主动清理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-%E4%BD%A0%E7%83%AD%E7%88%B1GO%E8%AF%AD%E8%A8%80%E5%90%97"><span class="toc-text">10. 你热爱GO语言吗</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + Kubernetes%E7%9A%84%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7 + '&url=' + https%3A%2F%2Flinuxops.dev%2F2019%2F02%2F27%2FKubernetes%25E7%259A%2584%25E4%25BD%25BF%25E7%2594%25A8%25E6%258A%2580%25E5%25B7%25A7%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2019/02/27/Kubernetes%E7%9A%84%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

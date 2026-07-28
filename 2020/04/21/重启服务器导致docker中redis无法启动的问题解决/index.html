@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      重启服务器导致docker中redis无法启动的问题解决 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">重启服务器导致docker中redis无法启动的问题解决</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:45
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <h3 id="故障现像"><a href="#故障现像" class="headerlink" title="故障现像"></a>故障现像</h3><ul>
+<li><p>harbor服务里的redis容器启动失败</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13  
+14  
+15  
+16  
+17
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    [root@acp2-master-1 ~]# kubectl get po -n default  
+    NAME                                           READY   STATUS             RESTARTS   AGE  
+    docker-registry-fb854474f-jmwq5                1/1     Running            16         212d  
+    gitlab-ce-gitlab-ce-5c7b984fc-85clk            1/1     Running            8          9d  
+    gitlab-ce-gitlab-ce-database-8f7d789ff-hm2rf   1/1     Running            8          9d  
+    gitlab-ce-gitlab-ce-redis-c6b479b95-t5rjr      1/1     Running            8          9d  
+    harbor-harbor-chartmuseum-7bfd86c887-7dvnt     1/1     Running            0          33m  
+    harbor-harbor-clair-5d6bd4fdf-nxcw8            1/1     Running            3          33m  
+    harbor-harbor-core-d95c5f884-5x2cm             0/1     CrashLoopBackOff   5          14m  
+    harbor-harbor-database-0                       1/1     Running            0          32m  
+    harbor-harbor-jobservice-f5d9c4995-nh8qk       1/1     Running            6          14m  
+    harbor-harbor-nginx-774f9569cb-njxtn           1/1     Running            0          33m  
+    harbor-harbor-notary-server-867d58d99f-hdq8v   1/1     Running            0          33m  
+    harbor-harbor-notary-signer-6f6955b4fc-z99sh   1/1     Running            0          33m  
+    harbor-harbor-portal-65fd74dcbb-8pctx          1/1     Running            0          33m  
+    harbor-harbor-redis-bd8dbdf49-kttnr            0/1     CrashLoopBackOff   6          7m36s  
+    harbor-harbor-registry-7bbf6cb89f-ncxz9        2/2     Running            0          33m  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>日志报错</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13  
+14  
+15  
+16  
+17  
+18  
+19  
+20  
+21
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    [root@acp2-master-1 ~]# kubectl logs --tail 20 -f -n default harbor-harbor-redis-bd8dbdf49-kttnr  
+    (    &#39;      ,       .-`  | `,    )     Running in standalone mode  
+    |`-._`-...-` __...-.``-._|&#39;` _.-&#39;|     Port: 6379  
+    |    `-._   `._    /     _.-&#39;    |     PID: 1  
+      `-._    `-._  `-./  _.-&#39;    _.-&#39;  
+    |`-._`-._    `-.__.-&#39;    _.-&#39;_.-&#39;|  
+    |    `-._`-._        _.-&#39;_.-&#39;    |           http://redis.io  
+      `-._    `-._`-.__.-&#39;_.-&#39;    _.-&#39;  
+    |`-._`-._    `-.__.-&#39;    _.-&#39;_.-&#39;|  
+    |    `-._`-._        _.-&#39;_.-&#39;    |  
+      `-._    `-._`-.__.-&#39;_.-&#39;    _.-&#39;  
+          `-._    `-.__.-&#39;    _.-&#39;  
+              `-._        _.-&#39;  
+                  `-.__.-&#39;  
+      
+    1:M 22 Apr 2020 06:14:17.117 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.  
+    1:M 22 Apr 2020 06:14:17.117 # Server initialized  
+    1:M 22 Apr 2020 06:14:17.117 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command &#39;echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled&#39; as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.  
+    1:M 22 Apr 2020 06:14:17.120 * Reading RDB preamble from AOF file...  
+    1:M 22 Apr 2020 06:14:17.730 * Reading the remaining AOF tail...  
+    1:M 22 Apr 2020 06:14:18.095 # Bad file format reading the append only file: make a backup of your AOF file, then use ./redis-check-aof --fix &lt;filename&gt;  
+      
+</code></pre>
+<p>—|—  </p>
+<p>主要是4个问题，导致redis启动不了的主要是最后一行。“Bad file format reading the append only file: make a backup of your AOF file, then use .&#x2F;redis-check-aof –fix ” ，翻译一下读取仅追加文件的错误文件格式：备份AOF文件，然后使用.&#x2F;redis-check-a of–fix,有一个AOF的备份文件，通过这个.&#x2F;redis-check-a of–fix还原，查了一下redis的备份文件为“appendonly.aof”.</p>
+<h3 id="解决，其中有WARNING的告警可以不需要处理"><a href="#解决，其中有WARNING的告警可以不需要处理" class="headerlink" title="解决，其中有WARNING的告警可以不需要处理"></a>解决，其中有WARNING的告警可以不需要处理</h3><ul>
+<li><p>第一个警告：WARNING: The TCP backlog setting of 511 cannot be enforced because &#x2F;proc&#x2F;sys&#x2F;net&#x2F;core&#x2F;somaxconn is set to the lower value of 128.</p>
+<pre><code>1  
+2  
+3  
+4  
+5
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    方法1: 临时设置生效: sysctl -w net.core.somaxconn = 511  
+    方法2: 永久生效: 修改/etc/sysctl.conf文件，增加一行  
+    net.core.somaxconn= 511  
+    然后执行命令  
+    sysctl -p  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>第二个警告：WARNING overcommitmemory is set to 0! Background save may fail under low memory condition. To fix this issue add ‘vm.overcommitmemory &#x3D; 1’ to &#x2F;etc&#x2F;sysctl.conf and then reboot or run the command ‘sysctl vm.overcommit_memory&#x3D;1’ for this to take effect.</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13  
+14  
+15  
+16
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    解决方案  
+    方法1: 临时设置生效: sysctl -w vm.overcommit_memory = 1  
+    方法2: 永久生效: 修改/etc/sysctl.conf文件，增加一行  
+    vm.overcommit_memory = 1  
+    然后执行命令  
+    sysctl -p  
+      
+    补充:   
+    overcommit_memory参数说明：  
+    设置内存分配策略（可选，根据服务器的实际情况进行设置）  
+    /proc/sys/vm/overcommit_memory  
+    可选值：0、1、2。  
+    0， 表示内核将检查是否有足够的可用内存供应用进程使用；如果有足够的可用内存，内存申请允许；否则，内存申请失败，并把错误返回给应用进程。  
+    1， 表示内核允许分配所有的物理内存，而不管当前的内存状态如何。  
+    2， 表示内核允许分配超过所有物理内存和交换空间总和的内存  
+    注意：redis在dump数据的时候，会fork出一个子进程，理论上child进程所占用的内存和parent是一样的，比如parent占用的内存为8G，这个时候也要同样分配8G的内存给child,如果内存无法负担，往往会造成redis服务器的down机或者IO负载过高，效率下降。所以这里比较优化的内存分配策略应该设置为 1（表示内核允许分配所有的物理内存，而不管当前的内存状态如何）。  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>第三个警告：WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command ‘echo never &gt; &#x2F;sys&#x2F;kernel&#x2F;mm&#x2F;transparent_hugepage&#x2F;enabled’ as root, and add it to your &#x2F;etc&#x2F;rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.</p>
+<pre><code>1  
+2
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    解决方案：上面也提供了解决方案，&#39;echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled&#39;  这一行，直接执行就好了，但是这样的话，只是当前生效而已，如果电脑重启之后，又是需要重新设置的，所以把这个命令加入到启动过程中。  
+    编辑/etc/rc.local，加入echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled。  
+      
+</code></pre>
+<p>—|—  </p>
+<p>三个警告都已经解决，可以不解决，不影响服务，接下为就处理最后导致起不来的问题</p>
+<ul>
+<li><p>通过inspect redis容器找到数据在本地的目录</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13  
+14  
+15  
+16  
+17  
+18  
+19  
+20  
+21  
+22  
+23  
+24  
+25  
+26  
+27  
+28  
+29  
+30  
+31  
+32  
+33  
+34  
+35
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    },  
+    &quot;Mounts&quot;: [  
+        {  
+            &quot;Type&quot;: &quot;bind&quot;,  
+            &quot;Source&quot;: &quot;/var/lib/kubelet/pods/965118f1-a115-43f1-b517-870028afb64f/volumes/kubernetes.io~cephfs/pvc-37d4ca75-5316-11ea-b6ed-525400d63265&quot;,  
+            &quot;Destination&quot;: &quot;/bitnami/redis&quot;,  
+            &quot;Mode&quot;: &quot;&quot;,  
+            &quot;RW&quot;: true,  
+            &quot;Propagation&quot;: &quot;rprivate&quot;  
+        },  
+        {  
+            &quot;Type&quot;: &quot;bind&quot;,  
+            &quot;Source&quot;: &quot;/var/lib/kubelet/pods/965118f1-a115-43f1-b517-870028afb64f/volumes/kubernetes.io~secret/default-token-tv2rp&quot;,  
+            &quot;Destination&quot;: &quot;/var/run/secrets/kubernetes.io/serviceaccount&quot;,  
+            &quot;Mode&quot;: &quot;ro&quot;,  
+            &quot;RW&quot;: false,  
+            &quot;Propagation&quot;: &quot;rprivate&quot;  
+        },  
+        {  
+            &quot;Type&quot;: &quot;bind&quot;,  
+            &quot;Source&quot;: &quot;/var/lib/kubelet/pods/965118f1-a115-43f1-b517-870028afb64f/etc-hosts&quot;,  
+            &quot;Destination&quot;: &quot;/etc/hosts&quot;,  
+            &quot;Mode&quot;: &quot;&quot;,  
+            &quot;RW&quot;: true,  
+            &quot;Propagation&quot;: &quot;rprivate&quot;  
+        },  
+        {  
+            &quot;Type&quot;: &quot;bind&quot;,  
+            &quot;Source&quot;: &quot;/var/lib/kubelet/pods/965118f1-a115-43f1-b517-870028afb64f/containers/harbor-harbor/fdc4d83f&quot;,  
+            &quot;Destination&quot;: &quot;/dev/termination-log&quot;,  
+            &quot;Mode&quot;: &quot;&quot;,  
+            &quot;RW&quot;: true,  
+            &quot;Propagation&quot;: &quot;rprivate&quot;  
+        }  
+    ],  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>进入宿主机的目录找到 <code>/var/lib/kubelet/pods/965118f1-a115-43f1-b517-870028afb64f/</code> 可以使用find 找到备份文件appendonly.aof</p>
+<pre><code>1  
+2  
+3
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    [root@acp2-node-1 ~]# cd /var/lib/kubelet/pods/965118f1-a115-43f1-b517-870028afb64f  
+    [root@acp2-node-1 volumes]# find ./* -name appendonly.aof  
+    ./kubernetes.io~cephfs/pvc-37d4ca75-5316-11ea-b6ed-525400d63265/data/appendonly.aof  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>然后再查找恢复工具redis-check-aof，也可使用find命令</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    [root@acp2-node-1 pods]# find /* -name redis-check-aof  
+    /var/lib/docker/overlay2/b7d53e5601b2f83193463f47c11ac363cb15d4e7152935484944ff94d8ff0e49/diff/opt/bitnami/redis/bin/redis-check-aof  
+    [root@acp2-node-1 pods]# cd /var/lib/docker/overlay2/b7d53e5601b2f83193463f47c11ac363cb15d4e7152935484944ff94d8ff0e49/diff/opt/bitnami/redis/bin/  
+    [root@acp2-node-1 bin]# ll  
+    total 6732  
+    -rwxrwxr-x 1 root root  679512 Sep 21  2019 redis-benchmark  
+    -rwxrwxr-x 1 root root 1786296 Sep 21  2019 redis-check-aof  
+    -rwxrwxr-x 1 root root 1786296 Sep 21  2019 redis-check-rdb  
+    -rwxrwxr-x 1 root root  841624 Sep 21  2019 redis-cli  
+    -rwxrwxr-x 1 root root 1786296 Sep 21  2019 redis-server  
+    [root@acp2-node-1 bin]#  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>然后就是使用以下命令开始恢复</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13  
+14  
+15  
+16  
+17  
+18  
+19  
+20  
+21  
+22  
+23  
+24
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    [root@acp2-node-1 bin]# ./redis-check-aof --fix /var/lib/kubelet/pods/965118f1-a115-43f1-b517-870028afb64f/volumes/kubernetes.io~cephfs/pvc-37d4ca75-5316-11ea-b6ed-525400d63265/data/appendonly.aof  
+    The AOF appears to start with an RDB preamble.  
+    Checking the RDB preamble to start:  
+    [offset 0] Checking RDB file --fix  
+    [offset 26] AUX FIELD redis-ver = &#39;5.0.5&#39;  
+    [offset 40] AUX FIELD redis-bits = &#39;64&#39;  
+    [offset 52] AUX FIELD ctime = &#39;1587523879&#39;  
+    [offset 67] AUX FIELD used-mem = &#39;79175024&#39;  
+    [offset 83] AUX FIELD aof-preamble = &#39;1&#39;  
+    [offset 85] Selecting DB ID 0  
+    [offset 30115710] Selecting DB ID 1  
+    [offset 30117290] Selecting DB ID 2  
+    [offset 30596730] Checksum OK  
+    [offset 30596730] \o/ RDB looks OK! \o/  
+    [info] 472735 keys read  
+    [info] 470549 expires  
+    [info] 470549 already expired  
+    RDB preamble is OK, proceeding with AOF tail...  
+    0x         2b98f71: Expected prefix &#39;*&#39;, got: &#39;  
+    AOF analyzed: size=45715470, ok_up_to=45715313, diff=157  
+    This will shrink the AOF from 45715470 bytes, with 157 bytes, to 45715313 bytes  
+    Continue? [y/N]: y  
+    Successfully truncated AOF  
+    [root@acp2-node-1 bin]#  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>启动容器</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    [root@acp2-node-1 bin]# docker ps -a | grep harbor-harbor-redis  
+    9c917c4164c8        180c2ecb6e22                                         &quot;/entrypoint.sh /run…&quot;   About a minute ago   Exited (1) About a minute ago                       k8s_harbor-harbor_harbor-harbor-redis-bd8dbdf49-kttnr_default_965118f1-a115-43f1-b517-870028afb64f_6  
+    cb1ce5f0547c        10.0.129.100:60080/claas/pause:3.1                   &quot;/pause&quot;                 About an hour ago    Up About an hour                                    k8s_POD_harbor-harbor-redis-bd8dbdf49-kttnr_default_965118f1-a115-43f1-b517-870028afb64f_0  
+    [root@acp2-node-1 bin]# docker restart 9c917c4164c8  
+    9c917c4164c8  
+    [root@acp2-node-1 bin]# docker ps -a | grep harbor-harbor-redis  
+    08ecd6aa40b1        180c2ecb6e22                                         &quot;/entrypoint.sh /run…&quot;   About a minute ago   Up About a minute                                  k8s_harbor-harbor_harbor-harbor-redis-bd8dbdf49-kttnr_default_965118f1-a115-43f1-b517-870028afb64f_7  
+    cb1ce5f0547c        10.0.129.100:60080/claas/pause:3.1                   &quot;/pause&quot;                 About an hour ago    Up About an hour                                   k8s_POD_harbor-harbor-redis-bd8dbdf49-kttnr_default_965118f1-a115-43f1-b517-870028afb64f_0  
+    [root@acp2-node-1 bin]#  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>测试<br>通过测试发现已经没有问题，pod也都正常</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    [root@acp2-master-1 ~]# kubectl get po -n default | grep harbor  
+    harbor-harbor-chartmuseum-7bfd86c887-7dvnt     1/1     Running   0          101m  
+    harbor-harbor-clair-5d6bd4fdf-nxcw8            1/1     Running   3          101m  
+    harbor-harbor-core-d95c5f884-b9cp6             1/1     Running   0          28m  
+    harbor-harbor-database-0                       1/1     Running   0          100m  
+    harbor-harbor-jobservice-f5d9c4995-ljz8p       1/1     Running   0          28m  
+    harbor-harbor-nginx-774f9569cb-njxtn           1/1     Running   0          101m  
+    harbor-harbor-notary-server-867d58d99f-hdq8v   1/1     Running   0          101m  
+    harbor-harbor-notary-signer-6f6955b4fc-z99sh   1/1     Running   0          101m  
+    harbor-harbor-portal-65fd74dcbb-8pctx          1/1     Running   0          101m  
+    harbor-harbor-redis-bd8dbdf49-kttnr            1/1     Running   7          75m  
+    harbor-harbor-registry-7bbf6cb89f-ncxz9        2/2     Running   0          101m  
+    [root@acp2-master-1 ~]#  
+      
+</code></pre>
+<p>—|—  </p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2020/04/16/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:45
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2020/04/22/SLUBUnable%20to%20Allocate%20Memory/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%85%E9%9A%9C%E7%8E%B0%E5%83%8F"><span class="toc-text">故障现像</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%EF%BC%8C%E5%85%B6%E4%B8%AD%E6%9C%89WARNING%E7%9A%84%E5%91%8A%E8%AD%A6%E5%8F%AF%E4%BB%A5%E4%B8%8D%E9%9C%80%E8%A6%81%E5%A4%84%E7%90%86"><span class="toc-text">解决，其中有WARNING的告警可以不需要处理</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3 + '&url=' + https%3A%2F%2Flinuxops.dev%2F2020%2F04%2F21%2F%25E9%2587%258D%25E5%2590%25AF%25E6%259C%258D%25E5%258A%25A1%25E5%2599%25A8%25E5%25AF%25BC%25E8%2587%25B4docker%25E4%25B8%25ADredis%25E6%2597%25A0%25E6%25B3%2595%25E5%2590%25AF%25E5%258A%25A8%25E7%259A%2584%25E9%2597%25AE%25E9%25A2%2598%25E8%25A7%25A3%25E5%2586%25B3%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2020/04/21/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

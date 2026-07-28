@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      K8s部署kong之yaml 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">K8s部署kong之yaml</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:44
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h2><p>官方安装：<a target="_blank" rel="noopener" href="https://getkong.org/install/kubernetes/">https://getkong.org/install/kubernetes/</a></p>
+<h2 id="简介："><a href="#简介：" class="headerlink" title="简介："></a>简介：</h2><p>Kong 是在客户端和（微）服务间转发API通信的API网关，通过插件扩展功能。</p>
+<h3 id="Kong-有两个主要组件："><a href="#Kong-有两个主要组件：" class="headerlink" title="Kong 有两个主要组件："></a>Kong 有两个主要组件：</h3><ul>
+<li>Kong Server ：基于 nginx 的服务器，用来接收 API 请求。</li>
+<li>Apache Cassandra &amp; ：用来存储操作数据。</li>
+</ul>
+<p>注：Ambassador没有数据库 - 它依赖于ConfigMap来存储状态</p>
+<h3 id="Kong-基本功能："><a href="#Kong-基本功能：" class="headerlink" title="Kong 基本功能："></a>Kong 基本功能：</h3><ul>
+<li>HTTP 基本认证、密钥认证、CORS（ Cross-origin Resource Sharing，跨域资源共享）、TCP、UDP、文件日志、API 请求限流、请求转发以及 nginx 监控</li>
+<li>Serf是一个去中心化的集群成员管理、故障检测解决方案，Kong用它做清缓存，看来Kong里面核心的数据consumer、api、plugin都是做了缓存的，还可以做集群节点的监控</li>
+</ul>
+<h3 id="Kong-不足："><a href="#Kong-不足：" class="headerlink" title="Kong 不足："></a>Kong 不足：</h3><ul>
+<li>数据库不支持常用的mysql，只支持Postgres&#x2F;Cassandra</li>
+<li>扩展Kong需要会写lua脚本</li>
+<li>不修改源码的情况下，无法自定义nginx配置文件，因为重启后会重新初始化有变更的nginx配置文件【nginx.conf|nginx-kong.conf】</li>
+<li>安装过程中会创建一个 Postgres 的 StatefulSet，前面提到，这一版本对 Kubernetes 集群的最低版本要求是 1.8</li>
+</ul>
+<h3 id="Kong的限流"><a href="#Kong的限流" class="headerlink" title="Kong的限流"></a>Kong的限流</h3><ul>
+<li><p>本地限流（local）</p>
+</li>
+<li><p>数据库限流（cluster）</p>
+</li>
+<li><p>Redis限流</p>
+<ul>
+<li>注：Kong的这三种限流方式都没有考虑并发情况</li>
+<li>限流：<a target="_blank" rel="noopener" href="https://my.oschina.net/chinamerp/blog/851613">https://my.oschina.net/chinamerp/blog/851613</a></li>
+</ul>
+</li>
+</ul>
+<p>当到达限流的临界值（max-1）时，此时有多条请求同时执行get_usage，计算结果全部通过，而我们期望的是仅有一条请求能通过</p>
+<p>8000端口是可以给用户访问，就是说用户发送请求先到 Kong 项目的 8000 端口，然后Kong 项目帮你转到你的后端应用api。</p>
+<h3 id="Kong-api简单使用"><a href="#Kong-api简单使用" class="headerlink" title="Kong api简单使用"></a>Kong api简单使用</h3><p>8001 端口是管理端口，比如说，管理员可以通过 8001端口来得到你加入过的 api</p>
+<ul>
+<li><p>列出 所加过的 api</p>
+<pre><code>1
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    curl localhost:8001/apis/   
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>加入 api</p>
+<pre><code>1
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    curl -i -X POST --url http://localhost:8001/apis/ --data &#39;upstream_url=http://camp.uats.cc&#39; --data &#39;request_path=login&#39;     
+      
+</code></pre>
+<p>—|—  </p>
+<p>上面这段命令表示：</p>
+<pre><code>* –url：&lt;http://localhost:8001/apis/&gt; 固定的，加入 api 就得写这个，表示给 kong管理。
+* upstream_url：表示我们的网站。相当于一个请求前缀。
+* request_path：就是具体我们的 api。
+</code></pre>
+<ul>
+<li><p>删除 api</p>
+<pre><code>1
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    curl -i -X DELETE localhost:8001/apis/00f90ca9-cf2d-4830-c842-3b90f6cd08af    
+      
+</code></pre>
+<p>—|—  </p>
+<p>后面 这个串表示 加入的api的 id。</p>
+<h2 id="初始设置"><a href="#初始设置" class="headerlink" title="初始设置"></a>初始设置</h2><ul>
+<li><p>下载或克隆以下代码</p>
+<pre><code>1  
+2
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    git clone https://github.com/Kong/kong-dist-kubernetes.git  
+    cd kong-dist-kubernetes  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>修改配置文件主要是k8s对应service的类型修改为type:nodePort</p>
+<pre><code>apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-proxy
+  spec:
+  type: LoadBalancer  ## 将这里修改为nodeport
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-proxy
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+      app: kong
+</code></pre>
+</li>
+</ul>
+<h2 id="部署数据存储"><a href="#部署数据存储" class="headerlink" title="部署数据存储"></a>部署数据存储</h2><blockquote>
+<p>注意：这里使用pg数据库</p>
+</blockquote>
+<ul>
+<li><p>创建数据库</p>
+<pre><code>apiVersion: v1
+  kind: Service
+  metadata:
+  name: postgres
+  spec:
+  ports:
+  - name: pgql
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+      app: postgres
+  ---
+  apiVersion: v1
+  kind: ReplicationController
+  metadata:
+  name: postgres
+  spec:
+  replicas: 1
+  template:
+      metadata:
+      labels:
+          app: postgres
+      spec:
+      containers:
+          - name: postgres
+          image: postgres:9.6
+          env:
+              - name: POSTGRES_USER
+              value: kong
+              - name: POSTGRES_PASSWORD
+              value: kong
+              - name: POSTGRES_DB
+              value: kong
+              - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+              - containerPort: 5432
+          volumeMounts:
+              - mountPath: /var/lib/postgresql/data
+              name: pg-data
+      volumes:
+          - name: pg-data
+          emptyDir: {}
+
+1
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    kubectl create -f postgres.yaml     
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>准备数据库运行迁移作业，以下为kong_migration_postgres.yaml</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13  
+14  
+15  
+16  
+17  
+18  
+19  
+20  
+21
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    apiVersion: batch/v1  
+    kind: Job  
+    metadata:  
+    name: kong-migration  
+    spec:  
+    template:  
+        metadata:  
+        name: kong-migration  
+        spec:  
+        containers:  
+        - name: kong-migration  
+            image: kong  
+            env:  
+            - name: KONG_NGINX_DAEMON  
+                value: &#39;off&#39;  
+            - name: KONG_PG_PASSWORD  
+                value: kong  
+            - name: KONG_PG_HOST  
+                value: postgres.default.svc.cluster.local  
+            command: [ &quot;/bin/sh&quot;, &quot;-c&quot;, &quot;kong migrations bootstrap&quot; ]  
+        restartPolicy: Never  
+      
+</code></pre>
+<p>—|—  </p>
+<pre><code>    1  
+    
+</code></pre>
+<p>| </p>
+<pre><code>    kubectl create -f kong_migration_postgres.yaml   
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>将Kong管理员，代理服务和Deployment控制器部署到集群</p>
+<pre><code>apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-proxy
+  spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-proxy
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+  selector:
+      app: kong
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-proxy-ssl
+  spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-proxy-ssl
+      port: 8443
+      targetPort: 8443
+      protocol: TCP
+  selector:
+      app: kong
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-admin
+  spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-admin
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+  selector:
+      app: kong
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+  name: kong-admin-ssl
+  spec:
+  type: LoadBalancer
+  loadBalancerSourceRanges:
+  - 0.0.0.0/0
+  ports:
+  - name: kong-admin-ssl
+      port: 8444
+      targetPort: 8444
+      protocol: TCP
+  selector:
+      app: kong
+  ---
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+  name: kong-rc
+  spec:
+  replicas: 3
+  template:
+      metadata:
+      labels:
+          name: kong-rc
+          app: kong
+      spec:
+      containers:
+      - name: kong
+          image: kong
+          env:
+          - name: KONG_ADMIN_LISTEN
+              value: &quot;0.0.0.0:8001, 0.0.0.0:8444 ssl&quot;
+          - name: KONG_PG_PASSWORD
+              value: kong
+          - name: KONG_PG_HOST
+              value: postgres
+          - name: KONG_PROXY_ACCESS_LOG
+              value: &quot;/dev/stdout&quot;
+          - name: KONG_ADMIN_ACCESS_LOG
+              value: &quot;/dev/stdout&quot;
+          - name: KONG_PROXY_ERROR_LOG
+              value: &quot;/dev/stderr&quot;
+          - name: KONG_ADMIN_ERROR_LOG
+              value: &quot;/dev/stderr&quot;
+          ports:
+          - name: admin
+          containerPort: 8001
+          protocol: TCP
+          - name: proxy
+          containerPort: 8000
+          protocol: TCP
+          - name: proxy-ssl
+          containerPort: 8443
+          protocol: TCP
+          - name: admin-ssl
+          containerPort: 8444
+          protocol: TCP
+
+1
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    kubectl create -f kong_postgres.yaml  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>验证您的部署<br>您现在可以看到已经使用的资源kubectl：</p>
+<pre><code>1
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    kubectl get all  
+      
+</code></pre>
+<p>—|—  </p>
+<p>一旦EXTERNAL_IP可用于Kong代理和管理服务，您可以通过发出以下请求来测试Kong：</p>
+<pre><code>    1  
+    2  
+    3  
+    4  
+    
+</code></pre>
+<p>| </p>
+<pre><code>    curl &lt;kong-admin-ip-address&gt;:8001  
+    curl https://&lt;admin-ssl-ip-address&gt;:8444  
+    curl &lt;kong-proxy-ip-address&gt;:8000  
+    curl https://&lt;kong-proxy-ssl-ip-address&gt;:8443  
+      
+</code></pre>
+<p>—|—  </p>
+<p>我这可以看到kong以及启动了，kong-rc都是running，<br>举例测试例如：</p>
+<pre><code>    1  
+    
+</code></pre>
+<p>| </p>
+<pre><code>    curl 192.168.1.216:31572  
+      
+</code></pre>
+<p>—|—  </p>
+<h2 id="kong-UI管理工具–dashboard"><a href="#kong-UI管理工具–dashboard" class="headerlink" title="kong UI管理工具–dashboard"></a>kong UI管理工具–dashboard</h2><ul>
+<li><p>使用docker 进行启动</p>
+<pre><code>1
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    docker run -d -p 8080:8080 pgbi/kong-dashboard:v2  
+      
+</code></pre>
+<p>—|—  </p>
+<ul>
+<li><p>配置管理界面</p>
+<pre><code>1  
+2
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    API node 输入 k8snodeip:service nodeport  
+          例如我的是：192.168.1.216:31572  
+      
+</code></pre>
+<p>—|—  </p>
+<p><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong01.png" alt="kong01"><br><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong02.png" alt="kong02"></p>
+<ul>
+<li><p>操作界面<br><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong03.png" alt="kong03"><br><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong04.png" alt="kong04"></p>
+</li>
+<li><p>测试接口<br><img src="/2019/05/09/k8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/kong05.png" alt="kong05"></p>
+</li>
+<li><p>参考资料</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/PGBI/kong-dashboard">https://github.com/PGBI/kong-dashboard</a></li>
+<li><a target="_blank" rel="noopener" href="https://getkong.org/install/kubernetes/">https://getkong.org/install/kubernetes/</a></li>
+<li><a target="_blank" rel="noopener" href="https://getkong.org/install/kubernetes/">https://getkong.org/install/kubernetes/</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/shown1985/p/6484822.html">http://www.cnblogs.com/shown1985/p/6484822.html</a></li>
+<li>API Gateway 模式： <a target="_blank" rel="noopener" href="http://microservices.io/patterns/apigateway.html">http://microservices.io/patterns/apigateway.html</a></li>
+<li>Nginx： <a target="_blank" rel="noopener" href="https://www.nginx.com/blog/introduction-to-microservices/">https://www.nginx.com/blog/introduction-to-microservices/</a></li>
+<li>Kong 项目官网：<a target="_blank" rel="noopener" href="https://getkong.org/">https://getkong.org/</a></li>
+</ul>
+</li>
+</ul>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2019/05/07/kafka%E5%85%A5%E9%97%A8%E6%95%99%E7%A8%8B/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:44
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2019/05/08/K8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Bdocker/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3"><span class="toc-text">官方文档</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B%EF%BC%9A"><span class="toc-text">简介：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong-%E6%9C%89%E4%B8%A4%E4%B8%AA%E4%B8%BB%E8%A6%81%E7%BB%84%E4%BB%B6%EF%BC%9A"><span class="toc-text">Kong 有两个主要组件：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong-%E5%9F%BA%E6%9C%AC%E5%8A%9F%E8%83%BD%EF%BC%9A"><span class="toc-text">Kong 基本功能：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong-%E4%B8%8D%E8%B6%B3%EF%BC%9A"><span class="toc-text">Kong 不足：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong%E7%9A%84%E9%99%90%E6%B5%81"><span class="toc-text">Kong的限流</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kong-api%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="toc-text">Kong api简单使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E8%AE%BE%E7%BD%AE"><span class="toc-text">初始设置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="toc-text">部署数据存储</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#kong-UI%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7%E2%80%93dashboard"><span class="toc-text">kong UI管理工具–dashboard</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + K8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml + '&url=' + https%3A%2F%2Flinuxops.dev%2F2019%2F05%2F08%2FK8s%25E9%2583%25A8%25E7%25BD%25B2kong%25E4%25B9%258Byaml%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2019/05/08/K8s%E9%83%A8%E7%BD%B2kong%E4%B9%8Byaml/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

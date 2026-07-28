@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      深入 Nginx 之配置篇 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">深入 Nginx 之配置篇</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:44
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <blockquote>
+<p>注：原文链接：<a target="_blank" rel="noopener" href="http://tenpercent.top/2019/02/15/learn-nginx-configuration/">http://tenpercent.top/2019/02/15/learn-nginx-configuration/</a></p>
+</blockquote>
+<h2 id="常用配置项"><a href="#常用配置项" class="headerlink" title="常用配置项"></a>常用配置项</h2><p>在工作中，我们与 Nginx 打交道更多的是通过其配置文件来进行。那么掌握这些配置项各自的作用就很有必要了。</p>
+<p>首先，nginx.conf 的内容通常是这样的：</p>
+<pre><code>...              
+...            #核心摸块
+events {        #事件模块
+
+...
+}
+http {     # http 模块
+    server {      # server块
+
+        location [PATTERN] {  # location块
+
+            ...
+        }
+        location [PATTERN] {
+
+            ...
+        }
+    }
+    server {
+    ...
+    }
+
+}
+mail {     # mail 模块
+
+    server {    # server块
+        ...
+    }
+}
+</code></pre>
+<p>我们依次看一下每个模块一般有哪些配置项：</p>
+<h3 id="核心模块"><a href="#核心模块" class="headerlink" title="核心模块"></a>核心模块</h3><pre><code>user admin; #配置用户或者组。
+worker_processes 4; #允许生成的进程数，默认为1 
+pid /nginx/pid/nginx.pid; #指定 nginx 进程运行文件存放地址 
+error_log log/error.log debug; #错误日志路径，级别。
+</code></pre>
+<h3 id="事件模块"><a href="#事件模块" class="headerlink" title="事件模块"></a>事件模块</h3><pre><code>events { 
+    accept_mutex on; #设置网路连接序列化，防止惊群现象发生，默认为on 
+
+    multi_accept on; #设置一个进程是否同时接受多个网络连接，默认为off 
+
+    use epoll; #事件驱动模型select|poll|kqueue|epoll|resig
+
+    worker_connections 1024; #最大连接数，默认为512
+}
+</code></pre>
+<h3 id="http-模块"><a href="#http-模块" class="headerlink" title="http 模块"></a>http 模块</h3><pre><code>http {
+    include       mime.types;   #文件扩展名与文件类型映射表
+
+    default_type  application/octet-stream; #默认文件类型，默认为text/plain
+
+    access_log off; #取消服务日志    
+    sendfile on;   #允许 sendfile 方式传输文件，默认为off，可以在http块，server块，location块。
+
+    sendfile_max_chunk 100k;  #每个进程每次调用传输数量不能大于设定的值，默认为0，即不设上限。
+
+    keepalive_timeout 65;  #连接超时时间，默认为75s，可以在http，server，location块。
+    server 
+    {
+            keepalive_requests 120; #单连接请求上限次数。
+
+            listen 80; #监听端口
+
+            server_name  127.0.0.1;   #监听地址      
+
+            index index.html index.htm index.php;
+
+            root your_path;  #根目录
+
+            location ~ \.php$
+            {
+                fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;
+
+                #fastcgi_pass 127.0.0.1:9000;
+
+                fastcgi_index index.php;
+
+                include fastcgi_params;
+            }
+    }
+}
+</code></pre>
+<h2 id="配置项解析"><a href="#配置项解析" class="headerlink" title="配置项解析"></a>配置项解析</h2><ul>
+<li>worker_processes</li>
+</ul>
+<p>worker_processes 用来设置 Nginx 服务的进程数。该值推荐使用 CPU 内核数。</p>
+<ul>
+<li>worker_cpu_affinity</li>
+</ul>
+<p>worker_cpu_affinity 用来为每个进程分配CPU的工作内核，参数有多个二进制值表示，每一组代表一个进程，每组中的每一位代表该进程使用CPU的情况，1代表使用，0代表不使用。所以我们使用 worker_cpu_affinity 0001 0010 0100 1000;来让进程分别绑定不同的核上。默认情况下worker进程不绑定在任何一个CPU上。</p>
+<ul>
+<li>worker_rlimit_nofile</li>
+</ul>
+<p>设置毎个进程的最大文件打开数。如果不设的话上限就是系统的 ulimit –n的数字，一般为65535。</p>
+<ul>
+<li>worker_connections</li>
+</ul>
+<p>设置一个进程理论允许的最大连接数，理论上越大越好，但不可以超过 worker_rlimit_nofile 的值。</p>
+<ul>
+<li>use epoll</li>
+</ul>
+<p>设置事件驱动模型使用 epoll。epoll 是 Nginx 支持的高性能事件驱动库之一。是公认的非 常优秀的事件驱动模型。</p>
+<ul>
+<li>accept_mutex off</li>
+</ul>
+<p>关闭网络连接序列化，当其设置为开启的时候，将会对多个 Nginx 进程接受连接进行序列化，防止多个进程对连接的争抢。当服务器连接数不多时，开启这个参数会让负载有一定程度的降低。但是当服务器的吞吐量很大时，为了效率，请关闭这个参数；并且关闭这个参数的时候也可以让请求在多个 worker 间的分配更均衡。所以我们设置 accept_mutex off;</p>
+<ul>
+<li>multi_accept on</li>
+</ul>
+<p>设置一个进程可同时接受多个网络连接</p>
+<ul>
+<li>Sendfile on</li>
+</ul>
+<p>Sendfile是 Linux2.0 以后的推出的一个系统调用,它能简化网络传输过程中的步骤，提高服务器性能。<br>不用 sendfile的传统网络传输过程：硬盘 &gt;&gt; kernel buffer &gt;&gt; user buffer &gt;&gt; kernel socket buffer &gt;&gt; 协议栈</p>
+<p>用 sendfile()来进行网络传输的过程：<br>硬盘 &gt;&gt; kernel buffer (快速拷贝到 kernelsocket buffer) &gt;&gt; 协议栈</p>
+<ul>
+<li>tcp_nopush on</li>
+</ul>
+<p>设置数据包会累积一下再一起传输，可以提高一些传输效率。 tcp_nopush 必须和 sendfile 搭配使用。</p>
+<ul>
+<li>tcp_nodelay on</li>
+</ul>
+<p>小的数据包不等待直接传输。默认为on。看上去是和 tcp_nopush 相反的功能，但是两边都为 on 时 nginx 也可以平衡这两个功能的使用。</p>
+<ul>
+<li>keepalive_timeout</li>
+</ul>
+<p>HTTP 连接的持续时间。设的太长会使无用的线程变的太多。这个根据服务器访问数量、处理速度以及网络状况方面考虑。</p>
+<ul>
+<li>send_timeout</li>
+</ul>
+<p>设置 Nginx 服务器响应客户端的超时时间，这个超时时间只针对两个客户端和服务器建立连接后，某次活动之间的时间，如果这个时间后，客户端没有任何活动，Nginx服务器将关闭连接</p>
+<ul>
+<li>gzip on</li>
+</ul>
+<p>启用 gzip，对响应数据进行在线实时压缩,减少数据传输量。</p>
+<ul>
+<li>gzip_disable “msie6”</li>
+</ul>
+<p>Nginx服务器在响应这些种类的客户端请求时，不使用 Gzip 功能缓存应用数据，gzip_disable “msie6”对IE6浏览器的数据不进行 GZIP 压缩。</p>
+<p>常用的配置项大致这些，对于不同的业务场景，有的需要额外的其他配置项，这里不做展开。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>http 配置里有 location 这一项，它是用来根据请求中的 uri 来为其匹配相应的处理规则。</p>
+<h3 id="location-查找规则"><a href="#location-查找规则" class="headerlink" title="location 查找规则"></a>location 查找规则</h3><pre><code>location  = / {
+# 精确匹配 / ，主机名后面不能带任何字符串
+[ config A ]
+}
+location  / {
+# 因为所有的地址都以 / 开头，所以这条规则将匹配到所有请求
+# 但是正则和最长字符串会优先匹配
+[ config B ]
+}
+location /documents/ {
+# 匹配任何以 /documents/ 开头的地址，匹配符合以后，还要继续往下搜索
+# 只有后面的正则表达式没有匹配到时，这一条才会采用这一条
+[ config C ]
+}
+location ~ /documents/Abc {
+# 匹配任何以 /documents/Abc 开头的地址，匹配符合以后，还要继续往下搜索
+# 只有后面的正则表达式没有匹配到时，这一条才会采用这一条
+[ config CC ]
+}
+location ^~ /images/ {
+# 匹配任何以 /images/ 开头的地址，匹配符合以后，停止往下搜索正则，采用这一条。
+[ config D ]
+}
+location ~* \.(gif|jpg|jpeg)$ {
+# 匹配所有以 gif,jpg或jpeg 结尾的请求
+# 然而，所有请求 /images/ 下的图片会被 config D 处理，因为 ^~ 到达不了这一条正则
+[ config E ]
+}
+location /images/ {
+# 字符匹配到 /images/，继续往下，会发现 ^~ 存在
+[ config F ]
+}
+location /images/abc {
+# 最长字符匹配到 /images/abc，继续往下，会发现 ^~ 存在
+# F与G的放置顺序是没有关系的
+[ config G ]
+}
+location ~ /images/abc/ {
+# 只有去掉 config D 才有效：先最长匹配 config G 开头的地址，继续往下搜索，匹配到这一条正则，采用
+    [ config H ]
+}
+</code></pre>
+<p>正则查找优先级从高到低依次如下：</p>
+<ul>
+<li>“ &#x3D; “ 开头表示精确匹配，如 A 中只匹配根目录结尾的请求，后面不能带任何字符串。</li>
+<li>“ ^~ “ 开头表示uri以某个常规字符串开头，不是正则匹配</li>
+<li>“ ~ “ 开头表示区分大小写的正则匹配;</li>
+<li>“ ~* “ 开头表示不区分大小写的正则匹配</li>
+<li>“ &#x2F; “ 通用匹配, 如果没有其它匹配,任何请求都会匹配到</li>
+</ul>
+<h3 id="负载均衡配置"><a href="#负载均衡配置" class="headerlink" title="负载均衡配置"></a>负载均衡配置</h3><p>Nginx 的负载均衡需要用到 upstream 模块，可通过以下配置来实现：</p>
+<pre><code>upstream test-upstream {
+    ip_hash; # 使用 ip_hash 算法分配
+
+    server 192.168.1.1; # 要分配的 ip
+    server 192.168.1.2;
+}
+server {
+    location / {       
+        proxy_pass http://test-upstream;
+    }
+
+}
+</code></pre>
+<p>上面的例子定义了一个 test-upstream 的负载均衡配置，通过 proxy_pass 反向代理指令将请求转发给该模块进行分配处理。</p>
+<blockquote>
+<p>注：原文链接：<a target="_blank" rel="noopener" href="http://tenpercent.top/2019/02/15/learn-nginx-configuration/">http://tenpercent.top/2019/02/15/learn-nginx-configuration/</a></p>
+</blockquote>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2019/03/18/%E6%9F%90%E4%BA%91ace%202.3%E5%B9%B3%E5%8F%B0%E9%83%A8%E7%BD%B2/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:44
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2019/03/20/%E6%B7%B1%E5%85%A5%20Nginx%20%E4%B9%8B%E6%9E%B6%E6%9E%84%E7%AF%87/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E9%A1%B9"><span class="toc-text">常用配置项</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97"><span class="toc-text">核心模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8B%E4%BB%B6%E6%A8%A1%E5%9D%97"><span class="toc-text">事件模块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#http-%E6%A8%A1%E5%9D%97"><span class="toc-text">http 模块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%A1%B9%E8%A7%A3%E6%9E%90"><span class="toc-text">配置项解析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-text">其他</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#location-%E6%9F%A5%E6%89%BE%E8%A7%84%E5%88%99"><span class="toc-text">location 查找规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE"><span class="toc-text">负载均衡配置</span></a></li></ol></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E6%B7%B1%E5%85%A5%20Nginx%20%E4%B9%8B%E9%85%8D%E7%BD%AE%E7%AF%87 + '&url=' + https%3A%2F%2Flinuxops.dev%2F2019%2F03%2F20%2F%25E6%25B7%25B1%25E5%2585%25A5%2520Nginx%2520%25E4%25B9%258B%25E9%2585%258D%25E7%25BD%25AE%25E7%25AF%2587%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2019/03/20/%E6%B7%B1%E5%85%A5%20Nginx%20%E4%B9%8B%E9%85%8D%E7%BD%AE%E7%AF%87/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

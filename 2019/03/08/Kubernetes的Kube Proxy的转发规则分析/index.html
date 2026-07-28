@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      Kubernetes的Kube Proxy的转发规则分析 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">Kubernetes的Kube Proxy的转发规则分析</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:44
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><ul>
+<li>filter表</li>
+<li>nat表<ul>
+<li>Chain KUBE-SERVICES</li>
+<li>Chain KUBE-NODEPORTS (1 references)</li>
+<li>Chain KUBE-POSTROUTING (1 references)</li>
+</ul>
+</li>
+<li>报文处理流程图<ul>
+<li>发送到Node的报文的处理过程</li>
+<li>Node发出的报文的处理过程<br>概要</li>
+</ul>
+</li>
+</ul>
+<p>kube-proxy是kubernetes中设置转发规则的组件，通过iptables修改报文的流向。</p>
+<p>以下是在一台kubernetes node节点上观察到的结果，kube-proxy是一个独立的组件，下面的观察结果适用于运行在其它地方的kube-proxy。</p>
+<pre><code>$kube-proxy --version
+kubernetes v1.5.2
+</code></pre>
+<p>通过<code>iptables -L -t [iptables表名]</code>可以看到，kube-proxy只修改了filter和nat表。<br>五个检查点:</p>
+<pre><code>          INPUT                 OUPUT
+            .                     |
+           /_\           +--------+
+            |           _|_
+            +--------+  \ /
+                     |   &#39; 
+                     Router --------|&gt; FORWARD
+                     .   |                |
+                    /_\  +--------+       |
+                     |           _|_     _|_
+           +---------+           \ /     \ /
+           |                      &#39;       &#39; 
+PKT ---&gt; PREROUTING              POSTROUTING  ---&gt; PKT
+</code></pre>
+<h3 id="filter表"><a href="#filter表" class="headerlink" title="filter表"></a>filter表</h3><p>filter表中Chain:</p>
+<pre><code>$iptables -t filter -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+KUBE-FIREWALL  all  --  anywhere         anywhere
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+DOCKER-ISOLATION  all  --  anywhere      anywhere
+DOCKER     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere        ctstate RELATED,ESTABLISHED
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+KUBE-FIREWALL  all  --  anywhere         anywhere
+KUBE-SERVICES  all  --  anywhere         anywhere        /* kubernetes service portals */
+
+Chain DOCKER (1 references)
+target     prot opt source               destination
+
+Chain DOCKER-ISOLATION (1 references)
+target     prot opt source               destination
+RETURN     all  --  anywhere             anywhere
+
+Chain KUBE-FIREWALL (2 references)
+target     prot opt source               destination
+DROP       all  --  anywhere             anywhere        /* kubernetes firewall for dropping marked packets */ mark match 0x8000/0x8000
+
+Chain KUBE-SERVICES (1 references)
+target     prot opt source               destination
+REJECT     tcp  --  anywhere             10.254.153.61   /* first/webshell:http has no endpoints */ tcp dpt:http reject-with icmp-port-unreachable
+REJECT     tcp  --  anywhere             10.254.153.61   /* first/webshell:ssh has no endpoints */ tcp dpt:ssh reject-with icmp-port-unreachable
+</code></pre>
+<p>可以看到kube-proxy只设置了filter表中INPUT chain和OUTPUT chain，增加了KUBE-FIREWALL和KUBE-SERVICES两个规则链。</p>
+<p>所有的出报文都要经过KUBE-SERVICES，如果一个Service没有对应的endpoint，则拒绝将报文发出:</p>
+<pre><code>$./kubectl.sh get services -o wide -n first
+NAME       CLUSTER-IP      EXTERNAL-IP   PORT(S)         AGE       SELECTOR
+webshell   10.254.153.61   &lt;none&gt;        80/TCP,22/TCP   3d        name=webshell,type=pod
+</code></pre>
+<p>注意在KUBE-FIREWALL中，所有标记了0x8000的包都会被丢弃，标记动作可以发生在其它的表中。</p>
+<h3 id="nat表"><a href="#nat表" class="headerlink" title="nat表"></a>nat表</h3><p>nat表中设置的规则比较多:</p>
+<ol>
+<li><p>(inbound)在PREROUTING阶段，将所有报文转发到KUBE-SERVICES</p>
+</li>
+<li><p>(outbound)在OUTPUT阶段，将所有报文转发到KUBE-SERVICES</p>
+</li>
+<li><p>(outbound)在POSTROUTING阶段，将所有报文转发到KUBE-POSTROUTING</p>
+</li>
+</ol>
+<h5 id="Chain-KUBE-SERVICES"><a href="#Chain-KUBE-SERVICES" class="headerlink" title="Chain KUBE-SERVICES"></a>Chain KUBE-SERVICES</h5><pre><code>target     prot opt source               destination
+KUBE-SVC-QMBTMOHBQS5DJKOG  tcp  --  anywhere    10.254.153.61   /* first/webshell:http cluster IP */ tcp dpt:http
+KUBE-SVC-TRP5S22NJPNCPLI2  tcp  --  anywhere    10.254.153.61   /* first/webshell:ssh cluster IP */ tcp dpt:ssh
+KUBE-SVC-XGLOHA7QRQ3V22RZ  tcp  --  anywhere    172.16.60.36    /* kube-system/kubernetes-dashboard: cluster IP */ tcp dpt:http
+KUBE-SVC-NPX46M4PTMTKRN6Y  tcp  --  anywhere    10.254.0.1      /* default/kubernetes:https cluster IP */ tcp dpt:https
+KUBE-NODEPORTS  all  --  anywhere             anywhere          /* kubernetes service nodeports; NOTE: this must be the last rule in this chain */ ADDRTYPE match dst-type LOCAL
+</code></pre>
+<p>可以看到，每个Service的每个服务端口都会在Chain KUBE-SERVICES中有一条对应的规则，发送到clusterIP的报文，将会转发到对应的Service的规则链，没有命中ClusterIP的，转发到KUBE-NODEPORTS。</p>
+<h5 id="Chain-KUBE-SVC-XGLOHA7QRQ3V22RZ-2-references"><a href="#Chain-KUBE-SVC-XGLOHA7QRQ3V22RZ-2-references" class="headerlink" title="Chain KUBE-SVC-XGLOHA7QRQ3V22RZ (2 references)"></a>Chain KUBE-SVC-XGLOHA7QRQ3V22RZ (2 references)</h5><pre><code>target     prot opt source               destination
+KUBE-SEP-IIXSAVQWZXISB6RA  all  --  anywhere      anywhere             /* kube-system/kubernetes-dashboard: */
+</code></pre>
+<p>而每一个SERVICE，又将报文提交到了各自的KUBE-SEP-XXX。</p>
+<h5 id="Chain-KUBE-SEP-IIXSAVQWZXISB6RA-1-references"><a href="#Chain-KUBE-SEP-IIXSAVQWZXISB6RA-1-references" class="headerlink" title="Chain KUBE-SEP-IIXSAVQWZXISB6RA (1 references)"></a>Chain KUBE-SEP-IIXSAVQWZXISB6RA (1 references)</h5><pre><code>target     prot opt source               destination
+KUBE-MARK-MASQ  all  --  172.16.167.1    anywhere        /* kube-system/kubernetes-dashboard: */
+DNAT            tcp  --  anywhere        anywhere        /* kube-system/kubernetes-dashboard: */ tcp to:172.16.167.1:9090
+</code></pre>
+<p>最后在KUBE-SEP-XX中完整了最终的DNAT，将目的地址转换成了POD的IP和端口。</p>
+<p>这里的KUBE-MARK-MASQ为报文打上了标记，表示这个报文是由kubernetes管理的，Kuberntes将会对它进行NAT转换。</p>
+<pre><code>Chain KUBE-MARK-MASQ (3 references)
+target     prot opt source               destination
+MARK       all  --  anywhere             anywhere             MARK or 0x4000
+</code></pre>
+<h5 id="Chain-KUBE-NODEPORTS-1-references"><a href="#Chain-KUBE-NODEPORTS-1-references" class="headerlink" title="Chain KUBE-NODEPORTS (1 references)"></a>Chain KUBE-NODEPORTS (1 references)</h5><pre><code>target     prot opt source               destination
+KUBE-MARK-MASQ  tcp  --  anywhere             anywhere       /* kube-system/kubernetes-dashboard: */ tcp dpt:31275
+KUBE-SVC-XGLOHA7QRQ3V22RZ  tcp  --  anywhere  anywhere       /* kube-system/kubernetes-dashboard: */ tcp dpt:31275
+</code></pre>
+<p>可以看到，KUBE-NODEPORT中，根据目的端口，将报文转发到对应的Service的规则链，然后就如同在“Chain KUBE-SERVICES”中的过程，将报文转发到了对应的POD。</p>
+<p>只有发送到被kubernetes占用的端口的报文才会进入KUBE-MARK-MASQ打上标记，并转发到对应的服务规则链。</p>
+<p>例如这里分配给SERVICE的端口是31275，其它端口的包不由kuberentes管理.</p>
+<h5 id="Chain-KUBE-POSTROUTING-1-references"><a href="#Chain-KUBE-POSTROUTING-1-references" class="headerlink" title="Chain KUBE-POSTROUTING (1 references)"></a>Chain KUBE-POSTROUTING (1 references)</h5><pre><code>target     prot opt source               destination
+MASQUERADE  all  --  anywhere             anywhere             /* kubernetes service traffic requiring SNAT */ mark match 0x4000/0x4000
+</code></pre>
+<p>这里表示k8s管理的报文(也就是被标记了0x4000的报文)，在离开Node（物理机）的时候需要进行SNAT转换。</p>
+<p>也就是POD发出的报文，</p>
+<h3 id="报文处理流程图"><a href="#报文处理流程图" class="headerlink" title="报文处理流程图"></a>报文处理流程图</h3><p>下面的图中，没有画出KUBE-FIREWALL，KUBE-FIREWALL发生在filter表的INPUT和OUTPUT Chain中，下面的图中(FW)表示带有KUBE-FIREWALL。</p>
+<p>(KUBE-SERVICES@nat): 表示nat表中的KUBE-SERVICES chain。</p>
+<p>(KUBE-SERVICES@filter,nat): 表示在filter和nat中各有一个名为KUBE-SERVICES的chain。</p>
+<p>发送到Node的报文的处理过程</p>
+<p>报文先经过nat.prerouting，然后经过filter.input。</p>
+<pre><code>                                                   (KUBE-SVC@nat)              
+                                                     +-&gt;SVC1
+                (KUBE-SERVICES@nat)                  |           (KUBE-SEP@nat)
+            +---&gt;命中ClusterIP   --------------------+-&gt;SVC2 --&gt;SEP1,Mark0x0400,DNAT
+PREROUTING  |                              ^         |                 |
+    PKT  --&gt;|                              |         +-&gt;SVC3           |
+            |                              |                           |
+            +---&gt;未命中ClusterIP ---&gt;命中服务端口                         |       
+                                  |                                    |       
+                                  +-&gt;未命中服务端口                      |       
+                                           |                           |       
+                                           v                           v
+                                         +-----------------------------+
+                                         |         INPUT(FW)           |--&gt; END
+                                         +-----------------------------+
+</code></pre>
+<p>Node发出的报文的处理过程</p>
+<pre><code>                                      (KUBE-SVC@nat)              
+               (KUBE-SERVICES         +-&gt;SVC1
+  OUTPUT(FW)   @filter,nat)           |             (KUBE-SEP@nat)
+   PKT  -----&gt;命中ClusterIP ----------+-&gt;SVC2 --&gt;SEP1,Mark0x0400,DNAT
+          |                           |                 |
+          |                           +-&gt;SVC3           |
+          |                                             |
+          |                                             |
+          |              +-----------------+            | 
+          +------------&gt; |   POSTROUTING   | &lt;----------+
+                         +--------+--------+
+                                  |         
+                                  v         
+                          match 0x0400，SNAT@nat                 
+                                  |
+                                  v
+                                 NIC 
+</code></pre>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2019/03/07/%E4%BD%BF%E7%94%A8%20CLI%20%E5%88%9B%E5%BB%BA%20Azure%20VM%20%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E6%98%A0%E5%83%8F/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:44
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2019/03/08/AWS%E5%B8%B8%E7%94%A8cli%E5%91%BD%E4%BB%A4/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%A6%81"><span class="toc-text">概要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#filter%E8%A1%A8"><span class="toc-text">filter表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nat%E8%A1%A8"><span class="toc-text">nat表</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Chain-KUBE-SERVICES"><span class="toc-text">Chain KUBE-SERVICES</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Chain-KUBE-SVC-XGLOHA7QRQ3V22RZ-2-references"><span class="toc-text">Chain KUBE-SVC-XGLOHA7QRQ3V22RZ (2 references)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Chain-KUBE-SEP-IIXSAVQWZXISB6RA-1-references"><span class="toc-text">Chain KUBE-SEP-IIXSAVQWZXISB6RA (1 references)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Chain-KUBE-NODEPORTS-1-references"><span class="toc-text">Chain KUBE-NODEPORTS (1 references)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Chain-KUBE-POSTROUTING-1-references"><span class="toc-text">Chain KUBE-POSTROUTING (1 references)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%A5%E6%96%87%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-text">报文处理流程图</span></a></li></ol></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + Kubernetes%E7%9A%84Kube%20Proxy%E7%9A%84%E8%BD%AC%E5%8F%91%E8%A7%84%E5%88%99%E5%88%86%E6%9E%90 + '&url=' + https%3A%2F%2Flinuxops.dev%2F2019%2F03%2F08%2FKubernetes%25E7%259A%2584Kube%2520Proxy%25E7%259A%2584%25E8%25BD%25AC%25E5%258F%2591%25E8%25A7%2584%25E5%2588%2599%25E5%2588%2586%25E6%259E%2590%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2019/03/08/Kubernetes%E7%9A%84Kube%20Proxy%E7%9A%84%E8%BD%AC%E5%8F%91%E8%A7%84%E5%88%99%E5%88%86%E6%9E%90/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

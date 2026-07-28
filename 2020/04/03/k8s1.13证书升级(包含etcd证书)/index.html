@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      k8s1.13证书升级(包含etcd证书) 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">k8s1.13证书升级(包含etcd证书)</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:44
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <p>一、etcd备份：</p>
+<ul>
+<li><p>脚本中对k8s做了备份，但是没有对etcd数据做备份，需要对etcd数据做备份。</p>
+</li>
+<li><p>参考etcd(V3版api)备份和恢复<br>二 、master节点k8s证书更换（分别在每个master上执行即可）</p>
+</li>
+<li><p>脚本最好放在一个空目录下执行</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13  
+14  
+15  
+16  
+17  
+18  
+19  
+20  
+21  
+22  
+23  
+24  
+25  
+26  
+27  
+28  
+29  
+30  
+31  
+32  
+33  
+34  
+35  
+36  
+37  
+38  
+39  
+40  
+41  
+42  
+43  
+44  
+45  
+46  
+47  
+48  
+49  
+50  
+51  
+52  
+53  
+54  
+55  
+56  
+57  
+58  
+59  
+60  
+61  
+62  
+63  
+64  
+65  
+66  
+67  
+68  
+69  
+70  
+71  
+72  
+73  
+74  
+75  
+76  
+77  
+78  
+79  
+80  
+81  
+82  
+83  
+84  
+85  
+86  
+87  
+88  
+89  
+90  
+91  
+92  
+93  
+94  
+95  
+96  
+97  
+98  
+99  
+100  
+101  
+102  
+103  
+104  
+105  
+106  
+107  
+108  
+109  
+110  
+111  
+112  
+113  
+114  
+115  
+116  
+117  
+118  
+119  
+120  
+121  
+122  
+123  
+124  
+125  
+126  
+127  
+128  
+129  
+130  
+131  
+132  
+133  
+134  
+135  
+136  
+137  
+138  
+139  
+140  
+141
+</code></pre>
+</li>
+</ul>
+<p>| </p>
+<pre><code>    #!/bin/bash  
+    if [ ! -d &quot;/root/tmp/&quot; ]; then  
+      mkdir /root/tmp/  
+    fi  
+    cp -rf /etc/kubernetes /root/tmp/kubernetes_`date &#39;+%Y%m%d_%H.%M.%S&#39;`  
+    #更换apiserver证书  
+    cat &lt;&lt;EOF&gt;ssl.conf  
+    [req]  
+    req_extensions = v3_req  
+    distinguished_name = req_distinguished_name  
+    [req_distinguished_name]  
+    [v3_req]  
+    keyUsage =critical, digitalSignature, keyEncipherment  
+    extendedKeyUsage = TLS Web Server Authentication, TLS Web Client Authentication  
+    subjectAltName = @alt_names  
+    [alt_names]  
+    EOF  
+    ip=1  
+    dns=1  
+    for aa in `openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep &quot;DNS&quot;|sed &quot;s/,/\n/g&quot;|grep &quot;DNS&quot;|tr -d &quot; &quot;`; do echo $aa| sed &quot;s/DNS:/DNS.$dns = /&quot; &gt;&gt; ssl.conf;let dns+=1; done  
+    for aa in `openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep &quot;IP Address&quot;|sed &quot;s/,/\n/g&quot;|grep &quot;IP Address&quot;|tr -d &quot; &quot; `;do echo $aa| sed &quot;s/IPAddress:/IP.$ip = /&quot; &gt;&gt; ssl.conf;let ip+=1; done  
+    openssl req -new -key /etc/kubernetes/pki/apiserver.key -out apiserver.csr -subj &quot;/CN=kube-apiserver&quot; -config ssl.conf  
+    openssl x509 -req -in apiserver.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out apiserver.crt -days 10950 -extensions v3_req -extfile ssl.conf  
+    mv /etc/kubernetes/pki/apiserver.crt /tmp  
+    cp apiserver.crt /etc/kubernetes/pki/  
+      
+    #更换apiserver-kubelet-client证书  
+    cat &lt;&lt;EOF&gt;client.conf  
+     [ v3_ca ]  
+    keyUsage = critical, digitalSignature, keyEncipherment  
+    extendedKeyUsage = clientAuth  
+    EOF  
+      
+      
+    openssl genrsa -out admin.key 2048  
+    openssl req -new -key admin.key -out admin.csr -subj &quot;/O=system:masters/CN=kube-apiserver-kubelet-client&quot;  
+    openssl x509 -req -in admin.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -sha256 -out admin.crt -extensions v3_ca -extfile client.conf -days 3650  
+    mv /etc/kubernetes/pki/apiserver-kubelet-client.key /tmp  
+    mv /etc/kubernetes/pki/apiserver-kubelet-client.crt /tmp  
+    mv admin.key apiserver-kubelet-client.key  
+    mv admin.crt apiserver-kubelet-client.crt  
+    cp apiserver-kubelet-client.key /etc/kubernetes/pki/  
+    cp apiserver-kubelet-client.crt /etc/kubernetes/pki/  
+    kubectl delete pod -n kube-system kube-apiserver-$HOSTNAME  
+    docker ps |grep &quot;kube-apiserver&quot; | awk &#39;{print $1}&#39; | xargs docker rm -f  
+      
+      
+    #更换front-proxy-client证书  
+    openssl genrsa -out client.key 2048  
+    openssl req -new -key client.key -out client.csr -subj &quot;/O=system:masters/CN=front-proxy-client&quot;  
+    openssl x509 -req -in client.csr -CA /etc/kubernetes/pki/front-proxy-ca.crt -CAkey /etc/kubernetes/pki/front-proxy-ca.key -CAcreateserial -sha256 -out client.crt -extensions v3_ca -extfile client.conf -days 3650  
+    mv /etc/kubernetes/pki/front-proxy-client.key /tmp  
+    mv /etc/kubernetes/pki/front-proxy-client.crt /tmp  
+    mv client.key front-proxy-client.key  
+    mv client.crt front-proxy-client.crt  
+    cp front-proxy-client.key /etc/kubernetes/pki/  
+    cp front-proxy-client.crt /etc/kubernetes/pki/  
+    sleep 8  
+      
+      
+    #更换Kubelet证书  
+    #Master节点直接执行此脚本  
+    cat &lt;&lt;EOF&gt;kube.conf  
+     [ v3_ca ]  
+    keyUsage = critical, digitalSignature, keyEncipherment  
+    extendedKeyUsage = clientAuth  
+    EOF  
+      
+      
+    openssl genrsa -out kubelet.key 2048  
+    openssl req -new -key kubelet.key -out kubelet.csr -subj &quot;/O=system:nodes/CN=system:node:$HOSTNAME&quot;  
+    openssl x509 -req -in kubelet.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -sha256 -out kubelet.crt -extensions v3_ca -extfile kube.conf -days 3650  
+    base64 kubelet.crt | tr -d &#39;\n&#39; &gt; kubelet-crt-data  
+    base64 kubelet.key | tr -d &#39;\n&#39; &gt; kubelet-key-data  
+    KUBELET_CRT_DATA=$(cat kubelet-crt-data)  
+    KUBELET_KEY_DATA=$(cat kubelet-key-data)  
+    sed -i \  
+    -e &#39;s/client-certifica..*:.*/&#39;&quot;client-certificate-data: $KUBELET_CRT_DATA&quot;&#39;/&#39; \  
+    -e &#39;s/client-k..*:.*/&#39;&quot;client-key-data: $KUBELET_KEY_DATA&quot;&#39;/&#39; \  
+        /etc/kubernetes/kubelet.conf  
+      
+    #controller证书更换  
+    openssl genrsa -out controller.key 2048  
+    openssl req -new -key controller.key -out controller.csr -subj &quot;/CN=system:kube-controller-manager&quot;  
+    openssl x509 -req -in controller.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -sha256 -out controller.crt -extensions v3_ca -extfile client.conf -days 3650  
+    base64 controller.crt | tr -d &#39;\n&#39; &gt; controller-crt-data  
+    base64 controller.key | tr -d &#39;\n&#39; &gt; controller-key-data  
+      
+    CONTROLLER_CRT_DATA=$(cat controller-crt-data)  
+    CONTROLLER_KEY_DATA=$(cat controller-key-data)  
+    sed -i \  
+    -e &#39;s/client-certifica..*:.*/&#39;&quot;client-certificate-data: $CONTROLLER_CRT_DATA&quot;&#39;/&#39; \  
+    -e &#39;s/client-k..*:.*/&#39;&quot;client-key-data: $CONTROLLER_KEY_DATA&quot;&#39;/&#39; \  
+        /etc/kubernetes/controller-manager.conf  
+    kubectl delete pod -n kube-system kube-controller-manager-$HOSTNAME  
+    docker ps |grep &quot;k8s_kube-controller-manager&quot; |awk &#39;{print $1}&#39; | xargs docker rm -f  
+      
+    #scheduler证书更换  
+    openssl genrsa -out scheduler.key 2048  
+    openssl req -new -key scheduler.key -out scheduler.csr -subj &quot;/CN=system:kube-scheduler&quot;  
+    openssl x509 -req -in scheduler.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -sha256 -out scheduler.crt -extensions v3_ca -extfile client.conf -days 3650  
+    base64 scheduler.crt | tr -d &#39;\n&#39; &gt; scheduler-crt-data  
+    base64 scheduler.key | tr -d &#39;\n&#39; &gt; scheduler-key-data  
+      
+    SCHEDULER_CRT_DATA=$(cat scheduler-crt-data)  
+    SCHEDULER_KEY_DATA=$(cat scheduler-key-data)  
+    sed -i \  
+    -e &#39;s/client-certifica..*:.*/&#39;&quot;client-certificate-data: $SCHEDULER_CRT_DATA&quot;&#39;/&#39; \  
+    -e &#39;s/client-k..*:.*/&#39;&quot;client-key-data: $SCHEDULER_KEY_DATA&quot;&#39;/&#39; \  
+        /etc/kubernetes/scheduler.conf  
+    kubectl delete pod -n kube-system kube-scheduler-$HOSTNAME  
+    docker ps |grep &quot;k8s_kube-scheduler&quot; |awk &#39;{print $1}&#39; | xargs docker rm -f  
+      
+      
+    systemctl restart kubelet  
+      
+    echo -e &quot;\033[5;33;40m master单节点证书签发成功\033[0m \n&quot;  
+      
+    echo -e &quot;\033[5;33;40m 验证证书，请仔细查看证书签发时间\033[0m \n&quot;  
+    echo &quot;--------------------------------&quot;  
+    echo &quot;apiserver证书&quot;  
+    echo `openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -dates`  
+    echo &quot;--------------------------------&quot;  
+    echo &quot;kubelet证书&quot;  
+    cat /etc/kubernetes/kubelet.conf |grep client-certificate-data |awk -F: &#39;{print $2}&#39; | awk &#39;{print $1}&#39; | base64 -d &gt; a.crt  
+    echo `openssl x509 -in a.crt -noout -dates`  
+    echo &quot;--------------------------------&quot;  
+    echo &quot;controller-manager证书&quot;  
+    cat /etc/kubernetes/controller-manager.conf |grep client-certificate-data |awk -F: &#39;{print $2}&#39; | awk &#39;{print $1}&#39; | base64 -d &gt; a.crt  
+    echo `openssl x509 -in a.crt -noout -dates`  
+    echo &quot;--------------------------------&quot;  
+    echo &quot;scheduler证书&quot;  
+    cat /etc/kubernetes/scheduler.conf |grep client-certificate-data |awk -F: &#39;{print $2}&#39; | awk &#39;{print $1}&#39; | base64 -d &gt; a.crt  
+    echo `openssl x509 -in a.crt -noout -dates`  
+    echo &quot;--------------------------------&quot;  
+    echo &quot;apiserver-kubelet-client证书&quot;  
+    echo `openssl x509 -in /etc/kubernetes/pki/apiserver-kubelet-client.crt -noout -dates`  
+    echo &quot;--------------------------------&quot;  
+    echo &quot;front-proxy-client证书&quot;  
+    echo `openssl x509 -in /etc/kubernetes/pki/front-proxy-client.crt -noout -dates`  
+    rm -rf a.crt  
+      
+</code></pre>
+<p>—|—<br>三、master节点etcd证书更换（分别在每个master上执行即可）</p>
+<pre><code>1  
+2  
+3  
+4  
+5  
+6  
+7  
+8  
+9  
+10  
+11  
+12  
+13  
+14  
+15  
+16  
+17  
+18  
+19  
+20  
+21  
+22  
+23  
+24  
+25  
+26  
+27  
+28  
+29  
+30  
+31  
+32  
+33  
+34  
+35  
+36  
+37  
+38  
+39  
+40  
+41  
+42  
+43  
+44  
+45  
+46  
+47  
+48  
+49  
+50  
+51  
+52  
+53  
+54  
+55  
+56  
+57  
+58  
+59  
+60  
+61  
+62  
+63  
+64  
+65  
+66  
+67  
+68  
+69  
+70  
+71  
+72  
+73  
+74  
+75  
+76  
+77  
+78  
+79  
+80  
+81  
+82  
+83  
+</code></pre>
+<p>| </p>
+<pre><code>if [ ! -d &quot;/root/tmp/&quot; ]; then  
+  mkdir /root/tmp/  
+fi  
+cp -rf /etc/kubernetes/pki/etcd /root/tmp/etcd_`date &#39;+%Y%m%d_%H.%M.%S&#39;`  
+  
+  
+#etcd的healthcheck-client-client证书更换  
+cat &lt;&lt;EOF&gt;healthcheck.conf  
+ [ v3_ca ]  
+keyUsage = critical, digitalSignature, keyEncipherment  
+extendedKeyUsage = clientAuth, serverAuth,TLS Web Server Authentication, TLS Web Client Authentication  
+EOF  
+  
+  
+#openssl genrsa -out healthcheck-client.key 2048  
+openssl req -new -key /etc/kubernetes/pki/etcd/healthcheck-client.key -out healthcheck-client.csr -subj &quot;/O=system:masters/CN=kube-etcd-healthcheck-client&quot;  
+openssl x509 -req -in healthcheck-client.csr -CA /etc/kubernetes/pki/etcd/ca.crt -CAkey /etc/kubernetes/pki/etcd/ca.key -CAcreateserial -sha256 -out healthcheck-client.crt -extensions v3_ca -extfile healthcheck.conf -days 3650  
+mv /etc/kubernetes/pki/etcd/healthcheck-client.crt /tmp  
+cp healthcheck-client.crt /etc/kubernetes/pki/etcd/  
+  
+  
+#etcd的peer证书更换  
+  
+cat &lt;&lt;EOF&gt;peer-ssl.conf  
+[req]  
+req_extensions = v3_req  
+distinguished_name = req_distinguished_name  
+[req_distinguished_name]  
+[v3_req]  
+keyUsage =critical, digitalSignature, keyEncipherment  
+extendedKeyUsage = TLS Web Server Authentication, TLS Web Client Authentication  
+subjectAltName = @alt_names  
+[alt_names]  
+EOF  
+ippeer=1  
+dnspeer=1  
+for bb in `openssl x509 -in /etc/kubernetes/pki/etcd/peer.crt -noout -text |grep &quot;DNS&quot;|sed &quot;s/,/\n/g&quot;|grep &quot;DNS&quot;|tr -d &quot; &quot;`; do echo $bb| sed &quot;s/DNS:/DNS.$dnspeer = /&quot; &gt;&gt; peer-ssl.conf;let dnspeer+=1; done  
+for bb in `openssl x509 -in /etc/kubernetes/pki/etcd/peer.crt -noout -text |grep &quot;IP Address&quot;|sed &quot;s/,/\n/g&quot;|grep &quot;IP Address&quot;|tr -d &quot; &quot; `;do echo $bb| sed &quot;s/IPAddress:/IP.$ippeer = /&quot; &gt;&gt; peer-ssl.conf;let ippeer+=1; done  
+openssl req -new -key /etc/kubernetes/pki/etcd/peer.key -out peer.csr -subj &quot;/CN=$HOSTNAME&quot; -config peer-ssl.conf  
+openssl x509 -req -in peer.csr -CA /etc/kubernetes/pki/etcd/ca.crt -CAkey /etc/kubernetes/pki/etcd/ca.key -CAcreateserial -out peer.crt -days 3650 -extensions v3_req -extfile peer-ssl.conf  
+mv /etc/kubernetes/pki/etcd/peer.crt /tmp  
+cp peer.crt /etc/kubernetes/pki/etcd  
+  
+  
+#etcd的server证书更换  
+cat &lt;&lt;EOF&gt;server-ssl.conf  
+[req]  
+req_extensions = v3_req  
+distinguished_name = req_distinguished_name  
+[req_distinguished_name]  
+[v3_req]  
+keyUsage =critical, digitalSignature, keyEncipherment  
+extendedKeyUsage = TLS Web Server Authentication, TLS Web Client Authentication  
+subjectAltName = @alt_names  
+[alt_names]  
+EOF  
+ipserver=1  
+dnsserver=1  
+for cc in `openssl x509 -in /etc/kubernetes/pki/etcd/server.crt -noout -text |grep &quot;DNS&quot;|sed &quot;s/,/\n/g&quot;|grep &quot;DNS&quot;|tr -d &quot; &quot;`; do echo $cc| sed &quot;s/DNS:/DNS.$dnsserver = /&quot; &gt;&gt; server-ssl.conf;let dnsserver+=1; done  
+for cc in `openssl x509 -in /etc/kubernetes/pki/etcd/server.crt -noout -text |grep &quot;IP Address&quot;|sed &quot;s/,/\n/g&quot;|grep &quot;IP Address&quot;|tr -d &quot; &quot; `;do echo $cc| sed &quot;s/IPAddress:/IP.$ipserver = /&quot; &gt;&gt; server-ssl.conf;let ipserver+=1; done  
+openssl req -new -key /etc/kubernetes/pki/etcd/server.key -out server.csr -subj &quot;/CN=$HOSTNAME&quot; -config server-ssl.conf  
+openssl x509 -req -in server.csr -CA /etc/kubernetes/pki/etcd/ca.crt -CAkey /etc/kubernetes/pki/etcd/ca.key -CAcreateserial -out server.crt -days 3650 -extensions v3_req -extfile server-ssl.conf  
+mv /etc/kubernetes/pki/etcd/server.crt /tmp  
+cp server.crt /etc/kubernetes/pki/etcd  
+kubectl delete pod -n kube-system etcd-$HOSTNAME  
+docker ps |grep etcd | awk &#39;{print $1}&#39; | xargs docker rm -f  
+sleep 2  
+  
+  
+echo -e &quot;\033[5;33;40m master单节点etcd证书签发成功\033[0m \n&quot;  
+  
+echo -e &quot;\033[5;33;40m 验证证书，请仔细查看证书签发时间\033[0m \n&quot;  
+  
+  
+echo &quot;--------------------------------&quot;  
+echo &quot;etcd-healthcheck-client证书&quot;  
+echo `openssl x509 -in /etc/kubernetes/pki/etcd/healthcheck-client.crt -noout -dates`  
+echo &quot;--------------------------------&quot;  
+echo &quot;etcd-peer证书&quot;  
+echo `openssl x509 -in /etc/kubernetes/pki/etcd/peer.crt -noout -dates`  
+echo &quot;--------------------------------&quot;  
+echo &quot;etcd-server证书&quot;  
+echo `openssl x509 -in /etc/kubernetes/pki/etcd/server.crt -noout -dates`  
+  
+</code></pre>
+<p>—|—  </p>
+<p>四、slave的kubelet证书升级(分别在每个slave上执行即可)</p>
+<ul>
+<li><p>把master节点的&#x2F;etc&#x2F;kubernetes&#x2F;pki目录下的ca.key拷贝到slave的&#x2F;etc&#x2F;kubernetes&#x2F;pki目录下</p>
+<p>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br>29<br>30<br>31<br>32<br>33<br>34<br>35<br>36<br>37</p>
+</li>
+</ul>
+<p>| </p>
+<pre><code>/bin/bash  
+if [ ! -d &quot;/root/tmp/&quot; ]; then  
+  mkdir /root/tmp/  
+fi  
+cp -rf /etc/kubernetes /root/tmp/kubernetes_`date &#39;+%Y%m%d_%H.%M.%S&#39;`  
+   
+   
+cat &lt;&lt;EOF&gt;kube.conf  
+ [ v3_ca ]  
+keyUsage = critical, digitalSignature, keyEncipherment  
+extendedKeyUsage = clientAuth  
+EOF  
+    
+    
+openssl genrsa -out kubelet.key 2048  
+openssl req -new -key kubelet.key -out kubelet.csr -subj &quot;/O=system:nodes/CN=system:node:$HOSTNAME&quot;  
+openssl x509 -req -in kubelet.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -sha256 -out kubelet.crt -extensions v3_ca -extfile kube.conf -days 3650  
+base64 kubelet.crt | tr -d &#39;\n&#39; &gt; kubelet-crt-data  
+base64 kubelet.key | tr -d &#39;\n&#39; &gt; kubelet-key-data  
+KUBELET_CRT_DATA=$(cat kubelet-crt-data)  
+KUBELET_KEY_DATA=$(cat kubelet-key-data)  
+sed -i \  
+-e &#39;s/client-certifica..*:.*/&#39;&quot;client-certificate-data: $KUBELET_CRT_DATA&quot;&#39;/&#39; \  
+-e &#39;s/client-k..*:.*/&#39;&quot;client-key-data: $KUBELET_KEY_DATA&quot;&#39;/&#39; \  
+    /etc/kubernetes/kubelet.conf  
+systemctl restart kubelet  
+   
+   
+   
+   
+echo -e &quot;\033[5;33;40m slave单节点kubelet证书签发成功\033[0m \n&quot;  
+   
+echo -e &quot;\033[5;33;40m 验证证书，请仔细查看证书签发时间\033[0m \n&quot;  
+   
+cat /etc/kubernetes/kubelet.conf |grep client-certificate-data |awk -F: &#39;{print $2}&#39; | awk &#39;{print $1}&#39; | base64 -d &gt; a.crt  
+echo `openssl x509 -in a.crt -noout -dates`  
+rm -rf a.crt  
+  
+</code></pre>
+<p>—|—  </p>
+<p>五、删除dns、proxy、flannel的pod</p>
+<pre><code>1  
+2  
+3  
+</code></pre>
+<p>| </p>
+<pre><code>kubectl get pod -n kube-system |grep proxy |awk &#39;{print $1}&#39;|xargs kubectl delete pod -n kube-system  
+kubectl get pod -n kube-system |grep dns |awk &#39;{print $1}&#39;|xargs kubectl delete pod -n kube-system  
+kubectl get pod -n kube-system |grep flannel |awk &#39;{print $1}&#39;|xargs kubectl delete pod -n kube-system  
+  
+</code></pre>
+<p>—|—  </p>
+<p>六、功能验证</p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2020/04/03/%E5%8D%87%E7%BA%A7docker1.12.6%E5%88%B018.09,%E5%B9%B6%E5%88%87%E6%8D%A2%E5%AD%98%E5%82%A8direct-lvm%E5%88%B0overlay2/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:44
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2020/04/03/overlay2%20use%20xfs%20filesystem%20cause%20system%20hang/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + k8s1.13%E8%AF%81%E4%B9%A6%E5%8D%87%E7%BA%A7(%E5%8C%85%E5%90%ABetcd%E8%AF%81%E4%B9%A6) + '&url=' + https%3A%2F%2Flinuxops.dev%2F2020%2F04%2F03%2Fk8s1.13%25E8%25AF%2581%25E4%25B9%25A6%25E5%258D%2587%25E7%25BA%25A7(%25E5%258C%2585%25E5%2590%25ABetcd%25E8%25AF%2581%25E4%25B9%25A6)%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2020/04/03/k8s1.13%E8%AF%81%E4%B9%A6%E5%8D%87%E7%BA%A7(%E5%8C%85%E5%90%ABetcd%E8%AF%81%E4%B9%A6)/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

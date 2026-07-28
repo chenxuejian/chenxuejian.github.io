@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="John Doe" />
+  <!-- Open Graph Description 简短摘要-->
+  
+  <!-- 用于搜索引擎的文章摘要 -->
+  
+  
+  
+  <title>
+    
+      AWS常用cli命令 
+      
+      
+      |
+    
+     Hexo
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Adolf的技术博客</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">AWS常用cli命令</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-17 22:26:44
+        </span>
+        
+      </div>
+      <div class="markdown-body">
+        <h2 id="写在前边的话"><a href="#写在前边的话" class="headerlink" title="写在前边的话"></a>写在前边的话</h2><p>对AWS服务操作可以通过管理控制台、各语言SDK、CLI以及API等方式。管理控制台最简单，可以直接通过Web界面操作，但是有些服务或者服务下的某些操作无法直接用控制台调用；</p>
+<p>API的方式最复杂，需要自己生成哈希值签署请求以及处理请求错误等低级别的操作，AWS 的大部分服务都提供REST的API以及类似于REST的查询API，API提供的服务操作是最新最全面的；</p>
+<p>SDK 的好处是封装好了请求签署与请求错误处理以及重试机制，用户只需要直接调用相关接口即可，但对于新的服务及操作的支持可能会滞后于API接口的发布。CLI 其实也可以看成SDK的一种，它是AWS 服务操作的一把瑞士军刀。</p>
+<p>本文针对项目实践中所用到的 AWS 服务的常用 CLI 命令进行一个简单总结，方便以后查阅。</p>
+<h2 id="EC2"><a href="#EC2" class="headerlink" title="EC2"></a>EC2</h2><ol>
+<li><p>挂载 EBS</p>
+<ul>
+<li><p>linux </p>
+<pre><code>查看块设备： lsblk
+  格式化磁盘： sudo mkfs -t ext4 /dev/xvdb
+  挂载卷： sudo mount /dev/xvdb /mnt/mydir
+  卸载卷： sudo umount /dev/xvdb
+</code></pre>
+</li>
+<li><p>windows </p>
+<pre><code>diskpart
+  san policy=onlineall
+  list disk
+  disk yourdiskid
+  attributes disk clear readonly
+  online disk
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>实例操作</p>
+<pre><code>aws ec2 describe-instances
+ aws ec2 describe-instances --instance-ids &quot;instanceid1&quot; &quot;instanceid2&quot;
+ aws ec2 start-instances --instance-ids &quot;instanceid1&quot; &quot;instanceid2&quot;
+ aws ec2 stop-intances --instance-ids &quot;instanceid1&quot; &quot;instanceid2&quot; 
+ aws ec2 run-instances --image-id ami-b6b62b8f --security-group-ids sg-xxxxxxxx --key-name mytestkey --block-device-mappings &quot;[{\&quot;DeviceName\&quot;: \&quot;/dev/sdh\&quot;,\&quot;Ebs\&quot;:{\&quot;VolumeSize\&quot;:100}}]&quot; --instance-type t2.medium --count 1 --subnet-id subnet-e8330c9c --associate-public-ip-address
+</code></pre>
+</li>
+</ol>
+<p>(Note: 若不指定subnet-id则会在默认vpc中去选，此时若指定了非默认vpc的安全组会出现请求错误。如无特殊要求，建议安全组和子网都不指定，就不会出现这种问题。)</p>
+<ol start="3">
+<li><p>查看region与AZ</p>
+<pre><code>aws ec2 describe-region
+ aws ec2 describe-availability-zones --region region-name
+</code></pre>
+</li>
+<li><p>查看实例元数据和用户数据</p>
+<pre><code>curl http://169.254.169.254/latest/meta-data／
+ curl http://169.254.169.254/latest/user-data／
+</code></pre>
+</li>
+<li><p>查看ami</p>
+<pre><code>aws ec2 describe-images
+</code></pre>
+</li>
+<li><p>key-pair</p>
+<pre><code>aws ec2 create-key-pair --key-name mykeyname
+</code></pre>
+</li>
+<li><p>安全组</p>
+<pre><code>aws ec2 create-security-group --group-name mygroupname --description mydescription --vpc-id vpc-id(若不指定vpc，则在默认vpc中创建安全组)
+ aws ec2 authorize-security-group-ingress --group-id sg-xxxxyyyy --protocol tcp --port 22 --cidr 0.0.0.0/0
+ aws ec2 authorize-security-group-ingress --group-id sg-xxxxyyyy --protocol tcp --port 9999 --source-group sg-xxxxxxxx
+</code></pre>
+</li>
+</ol>
+<h2 id="AutoScaling"><a href="#AutoScaling" class="headerlink" title="AutoScaling"></a>AutoScaling</h2><ol>
+<li><p>列出AS组 </p>
+<pre><code>aws autoscaling describe-auto-scaling-groups
+</code></pre>
+</li>
+<li><p>列出AS实例 </p>
+<pre><code>aws autoscaling describe-auto-scaling-instances --instance-ids [instance-id-1 instance-id-2 ...]
+</code></pre>
+</li>
+<li><p>从组中分离实例 </p>
+<pre><code>aws autoscaling detach-instances --auto-scaling-group-name myasgroup --instance-ids instanceid1 instanceid2 [--should-decrement-desired-capacity|--no-should-decrement-desired-capacity]
+</code></pre>
+</li>
+<li><p>附加实例到组 </p>
+<pre><code>aws autoscaling attach-instances --auto-scaling-group-name myasgroup --instance-ids instanceid1 instanceid2
+</code></pre>
+</li>
+<li><p>挂起AS流程 </p>
+<pre><code>aws autoscaling suspend-process --auto-scaling-group-name myasgroup --scaling-processes AZRebalance|AlarmNotification|...
+</code></pre>
+</li>
+<li><p>删除AS组 </p>
+<pre><code>aws autoscaling delete-auto-scaling-group --auto-scaling-group-name myasgroup
+</code></pre>
+</li>
+</ol>
+<h2 id="S3"><a href="#S3" class="headerlink" title="S3"></a>S3</h2><ol>
+<li><p>查看</p>
+<pre><code>aws s3 ls
+ aws s3 ls s3://bucket
+ aws s3 ls s3://bucket/prefix
+</code></pre>
+</li>
+<li><p>拷贝</p>
+<pre><code>aws s3 cp /to/local/path s3://bucket/prefix
+ aws s3 cp s3://bucket/prefix /to/local/path
+ aws s3 cp s3://bucket1/prefix1 s3://bucket2/prefix2
+</code></pre>
+</li>
+<li><p>同步</p>
+<pre><code>aws sync [--delete] /to/local/dir s3://bucket/prefixdir
+ aws sync [--delete] s3://bucket/prefixdir /to/local/dir
+ aws sync [--delete] s3://bucket1/prefixdir1 s3://bucket2/prefixdir2
+</code></pre>
+</li>
+<li><p>手动分片上传</p>
+</li>
+</ol>
+<ul>
+<li><p>文件分片 </p>
+<pre><code>split -b 40m myfile myfile-part-
+</code></pre>
+</li>
+<li><p>创建分片上传任务 </p>
+<pre><code>aws s3api create-multipart-upload --bucket bucketname --key prefix
+
+  记录返回值
+  {
+      &quot;Bucket&quot;: &quot;bucketname&quot;, 
+      &quot;UploadId&quot;: &quot;uploadeid&quot;, 
+      &quot;Key&quot;: &quot;prefix&quot;
+  }
+</code></pre>
+</li>
+<li><p>上传分片</p>
+<pre><code>aws s3api upload-part --bucket bucketname --key prefix --part-number [分片上传编号(e.g. 1,2,3...)] --body myfile-[x] --upload-id uploadid
+</code></pre>
+</li>
+<li><p>列出已上传分片，创建分片结构文件 </p>
+<pre><code>aws s3api list-parts --bucket bucketname --key prefix --upload-id uploadid
+</code></pre>
+</li>
+<li><p>将上命令结果中的parts部分保存为 temp 文件 </p>
+<pre><code>{
+      &quot;Parts&quot;:[
+          {
+              &quot;PartNumber&quot;:1,
+              &quot;ETag&quot;:&quot;&quot;xxxxxxx&quot;&quot;
+          },
+          {
+              &quot;PartNumber&quot;:2,
+              &quot;ETag&quot;:&quot;&quot;xxxxxxxx&quot;&quot;
+          }
+      ]
+  }
+</code></pre>
+</li>
+<li><p>结束分片上传任务 </p>
+<pre><code>aws s3api complete-multipart-upload --multipart-upload file://temp --bucket bucketname --key prefix --upload-id uploadid
+</code></pre>
+</li>
+</ul>
+<h2 id="IAM"><a href="#IAM" class="headerlink" title="IAM"></a>IAM</h2><ul>
+<li><p>Role 操作 </p>
+<pre><code>aws iam create-role MY-ROLE-NAME --assum-role-policy-document file://path/to/trustpolicy.json
+  aws iam put-role-policy --role-name MY-ROLE-NAME --policy-name MY-PERM-POLICY --policy-document file://path/to/permissionpolicy.json
+  aws iam create-instance-profile --instance-profile-name MY-INSTANCE-PROFILE
+  aws iam add-role-to-instance-profile --instance-profile-name MY-INSTANCE-PROFILE --role-name MY-ROLE-NAME
+</code></pre>
+</li>
+</ul>
+<h2 id="AUTO-SCALING"><a href="#AUTO-SCALING" class="headerlink" title="AUTO-SCALING"></a>AUTO-SCALING</h2><ul>
+<li><p>查看信息 </p>
+<pre><code>aws autoscaling describe-auto-scaling-groups
+  aws autoscaling describe-auto-scaling-instances
+</code></pre>
+</li>
+</ul>
+<h2 id="STS"><a href="#STS" class="headerlink" title="STS"></a>STS</h2><ul>
+<li><p>代入ROLE的EC2实例的临时认证信息 </p>
+<pre><code>curl http://169.254.169.254/latest/meta-data／iam/security-credentials/ROLE-NAME
+</code></pre>
+</li>
+</ul>
+<h2 id="kinesis"><a href="#kinesis" class="headerlink" title="kinesis"></a>kinesis</h2><ol>
+<li><p>创建流 </p>
+<pre><code>aws kinesis create-stream –stream-name mystream –shard-count
+</code></pre>
+</li>
+<li><p>列出流 </p>
+<pre><code>aws kinesis list-streams
+</code></pre>
+</li>
+<li><p>获取指定流的分片迭代器 </p>
+<pre><code>aws kinesis get-shard-iterator –stream-name mystream –shard-id shard-1 –shard-iterator-type TRIM_HORIZON
+</code></pre>
+</li>
+<li><p>发送数据到流 </p>
+<pre><code>aws kinesis put-record –stream-name mystream –partition-key mykey –data test
+</code></pre>
+</li>
+<li><p>获取流数据 </p>
+<pre><code>aws kinesis get-records –shard-iterator myiterator
+</code></pre>
+</li>
+</ol>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2019/03/08/Kubernetes%E7%9A%84Kube%20Proxy%E7%9A%84%E8%BD%AC%E5%8F%91%E8%A7%84%E5%88%99%E5%88%86%E6%9E%90/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-17 22:26:44
+            </span>
+            
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2019/03/13/ES%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E7%BB%B4%E6%8A%A4/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E8%BE%B9%E7%9A%84%E8%AF%9D"><span class="toc-text">写在前边的话</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EC2"><span class="toc-text">EC2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AutoScaling"><span class="toc-text">AutoScaling</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S3"><span class="toc-text">S3</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IAM"><span class="toc-text">IAM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AUTO-SCALING"><span class="toc-text">AUTO-SCALING</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#STS"><span class="toc-text">STS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#kinesis"><span class="toc-text">kinesis</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          
+              <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+                <i class="iconfont icon-github"></i>
+              </a>
+              
+        </li>
+        
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2026 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + AWS%E5%B8%B8%E7%94%A8cli%E5%91%BD%E4%BB%A4 + '&url=' + https%3A%2F%2Flinuxops.dev%2F2019%2F03%2F08%2FAWS%25E5%25B8%25B8%25E7%2594%25A8cli%25E5%2591%25BD%25E4%25BB%25A4%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2019/03/08/AWS%E5%B8%B8%E7%94%A8cli%E5%91%BD%E4%BB%A4/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>
