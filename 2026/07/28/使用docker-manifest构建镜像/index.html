@@ -13,6 +13,11 @@
   
   <title>
     
+      使用docker manifest构建镜像 
+      
+      
+      |
+    
      Hexo
   </title>
 
@@ -99,149 +104,177 @@
 
 
       <div class="flex-container">
-        <div class="container index">
-  <div class="post-list">
-    <!-- 遍历渲染文章 -->
-    
-      <div class="post-item" title="使用docker manifest构建镜像">
-        <div class="time-m-d">2026-07-28</div>
-        <div class="title">
-          <a href="/2026/07/28/%E4%BD%BF%E7%94%A8docker-manifest%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/">
-            
-              
-                <span>使用docker manifest构建镜像</span>
-              
-            
-          </a>
-        </div>
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">使用docker manifest构建镜像</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2026-07-28 16:53:43
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/docker/" title="docker">
+                    #docker
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/%E5%AE%B9%E5%99%A8/" title="容器">
+                    #容器
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/%E9%95%9C%E5%83%8F/" title="镜像">
+                    #镜像
+                  </a>
+                </span>
+                
+              </span>
+          
       </div>
-    
-      <div class="post-item" title="x86 GPU 的机器报错处理">
-        <div class="time-m-d">2026-07-19</div>
-        <div class="title">
-          <a href="/2026/07/19/x86-GPU-%E7%9A%84%E6%9C%BA%E5%99%A8%E6%8A%A5%E9%94%99%E5%A4%84%E7%90%86/">
-            
-              
-                <span>x86 GPU 的机器报错处理</span>
-              
-            
-          </a>
-        </div>
+      <div class="markdown-body">
+        <h1 id="使用docker-manifest构建镜像"><a href="#使用docker-manifest构建镜像" class="headerlink" title="使用docker manifest构建镜像"></a>使用docker manifest构建镜像</h1><h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ol>
+<li>本地要有两个架构镜像</li>
+<li>docker需要开启cli:<br> export DOCKER_CLI_EXPERIMENTAL&#x3D;”enabled”</li>
+</ol>
+<h2 id="具体操作"><a href="#具体操作" class="headerlink" title="具体操作"></a>具体操作</h2><ol>
+<li>需要登录dockerhub(必须操作)</li>
+<li>更改名字,如：<br>harbor.hyperdl.cn:180&#x2F;hyperdl&#x2F;pipeline:v5.0.arm64<br>harbor.hyperdl.cn:180&#x2F;hyperdl&#x2F;pipeline:v5.0.amd64</li>
+<li>开始creat<br>docker manifest create –insecure chengminghui&#x2F;pipeline:v5.0 chengminghui&#x2F;pipeline:v5.0.arm64 chengminghui&#x2F;pipeline:v5.0.amd64</li>
+<li>push命令<br>docker manifest push docker.io&#x2F;chengminghui&#x2F;pipeline:v5.0</li>
+<li>inspect查看<br>docker manifest inspect docker.io&#x2F;chengminghui&#x2F;pipeline:v5.0</li>
+<li>docker 可以正常pull<br>docker pull docker.io&#x2F;chengminghui&#x2F;pipeline:v5.0</li>
+</ol>
+<h3 id="参考文档："><a href="#参考文档：" class="headerlink" title="参考文档："></a>参考文档：</h3><p>   <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/622398522">使用 docker manifest 构建跨平台镜像</a></p>
+
       </div>
-    
-      <div class="post-item" title="linux 进入单用户重置密码">
-        <div class="time-m-d">2026-07-19</div>
-        <div class="title">
-          <a href="/2026/07/19/linux-%E8%BF%9B%E5%85%A5%E5%8D%95%E7%94%A8%E6%88%B7%E9%87%8D%E7%BD%AE%E5%AF%86%E7%A0%81/">
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
             
-              
-                <span>linux 进入单用户重置密码</span>
-              
+              <a href="/2026/07/19/x86-GPU-%E7%9A%84%E6%9C%BA%E5%99%A8%E6%8A%A5%E9%94%99%E5%A4%84%E7%90%86/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
             
-          </a>
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2026-07-28 16:53:43
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/docker/" title="docker">
+                        #docker
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/%E5%AE%B9%E5%99%A8/" title="容器">
+                        #容器
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/%E9%95%9C%E5%83%8F/" title="镜像">
+                        #镜像
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+          </div>
         </div>
-      </div>
+      
+    </div>
     
-      <div class="post-item" title="如何查看Linux网卡出口流量">
-        <div class="time-m-d">2026-07-19</div>
-        <div class="title">
-          <a href="/2026/07/19/%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8BLinux%E7%BD%91%E5%8D%A1%E5%87%BA%E5%8F%A3%E6%B5%81%E9%87%8F/">
-            
-              
-                <span>如何查看Linux网卡出口流量</span>
-              
-            
-          </a>
-        </div>
-      </div>
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8docker-manifest%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F"><span class="toc-text">使用docker manifest构建镜像</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87"><span class="toc-text">准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E6%93%8D%E4%BD%9C"><span class="toc-text">具体操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3%EF%BC%9A"><span class="toc-text">参考文档：</span></a></li></ol></li></ol></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
     
-      <div class="post-item" title="如何有效的修改Linux云服务器的hosts配置">
-        <div class="time-m-d">2021-01-28</div>
-        <div class="title">
-          <a href="/2021/01/28/%E5%A6%82%E4%BD%95%E6%9C%89%E6%95%88%E7%9A%84%E4%BF%AE%E6%94%B9Linux%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84hosts%E9%85%8D%E7%BD%AE/">
-            
-              
-                <span>如何有效的修改Linux云服务器的hosts配置</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="hexo中图片无法加载">
-        <div class="time-m-d">2021-01-26</div>
-        <div class="title">
-          <a href="/2021/01/26/hexo%E4%B8%AD%E5%9B%BE%E7%89%87%E6%97%A0%E6%B3%95%E5%8A%A0%E8%BD%BD/">
-            
-              
-                <span>hexo中图片无法加载</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="Hello World">
-        <div class="time-m-d">2021-01-25</div>
-        <div class="title">
-          <a href="/2021/01/25/Hello%20World/">
-            
-              
-                <span>Hello World</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="SLUB:Unable to Allocate Memory">
-        <div class="time-m-d">2020-04-22</div>
-        <div class="title">
-          <a href="/2020/04/22/SLUBUnable%20to%20Allocate%20Memory/">
-            
-              
-                <span>SLUB:Unable to Allocate Memory</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="重启服务器导致docker中redis无法启动的问题解决">
-        <div class="time-m-d">2020-04-21</div>
-        <div class="title">
-          <a href="/2020/04/21/%E9%87%8D%E5%90%AF%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%BC%E8%87%B4docker%E4%B8%ADredis%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8%E7%9A%84%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/">
-            
-              
-                <span>重启服务器导致docker中redis无法启动的问题解决</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="使用etcd快照恢复集群数据">
-        <div class="time-m-d">2020-04-16</div>
-        <div class="title">
-          <a href="/2020/04/16/%E4%BD%BF%E7%94%A8etcd%E5%BF%AB%E7%85%A7%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE/">
-            
-              
-                <span>使用etcd快照恢复集群数据</span>
-              
-            
-          </a>
-        </div>
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
       </div>
     
   </div>
-  <nav class="post-navigation">
-    
-    <span class="page-num">1 / 7</span>
-    
-      <a href="/page/2/"><i class="iconfont icon-angleright"></i></a>
-    
-  </nav>
-</div>
+
 
         
 <div class="footer">
@@ -498,6 +531,24 @@
 
 
         
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E4%BD%BF%E7%94%A8docker%20manifest%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F + '&url=' + https%3A%2F%2Flinuxops.dev%2F2026%2F07%2F28%2F%25E4%25BD%25BF%25E7%2594%25A8docker-manifest%25E6%259E%2584%25E5%25BB%25BA%25E9%2595%259C%25E5%2583%258F%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://linuxops.dev/2026/07/28/%E4%BD%BF%E7%94%A8docker-manifest%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
   
   
 <script src="/js/shares.js"></script>
